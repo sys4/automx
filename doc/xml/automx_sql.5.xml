@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry>
+  <refentryinfo>
+    <title>automx_sql</title>
+
+    <authorgroup>
+      <author>
+        <firstname>Christian</firstname>
+
+        <surname>Roessner</surname>
+
+        <contrib>Wrote the program.</contrib>
+
+        <email>c@roessner-network-solutions.com</email>
+      </author>
+
+      <editor>
+        <firstname>Patrick</firstname>
+
+        <othername>Ben</othername>
+
+        <surname>Koetter</surname>
+
+        <contrib>Wrote the documentation.</contrib>
+
+        <email>p@state-of-mind.de</email>
+      </editor>
+    </authorgroup>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>automx_sql</refentrytitle>
+
+    <manvolnum>5</manvolnum>
+
+    <refmiscinfo>Version 0.8_beta1</refmiscinfo>
+
+    <refmiscinfo>automx Manual</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname><filename>automx_sql</filename></refname>
+
+    <refpurpose>automx SQL backend configuration parameters</refpurpose>
+  </refnamediv>
+
+  <refsection>
+    <title>Description</title>
+
+    <para>The <citerefentry>
+        <refentrytitle>automx_sql</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry> man page specifies all parameters that control access
+    from within <systemitem class="service">automx</systemitem> to a SQL
+    backend.</para>
+  </refsection>
+
+  <refsection>
+    <title id="parameters">Parameters</title>
+
+    <variablelist>
+      <varlistentry>
+        <term><parameter>host</parameter> (default: none)</term>
+
+        <listitem>
+          <para>Specifies one or more SQL servers separated by commas. Each
+          server specification must provide database driver, username and
+          password to access a database on a host as shown in the following
+          example:</para>
+
+          <programlisting>host = driver://username:password@hostname/database</programlisting>
+
+          <important>
+            <title>Listing two and more servers</title>
+
+            <para>Subsequent servers to the first serve <emphasis>only for
+            fallback purposes</emphasis>, i.e. a server to the right will only
+            be queried if the server left to it cannot be reached. If a server
+            can be reached no further attempts will be made regardless if the
+            query returned a result or not.</para>
+          </important>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><parameter>query</parameter> (default: none)</term>
+
+        <listitem>
+          <para>Specifies the query that should be sent to the database
+          specified with the <parameter>host</parameter> parameter.</para>
+
+          <programlisting>query = SELECT displayname, mailaddr FROM mail WHERE mailaddr='%s';</programlisting>
+
+          <note>
+            <para>See the section called <quote>Macros and Variables</quote>
+            in <citerefentry>
+                <refentrytitle>automx.conf</refentrytitle>
+
+                <manvolnum>5</manvolnum>
+              </citerefentry> for a list of available query macros.</para>
+          </note>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><parameter>result_attrs</parameter> (default: none)</term>
+
+        <listitem>
+          <para>Specifies the attributes whose values should be used in an
+          automx account setup.</para>
+
+          <programlisting>result_attrs = displayname, mailaddr</programlisting>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+
+  <refsection>
+    <title>See also</title>
+
+    <para><citerefentry>
+        <refentrytitle>automx</refentrytitle>
+
+        <manvolnum>8</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx.conf</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_ldap</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_sql</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx-test</refentrytitle>
+
+        <manvolnum>1</manvolnum>
+      </citerefentry></para>
+  </refsection>
+</refentry>
