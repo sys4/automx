@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>automx_ldap</title><link rel="stylesheet" href="screen.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /></head><body><div class="refentry" title="automx_ldap"><a id="id2700983"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p><code class="filename">automx_ldap</code> — automx LDAP backend configuration parameters</p></div><div class="refsection" title="Description"><a id="id2734914"></a><h2>Description</h2><p>The <span class="citerefentry"><span class="refentrytitle">automx_ldap</span>(5)</span> man page specifies all parameters that control access
+    from within <code class="systemitem">automx</code> to a LDAP
+    backend.</p></div><div class="refsection" title="Parameters"><a id="id2724925"></a><h2>Parameters</h2><div class="variablelist"><dl><dt><span class="term"><em class="parameter"><code>authzid</code></em> (no default)</span></dt><dd><p>Specifies the SASL proxy authorization identity.</p></dd><dt><span class="term"><em class="parameter"><code>base</code></em> (default: none)</span></dt><dd><p>Specifies the default base DN to use when performing ldap
+          operations. The base must be specified as a Distinguished Name in
+          LDAP format.</p></dd><dt><span class="term"><em class="parameter"><code>binddn</code></em> (default: none)</span></dt><dd><p>Specifies the default bind DN to use when performing ldap
+          operations. The bind DN must be specified as a Distinguished Name in
+          LDAP format.</p></dd><dt><span class="term"><em class="parameter"><code>bindmethod</code></em> (default:
+        <code class="option">simple</code>)</span></dt><dd><p>Specifies how authentication should take place. Valid options
+          are either <code class="option">simple</code> for a simple bind or
+          <code class="option">sasl</code> for a bind that requires SASL
+          authentication.</p></dd><dt><span class="term"><em class="parameter"><code>bindpw</code></em> (default: none)</span></dt><dd><p>Specifies the password used when <em class="parameter"><code>binddn</code></em>
+          identifies itself with the LDAP server.</p></dd><dt><span class="term"><em class="parameter"><code>cacert</code></em> (default: none)</span></dt><dd><p>Specifies the path to a file that contains all certificates of
+          Certification Authorities automx should trust.</p></dd><dt><span class="term"><em class="parameter"><code>cert</code></em> (default: none)</span></dt><dd><p>Specifies the path to a file that contains automx's
+          certificate.</p></dd><dt><span class="term"><em class="parameter"><code>cipher</code></em> (default:
+        <code class="option">TLSv1</code>)</span></dt><dd><p>See <span class="citerefentry"><span class="refentrytitle">ciphers</span>(1)</span> for a list of valid options.</p></dd><dt><span class="term"><em class="parameter"><code>filter</code></em> (default:
+        <code class="option">(objectClass=*)</code>)</span></dt><dd><p>Specifies the search filter to select appropriate LDAP
+          objects. The filter should conform to the string representation for
+          search filters as defined in RFC 4515.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>See the section <span class="quote">“<span class="quote">Macros and Variables</span>”</span> in
+            <span class="citerefentry"><span class="refentrytitle">automx.conf</span>(5)</span> for a list of available query macros.</p></td></tr></table></div></dd><dt><span class="term"><em class="parameter"><code>host</code></em> (default:
+        <code class="option">ldap://127.0.0.1/</code>)</span></dt><dd><p>Specifies one or more LDAP servers separated by commas as
+          shown in the following example:</p><pre class="programlisting">host = ldap://127.0.0.1, ldap://192.168.2.1</pre><div class="important" title="Listing two and more servers" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Important: Listing two and more servers"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="images/important.svg" /></td><th align="left">Listing two and more servers</th></tr><tr><td align="left" valign="top"><p>Subsequent servers to the first serve <span class="emphasis"><em>only for
+            fallback purposes</em></span>, i.e. a server to the right will only
+            be queried if the server left to it cannot be reached. If a server
+            can be reached no further attempts will be made regardless if the
+            query returned a result or not.</p></td></tr></table></div></dd><dt><span class="term"><em class="parameter"><code>key</code></em> (default: none)</span></dt><dd><p>Specifies the path to a file that contains automx's private
+          key, which matches automx certificate given with
+          <em class="parameter"><code>cert</code></em>.</p></dd><dt><span class="term"><em class="parameter"><code>reqcert</code></em> (default:
+        <code class="option">never</code>)</span></dt><dd><p>Specifies what checks to perform on server certificates in a
+          TLS session, if any. The &lt;level&gt; can be specified as one of
+          the following keywords:</p><div class="variablelist"><dl><dt><span class="term">never</span></dt><dd><p>The client will not request or check any server
+                certificate. This is the default setting.</p></dd><dt><span class="term">allow</span></dt><dd><p>The server certificate is requested. If no certificate
+                is provided, the session proceeds normally. If a bad
+                certificate is provided, it will be ignored and the session
+                proceeds normally.</p></dd><dt><span class="term">try</span></dt><dd><p>The server certificate is requested. If no certificate
+                is provided, the session proceeds normally. If a bad
+                certificate is provided, the session is immediately
+                terminated.</p></dd><dt><span class="term">demand</span></dt><dd><p>These keywords are equivalent. The server certificate is
+                requested. If no certificate is provided, or a bad certificate
+                is provided, the session is immediately terminated.</p></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code>result_attrs</code></em> (default: none)</span></dt><dd><p>If automx finds one or more entries, the attributes specified
+          by result_attrs are returned. If * is listed, all user attributes
+          are returned.</p></dd><dt><span class="term"><em class="parameter"><code>saslmech</code></em> (default: none)</span></dt><dd><p>Specifies the SASL mechanism to be used for
+          authentication.</p><div class="variablelist"><dl><dt><span class="term">cram-md5</span></dt><dd><p>The SASL <code class="option">cram-md5</code> mechanism (see:
+                <a class="ulink" href="http://tools.ietf.org/rfc/rfc2195.txt" target="_top">RFC
+                2195</a>) will be used to authenticate LDAP bind
+                requests.</p></dd><dt><span class="term">digest-md5</span></dt><dd><p>The SASL <code class="option">digest-md5</code> mechanism (see:
+                <a class="ulink" href="http://www.ietf.org/rfc/rfc2831.txt" target="_top">RFC
+                2831</a>) will be used to authenticate LDAP bind
+                requests.</p></dd><dt><span class="term">external</span></dt><dd><p>The SASL <code class="option">external</code> mechanism (see:
+                <a class="ulink" href="http://tools.ietf.org/rfc/rfc4422.txt" target="_top">RFC
+                4422</a>) will be used to authenticate LDAP bind
+                requests.</p></dd><dt><span class="term">gssapi</span></dt><dd><p>The SASL <code class="option">gssapi</code> mechanism (see: <a class="ulink" href="http://www.ietf.org/rfc/rfc4752.txt" target="_top">RFC 4752</a>)
+                will be used to authenticate LDAP bind requests.</p></dd><dt><span class="term">none</span></dt><dd><p>No SASL mechanism will be use to authenticate LDAP bind
+                requests.</p></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code>scope</code></em> (default:
+        <code class="option">sub</code>)</span></dt><dd><p>Specify the scope of the search to be one of
+          <code class="option">base</code> (or <code class="option">exact</code>),
+          <code class="option">one</code> (or <code class="option">onelevel</code>),
+          <code class="option">sub</code> (or <code class="option">substree</code>), to specify a
+          base object, one-level, or subtree search.</p></dd><dt><span class="term"><em class="parameter"><code>usetls</code></em> (default:
+        <code class="option">false</code>)</span></dt><dd><p>Specifies if automx should use TLS when it connects to the
+          LDAP host.</p></dd></dl></div></div><div class="refsection" title="See also"><a id="id2752485"></a><h2>See also</h2><p><span class="citerefentry"><span class="refentrytitle">automx</span>(8)</span>, <span class="citerefentry"><span class="refentrytitle">automx.conf</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx_ldap</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx_sql</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx-test</span>(1)</span></p></div></div></body></html>

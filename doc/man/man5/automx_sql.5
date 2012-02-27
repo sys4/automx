@@ -1,0 +1,139 @@
+'\" t
+.\"     Title: automx_sql
+.\"    Author: Christian Roessner <c@roessner-network-solutions.com>
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 02/27/2012
+.\"    Manual: automx_sql
+.\"    Source: Version 0.8_beta1
+.\"  Language: English
+.\"
+.TH "AUTOMX_SQL" "5" "02/27/2012" "Version 0.8_beta1" "automx_sql"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+automx_sql \- automx SQL backend configuration parameters
+.SH "DESCRIPTION"
+.PP
+The
+\fBautomx_sql\fR(5)
+man page specifies all parameters that control access from within
+automx
+to a SQL backend\&.
+.SH "PARAMETERS"
+.PP
+\fBhost\fR (default: none)
+.RS 4
+Specifies one or more SQL servers separated by commas\&. Each server specification must provide database driver, username and password to access a database on a host as shown in the following example:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+host = driver://username:password@hostname/database
+.fi
+.if n \{\
+.RE
+.\}
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBListing two and more servers\fR
+.ps -1
+.br
+Subsequent servers to the first serve
+\fIonly for fallback purposes\fR, i\&.e\&. a server to the right will only be queried if the server left to it cannot be reached\&. If a server can be reached no further attempts will be made regardless if the query returned a result or not\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBquery\fR (default: none)
+.RS 4
+Specifies the query that should be sent to the database specified with the
+\fBhost\fR
+parameter\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+query = SELECT displayname, mailaddr FROM mail WHERE mailaddr=\*(Aq%s\*(Aq;
+.fi
+.if n \{\
+.RE
+.\}
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+See the section called
+\(lqMacros and Variables\(rq
+in
+\fBautomx.conf\fR(5)
+for a list of available query macros\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBresult_attrs\fR (default: none)
+.RS 4
+Specifies the attributes whose values should be used in an automx account setup\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+result_attrs = displayname, mailaddr
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.SH "SEE ALSO"
+.PP
+\fBautomx\fR(8),
+\fBautomx.conf\fR(5),
+\fBautomx_ldap\fR(5),
+\fBautomx_sql\fR(5),
+\fBautomx-test\fR(1)
+.SH "AUTHORS"
+.PP
+\fBChristian Roessner\fR <\&c@roessner\-network\-solutions\&.com\&>
+.RS 4
+Wrote the program\&.
+.RE
+.PP
+\fBPatrick Ben Koetter\fR <\&p@state\-of\-mind\&.de\&>
+.RS 4
+Wrote the documentation\&.
+.RE

@@ -1,0 +1,836 @@
+'\" t
+.\"     Title: automx.conf
+.\"    Author: Christian Roessner <c@roessner-network-solutions.com>
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 02/27/2012
+.\"    Manual: automx.conf
+.\"    Source: Version 0.8_beta1
+.\"  Language: English
+.\"
+.TH "AUTOMX\&.CONF" "5" "02/27/2012" "Version 0.8_beta1" "automx.conf"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+automx.conf \- automx configuration parameters
+.SH "DESCRIPTION"
+.PP
+The
+automx
+automx\&.conf
+configuration file specifies all parameters that control the
+automx
+configuration system\&. Parameters not specified in
+automx\&.conf
+are left at their default values\&.
+.SH "SYNTAX"
+.PP
+The general format of the
+automx\&.conf
+file is as follows:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Each logical line has the form
+\(lqparameter = value\(rq\&. Whitespace around the
+\(lq=\(rq
+is ignored, as is whitespace at the end of a logical line\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Empty lines and whitespace\-only lines are ignored, as are lines whose first non\-whitespace character is a
+\(lq#\(rq\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+When the same parameter is defined multiple times, only the last instance is remembered\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Uppercase and lowercase matters\&. Use parameter names, macros and variables exactly as specified\&.
+.RE
+.SH "STRUCTURE"
+.PP
+The configuration file is split into sections\&.
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A section begins with the section name surrounded by square brackets, e\&.g\&. [example\&.com]\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A section name identifies a domain or subdomain automx should respond with autoconfiguration instructions upon client request\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+A section defines services which will be sent as autoconfiguration instructions to a client\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Section names
+\fIautomx\fR,
+\fIdefault\fR
+and
+\fIGLOBAL\fR
+are reserved \- they have special meaning\&.
+.RE
+.SH "SERVICES"
+.PP
+Each section may specify one more services that should be provided to the client\&. A service must be defined in a section in order to be enabled\&. Options specific to a service are given using a concatenation of a service name and the parameter it should configure\&.
+.PP
+\fBExample\ \&1.\ \&Defining a service option\fR
+.PP
+The following concatenation of service name
+\fIsmtp\fR
+and service option
+\fB_server\fR
+creates the
+\fBsmtp_server\fR
+parameter:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+smtp_server = mail\&.example\&.com
+.fi
+.if n \{\
+.RE
+.\}
+.PP
+Service names available in automx are shown in the following list\&. The service options to create parameters are specified in
+the section called \(lqPARAMETERS\(rq:
+.PP
+\fIimap\fR
+.RS 4
+This name specifies a service as defined in
+\m[blue]\fBRFC 3501\fR\m[]\&\s-2\u[1]\d\s+2\&. The protocol to connect to this server is IMAP\&. Specifying this name is only applicable for
+\fBaccount_type\fR
+=
+\fIemail\fR\&.
+.RE
+.PP
+\fIpop\fR
+.RS 4
+This name specifies a service as defined in
+\m[blue]\fBRFC 1939\fR\m[]\&\s-2\u[2]\d\s+2\&. The protocol to connect to this server is POP3\&. Specifying this name is only applicable for
+\fBaccount_type\fR
+=
+\fIemail\fR\&.
+.RE
+.PP
+\fIsmtp\fR
+.RS 4
+This name specifies an SMTP service as defined in
+\m[blue]\fBRFC 5321\fR\m[]\&\s-2\u[3]\d\s+2\&. The protocol to connect to this server is SMTP\&. Specifying this name is only applicable for
+\fBaccount_type\fR
+=
+\fIemail\fR\&.
+.RE
+.SH "PARAMETERS"
+.PP
+autoconfig (no default)
+.RS 4
+Specifies a path to a file that contains static autoconfiguration options following to the Mozilla schema\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This parameter is valid only if backend = file has been specified\&.
+.sp .5v
+.RE
+.RE
+.PP
+autodiscover (no default)
+.RS 4
+Specifies a path to a file that contains static autoconfiguration options following to the Microsoft schema\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This parameter is valid only if backend = file has been specified\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBaccount_name\fR (no default, mandatory)
+.RS 4
+Specifies a display name in MUA account listings\&.
+.RE
+.PP
+\fBaccount_name_short\fR (no default, mandatory)
+.RS 4
+Specifies a short display name in MUA account listings\&.
+.RE
+.PP
+\fBaccount_type\fR (default: \fIemail\fR, mandatory)
+.RS 4
+Specifies the account type that should be configured:
+.PP
+\fIemail\fR
+.RS 4
+Setting this option will create an email configuration\&.
+.RE
+.sp
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+The Microsoft schema specifies additional account_types\&. Currently automx only supports
+\fIemail\fR\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBaction\fR (default: \fIsettings\fR, mandatory)
+.RS 4
+Specifies whether the response to the client contains configuration settings or if it should visit a different server or use a different address\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This option applies to Microsoft schema only\&.
+.sp .5v
+.RE
+.PP
+settings
+.RS 4
+The client should use the configuration settings sent in this response\&.
+.RE
+.RE
+.PP
+\fBbackend\fR (default: \fIDEFAULT\fR, mandatory)
+.RS 4
+Specifies the backend method to lookup configuration data\&. The following options are available:
+.PP
+\fIfile\fR
+.RS 4
+automx
+should use logic provided within this section to identify a different section which holds configuration settings\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+backend = file
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fIfilter\fR
+.RS 4
+automx
+should use logic provided within this section to identify a different section which holds configuration settings\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+backend = filter
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fIglobal\fR
+.RS 4
+automx
+should use general settings defined in the
+\fIglobal\fR
+section\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+backend = global
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fIldap\fR
+.RS 4
+automx
+should use a mixture of general and individual settings\&. General settings are set like static settings\&. Individual settings should be retrieved from an LDAP query\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+backend = ldap
+.fi
+.if n \{\
+.RE
+.\}
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+See also
+\fBautomx_ldap\fR(5)
+for a list of LDAP related configuration options\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fIsql\fR
+.RS 4
+automx
+should use a mixture of general and individual settings\&. General settings are set like static settings\&. Individual settings should be retrieved from an SQL query\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+backend = sql
+.fi
+.if n \{\
+.RE
+.\}
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+See also
+\fBautomx_sql\fR(5)
+for a list of SQL related configuration options\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fIstatic\fR
+.RS 4
+automx
+should use general settings provided within the current section\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+backend = static
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.RE
+.PP
+\fBdebug\fR (default: no)
+.RS 4
+Specifies if automx should note client request and server response to the (SSL) error log\&.
+.RE
+.PP
+\fBdisplay_name\fR (no default, optional)
+.RS 4
+Specifies an
+\(lqoptional display name that indicates the name of the sender (\&.\&.\&.) that could be displayed to the user of a mail application\(rq
+(see: 3\&.4\&. Address Specification in
+\m[blue]\fBRFC 5322\fR\m[]\&\s-2\u[4]\d\s+2)\&. The client can decide to accept or change the name\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This option applies to Microsoft schema only\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBdomains\fR (no default)
+.RS 4
+Specifies a list of domains automx will output autoconfiguration information for\&.
+.PP
+\fI*\fR
+.RS 4
+Specify
+\fI*\fR
+to let automx reply for any domains listed in a section\&.
+.RE
+.PP
+\fIdomain, domain, \&.\&.\&.\fR
+.RS 4
+Specify a comma separated list of domains automx should provide autoconfiguration for\&.
+.RE
+.RE
+.PP
+\fBprovider\fR (no default, mandatory)
+.RS 4
+The FQDN domain name of the domain that provides the configuration service\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+provider = example\&.com
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fBsection_filter\fR (default: \fIdomainpart\fR, optional)
+.RS 4
+Specifies a list of one or more filters whose result outputs a section name\&. The filters will be used in order specified\&. The first match ends execution of subsequent filters\&.
+.sp
+These filters will be used instead of the hard coded, internal
+\fIdomainpart\fR
+filter, which strictly uses the domainpart taken from the email address the client submitted in its configuration request\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+section_filters = server_1, server_2
+server_1 = /usr/sbin/postmap \-q "%u" hash:/etc/postfix/virtual_alias_domains | \e
+    sed \-e \*(Aqs/^\&.*@\e(\e\&.*\e)/\e1/g\*(Aq | grep internal\&.example\&.com
+server_2 = /usr/sbin/postmap \-q "%u" hash:/etc/postfix/virtual_alias_domains | \e
+    sed \-e \*(Aqs/^\&.*@\e(\e\&.*\e)/\e1/g\*(Aq | grep dmz\&.example\&.com
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fB\fIservice\fR\fR (default: \fIno\fR)
+.RS 4
+Specifies the service type that should be provided in the configuration response\&. By default all services are disabled\&. See
+the section called \(lqSERVICES\(rq
+for a list of valid service names\&.
+.RE
+.PP
+\fB\fIservice\fR\fR\fB_auth_identity\fR (no default)
+.RS 4
+Specifies the login name the client should use when it identifies the user in order to gain access to the service\&. See
+the section called \(lqMACROS AND VARIABLES\(rq
+for available options\&.
+.RE
+.PP
+\fB\fIservice\fR\fR\fB_auth\fR (no default)
+.RS 4
+Specifies the method the client should use when it identifies the user in order to gain access to the service\&. The following options are available:
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+Thunderbird 3\&.0 accepts only
+\(lqplain\(rq
+and
+\(lqsecure\(rq\&. It will ignore the whole XML file, if other values are given\&.
+.sp .5v
+.RE
+.PP
+\fIplaintext\fR
+.RS 4
+The client should use the SASL mechanisms
+\fIPLAIN\fR
+or
+\fILOGIN\fR
+to identify the user\&.
+.RE
+.PP
+\fIencrypted\fR
+.RS 4
+The client should use the SASL mechanisms
+\fICRAM\-MD5\fR
+or
+\fIDIGEST\-MD5\fR
+to identify the user\&.
+.RE
+.PP
+\fIntlm\fR
+.RS 4
+The client should use the SASL
+\fINTLM\fR
+mechanism to identify the user\&.
+.RE
+.PP
+\fIgssapi\fR
+.RS 4
+The client should use the SASL
+\fIGSSAPI\fR
+mechanism to identify the user\&.
+.RE
+.PP
+\fIclient\-ip\-address\fR
+.RS 4
+The client will not send identification data\&. Instead the server should recognize the user based on the clients IP address\&.
+.RE
+.PP
+\fItls\-client\-cert\fR
+.RS 4
+The client should send a TLS client certificate when the server requests one\&.
+.RE
+.PP
+smtp\-after\-pop
+.RS 4
+The client should authenticate using POP first, and then start sending messages over SMTP later\&.
+.RE
+.PP
+\fInone\fR
+.RS 4
+The client should not send any identification data\&.
+.RE
+.RE
+.PP
+\fB\fIservice\fR\fR\fB_port\fR (no default)
+.RS 4
+Specifies port number on which the service is offered\&. Typical, standardized port numbers are:
+.RE
+.PP
+\fB\fIservice\fR\fR\fB_server\fR (no default)
+.RS 4
+Specifies the IP address or hostname on which the service is offered\&.
+.RE
+.PP
+\fB\fIservice\fR\fR\fB_encryption\fR (no default)
+.RS 4
+Specifies whether the client should use a plaintext or an encrypted transport layer for client\-server communication\&. The following options are available:
+.PP
+\fIauto\fR
+.RS 4
+The client should try to start with
+\fIstarttls\fR, proceed with
+\fIssl\fR
+and settle with
+\fInone\fR, if only that is available\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This feature is not available in clients following the Mozilla schema\&. For these clients automx will always output
+\fInone\fR
+as encryption level\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fInone\fR
+.RS 4
+The client should use an unencrypted transport layer\&.
+.RE
+.PP
+\fIssl\fR
+.RS 4
+The client should use an SSL3 or TLS1 encrypted transport layer from the start\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This option is typical for
+\fIsmtps\fR,
+\fIpop3s\fR
+and
+\fIimaps\fR
+services and usually requires a dedicated port on the server for SSL encryption only\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fIstarttls\fR
+.RS 4
+The client should begin communication on an unencrypted port and then upgrade the communication to TLS via the STARTTLS command\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This option is typical for
+\fIsmtp\fR,
+\fIpop3\fR
+and
+\fIimap\fR
+services\&.
+.sp .5v
+.RE
+.RE
+.RE
+.PP
+\fBsmtp_author\fR (default: \fI%s\fR)
+.RS 4
+Specifies the envelope sender address used when the client sends a message\&. See
+the section called \(lqMACROS AND VARIABLES\(rq
+for available options\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This parameter is experimental\&. The feature is available for Microsoft clients only\&. For a definition of
+\(lqauthor\(rq
+see also
+\m[blue]\fBRFC 5598, Section 2\&.1 User Actors\fR\m[]\&\s-2\u[5]\d\s+2\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBsmtp_default\fR (no default)
+.RS 4
+Specifies if this service should be used globally for all outgoing messages from all accounts\&.
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+This feature is available to clients following the Mozilla schema only\&.
+.sp .5v
+.RE
+.RE
+.SH "MACROS AND VARIABLES"
+.PP
+The following macros and variables can be used within
+automx
+to build service configuration\&.
+.PP
+\fI%%\fR
+.RS 4
+This is replaced by a literal
+\(lq%\(rq
+character\&.
+.RE
+.PP
+\fI%d\fR
+.RS 4
+When the input key is an address of the form
+localpart@domainpart, this macro will be replaced by the (\m[blue]\fBRFC 2253\fR\m[]\&\s-2\u[6]\d\s+2) quoted domain part of the address\&.
+.RE
+.PP
+\fI%s\fR
+.RS 4
+This macro is replaced by the input key\&.
+.RE
+.PP
+\fI${varname}\fR
+.RS 4
+The value of
+\fI${varname}\fR, retrieved from an LDAP or SQL query, will be used\&.
+.RE
+.PP
+\fI%u\fR
+.RS 4
+When the input key is an address of the form
+localpart@domainpart, this macro will be replaced by the (\m[blue]\fBRFC 2253\fR\m[]\&\s-2\u[6]\d\s+2) quoted local part of the address\&.
+.RE
+.SH "SEE ALSO"
+.PP
+\fBautomx\fR(8),
+\fBautomx.conf\fR(5),
+\fBautomx_ldap\fR(5),
+\fBautomx_sql\fR(5),
+\fBautomx-test\fR(1)
+.SH "AUTHORS"
+.PP
+\fBChristian Roessner\fR <\&c@roessner\-network\-solutions\&.com\&>
+.RS 4
+Wrote the program\&.
+.RE
+.PP
+\fBPatrick Ben Koetter\fR <\&p@state\-of\-mind\&.de\&>
+.RS 4
+Wrote the documentation\&.
+.RE
+.SH "NOTES"
+.IP " 1." 4
+RFC 3501
+.RS 4
+\%http://www.rfc-editor.org/rfc/rfc3501.txt
+.RE
+.IP " 2." 4
+RFC 1939
+.RS 4
+\%http://www.rfc-editor.org/rfc/rfc1939.txt
+.RE
+.IP " 3." 4
+RFC 5321
+.RS 4
+\%http://www.rfc-editor.org/rfc/rfc5321.txt
+.RE
+.IP " 4." 4
+RFC 5322
+.RS 4
+\%http://tools.ietf.org/rfc/rfc5322.txt
+.RE
+.IP " 5." 4
+RFC 5598, Section 2.1 User Actors
+.RS 4
+\%http://tools.ietf.org/html/rfc5598#section-2.1
+.RE
+.IP " 6." 4
+RFC 2253
+.RS 4
+\%http://www.ietf.org/rfc/rfc2253.txt
+.RE

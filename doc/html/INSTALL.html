@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>INSTALL</title><link rel="stylesheet" href="screen.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.75.2" /></head><body><div class="article" title="INSTALL"><div class="titlepage"><div><div><h2 class="title"><a id="id2858879"></a>INSTALL</h2></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">Christian</span> <span class="surname">Roessner</span></h3><span class="contrib">Wrote the program.</span> <code class="email">&lt;<a class="email" href="mailto:c@roessner-network-solutions.com">c@roessner-network-solutions.com</a>&gt;</code></div><div class="editor"><h4 class="editedby">Edited by</h4><h3 class="editor"><span class="firstname">Patrick</span> <span class="othername">Ben</span> <span class="surname">Koetter</span></h3><span class="contrib">Wrote the documentation.</span> <code class="email">&lt;<a class="email" href="mailto:p@state-of-mind.de">p@state-of-mind.de</a>&gt;</code></div></div></div></div><hr /></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#download">1. automx Download</a></span></dt><dt><span class="section"><a href="#requirements">2. Software Requirements</a></span></dt><dt><span class="section"><a href="#install">3. Installing automx</a></span></dt><dd><dl><dt><span class="section"><a href="#install_automx">3.1. Installing the program</a></span></dt><dt><span class="section"><a href="#install_automx-test">3.2. Installing the test program</a></span></dt><dt><span class="section"><a href="#install_libraries">3.3. Installing automx-specific libraries</a></span></dt><dt><span class="section"><a href="#install_configuration">3.4. Installing the configuration file</a></span></dt><dt><span class="section"><a href="#install_man-pages">3.5. Installing man Pages</a></span></dt></dl></dd><dt><span class="section"><a href="#dns">4. DNS Configuration</a></span></dt><dt><span class="section"><a href="#webserver">5. Web Server Configuration</a></span></dt><dt><span class="section"><a href="#testing">6. Testing And Debugging automx</a></span></dt></dl></div><div class="abstract" title="Abstract"><p class="title"><b>Abstract</b></p><p>This document contains step by step instructions to install
+    automx.</p></div><div class="section" title="1. automx Download"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="download"></a>1. automx Download</h2></div></div></div><p>If you haven't done so yet <a class="ulink" href="http://automx.org/download/latest.tar.gz" target="_top">download automx</a>
+    from its website.</p><pre class="screen">$ wget http://automx.org/download/latest.tar.gz</pre><p>Unpack the tar archive and change into the newly created
+    directory.</p><pre class="screen">$ tar xzf latest.tar.gz
+$ cd automx-<em class="replaceable"><code>VERSION</code></em></pre></div><div class="section" title="2. Software Requirements"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="requirements"></a>2. Software Requirements</h2></div></div></div><p>automx is a Python application. You must install a few extra modules
+    to handle frontend and backend communication as well to deal with XML
+    data.</p><div class="variablelist"><dl><dt><span class="term">frontend</span></dt><dd><p>Install <span class="package">mod_wsgi</span> for the Apache web server
+          and the <span class="package">python-wsgi</span> module.</p></dd><dt><span class="term">backend (optional)</span></dt><dd><p>If you plan to use either LDAP or SQL as backends to retrieve
+          configuration options from install <span class="package">ldap</span> for LDAP
+          and <span class="package">python-sqlalchemy</span> for SQL. Further you also
+          need to install the SQL backend driver that communicates with your
+          database. For MySQL this might be <span class="package">mysqldb</span>.</p></dd><dt><span class="term">XML handling</span></dt><dd><p>Install python lxml or automx will not be able to handle the
+          XML data it needs to deal with.</p></dd></dl></div><p>Once you've satisfied the requirements, you can start to install
+    automx.</p></div><div class="section" title="3. Installing automx"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="install"></a>3. Installing automx</h2></div></div></div><p>automx is a wsgi script depending on some automx-specific libraries.
+    It reads its configuration from a single configuration file. The program,
+    the libraries and the configuration file need to be installed at different
+    locations.</p><div class="section" title="3.1. Installing the program"><div class="titlepage"><div><div><h3 class="title"><a id="install_automx"></a>3.1. Installing the program</h3></div></div></div><p>Create a directory for the automx program and copy it to that
+      location:</p><pre class="screen">% <span class="command"><strong>mkdir</strong></span> <code class="option">-p</code> /usr/local/lib/automx
+% <span class="command"><strong>cp</strong></span> automx-VERSION/automx.wsgi /usr/local/lib/automx/</pre></div><div class="section" title="3.2. Installing the test program"><div class="titlepage"><div><div><h3 class="title"><a id="install_automx-test"></a>3.2. Installing the test program</h3></div></div></div><p>Copy the <span class="command"><strong>automx-test</strong></span> program to a location that
+      is in your <code class="systemitem">$PATH</code>:</p><pre class="screen">% <span class="command"><strong>cp</strong></span> automx-VERSION/automx-test /usr/local/bin/automx-test</pre></div><div class="section" title="3.3. Installing automx-specific libraries"><div class="titlepage"><div><div><h3 class="title"><a id="install_libraries"></a>3.3. Installing automx-specific libraries</h3></div></div></div><p>Python provides a directory with site specific packages, called
+      site-packages. Copy the automx directory including all its files to
+      site-packages:</p><pre class="screen">% <span class="command"><strong>cp</strong></span> automx-VERSION/automx <em class="replaceable"><code>/usr/local/lib/python2.6/site-packages/</code></em></pre><div class="note" title="site-packages" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note: site-packages"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">site-packages</th></tr><tr><td align="left" valign="top"><p>The location of that directory depends on the Python version and
+        the distribution you use.</p></td></tr></table></div></div><div class="section" title="3.4. Installing the configuration file"><div class="titlepage"><div><div><h3 class="title"><a id="install_configuration"></a>3.4. Installing the configuration file</h3></div></div></div><p>Place the sample automx.conf file into /etc.</p><pre class="screen">% <span class="command"><strong>cp</strong></span> automx-VERSION/src/conf/automx.conf /etc/</pre><p>Follow <span class="citerefentry"><span class="refentrytitle">automx.conf</span>(5)</span> Adopt this configuration file to your needs. You may
+      find detailed information in the man page automx.conf(5).</p><div class="tip" title="Tip" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Tip"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Tip]" src="images/tip.svg" /></td><th align="left">Tip</th></tr><tr><td align="left" valign="top"><p>Set <em class="parameter"><code>debug</code></em>=<code class="option">yes</code> in the
+        section <em class="parameter"><code>automx</code></em> while you setup, configure and
+        test <code class="systemitem">automx</code>. It will help you detect problems
+        more easily. This will log the request GET/POST and the response to
+        the error.log file(s).</p></td></tr></table></div></div><div class="section" title="3.5. Installing man Pages"><div class="titlepage"><div><div><h3 class="title"><a id="install_man-pages"></a>3.5. Installing man Pages</h3></div></div></div><p>Try using the <span class="command"><strong>manpath</strong></span> command to find out where
+      man pages are stored on your computer:</p><pre class="screen">$ <span class="command"><strong>manpath</strong></span> 
+/usr/local/man:/usr/local/share/man:/usr/share/man</pre><p>Copy the man pages to that location.</p><pre class="screen">% <span class="command"><strong>cp</strong></span> <code class="option">-a</code> automx-VERSION/doc/man/ /usr/local/share/man</pre></div></div><div class="section" title="4. DNS Configuration"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="dns"></a>4. DNS Configuration</h2></div></div></div><p>Mail clients seeking mail account autoconfiguration will either
+    request an IP address for
+    <code class="systemitem">autoconfig.<em class="replaceable"><code>example.com</code></em></code>
+    (Mozilla schema) or
+    <code class="systemitem">autodiscover.<em class="replaceable"><code>example.com</code></em></code>
+    (Microsoft schema). Provide settings in your DNS that directs them to the
+    server running the <span class="package">automx</span> service:</p><pre class="programlisting">autoconfig.example.com.       IN    A     192.168.2.1
+autodiscover.example.com.     IN    A     192.168.2.1</pre></div><div class="section" title="5. Web Server Configuration"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="webserver"></a>5. Web Server Configuration</h2></div></div></div><p>Finally configure the web server. It will accept configuration
+    requests from mail clients, pass the information to automx and in turn
+    will respond with account profiles once automx has figured out the
+    details.</p><p>First enable the wsgi module. Follow your OS documentation to find
+    out how it needs to be done.</p><p>automx is able to provision mail clients following the Mozilla
+    autoconfig schema as well as mail clients following the Microsoft
+    autodiscover schema. Both schemas have different requirements regarding
+    hostname, port and level of security when a request is sent to the
+    configuration server:</p><div class="variablelist"><dl><dt><span class="term">Microsoft</span></dt><dd><p>Mail clients following the Microsoft autodiscover schema
+          require a https connection. The web server must identify itself as
+          autodiscover.<em class="replaceable"><code>example.com</code></em> on port
+          <code class="systemitem">443</code> and it must use a
+          valid server certificate that is trusted by the mail client
+          requesting configuration.</p></dd><dt><span class="term">Mozilla</span></dt><dd><p>Mail clients following the Mozilla autoconfig schema can use
+          either a http or a https connection. The web server must identify
+          itself as autoconfig.<em class="replaceable"><code>example.com</code></em> on port
+          <code class="systemitem">80</code> or <code class="systemitem">443</code>. If it connects on <code class="systemitem">443</code> a valid server certificate that is
+          trusted by the mail client requesting configuration has to be
+          used.</p></dd></dl></div><p>Here is a simple example that configures an autoconfig and an
+    autodiscover service - both use the same automx script:</p><pre class="programlisting">&lt;VirtualHost *:80&gt;
+
+  ServerName example.com
+  ServerAlias autoconfig.example.com
+  ServerAdmin webmaster@example.com
+
+  &lt;IfModule mod_wsgi.c&gt;
+    WSGIScriptAlias /mail/config-v1.1.xml /usr/local/lib/automx/automx.wsgi
+    &lt;Directory "/usr/local/lib/automx"&gt;
+      Order allow,deny
+      Allow from all
+    &lt;/Directory&gt;
+  &lt;/IfModule&gt;
+
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost *:443&gt;
+
+  ServerName example.com:443
+  ServerAlias autoconfig.example.com:443
+  ServerAdmin webmaster@example.com
+
+  &lt;IfModule mod_wsgi.c&gt;
+    WSGIScriptAlias /Autodiscover/Autodiscover.xml /usr/local/lib/automx/automx.wsgi
+    WSGIScriptAlias /autodiscover/autodiscover.xml /usr/local/lib/automx/automx.wsgi
+    &lt;Directory "/usr/local/lib/automx"&gt;
+      Order allow,deny
+      Allow from all
+    &lt;/Directory&gt;
+  &lt;/IfModule&gt;
+
+&lt;/VirtualHost&gt;</pre><div class="note" title="ISPs" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note: ISPs"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">ISPs</th></tr><tr><td align="left" valign="top"><p>In an advanced environment with thousands of domains, you can
+      redirect mail clients via DNS entries to your ISP
+      <code class="systemitem">automx</code> provisioning server for Microsoft
+      clients and a web server instance with a wild card
+      <em class="parameter"><code>ServerName</code></em> <code class="option">autoconfig.*</code> to serve
+      the Mozilla schema.</p><pre class="programlisting">autoconfig.example.com.       IN    A     192.168.2.1
+autodiscover.example.com.     IN    A     192.168.2.1</pre></td></tr></table></div><p>automx comes with a little utility that helps testing proper
+    operation. The next section explains how to use it.</p></div><div class="section" title="6. Testing And Debugging automx"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="testing"></a>6. Testing And Debugging automx</h2></div></div></div><p>The automx-test utility sends configuration requests for Microsoft
+    and Mozilla clients to the web server:</p><pre class="screen">$ <span class="command"><strong>automx-test</strong></span> <code class="option"><em class="replaceable"><code>user@example.com</code></em></code> <a id="testid"></a><img src="images/callouts/1.png" alt="1" border="0" /></pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left"><p><a href="#testid"><img src="images/callouts/1.png" alt="1" border="0" /></a> </p></td><td valign="top" align="left"><p>The domainpart in the address determines the list of hostnames
+        that will be queried. In this example
+        <code class="systemitem">autoconfig.example.com</code> and
+        <code class="systemitem">autodiscover.example.com</code> will be
+        contacted.</p></td></tr></table></div><p>You should see the web server header and get XML results from the
+    server.</p><p>If things go wrong, the
+    <code class="filename"><code class="filename">error.log</code></code> is your friend. It
+    will indicate configuration issues, if python modules are missing, if your
+    database can not be queried or anything else that might go wrong.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>If you split error logs by port, e.g. port
+      <code class="systemitem">80</code> and <code class="systemitem">443</code>, you need
+      to check both. Autoconfig requests will mostly show up in the port
+      <code class="systemitem">80</code> <code class="filename">error.log</code>, whereas
+      autodiscover will only show up in your <code class="systemitem">443</code>
+      <code class="filename">error.log</code>.</p></td></tr></table></div></div></div></body></html>
