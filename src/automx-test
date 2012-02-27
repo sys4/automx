@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# automx - auto configuration service
+# Copyright (C) 2012  state of mind
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Authors Christian Roessner, Patrick Ben Koetter, Marc Schiffbauer
+# Copyright (C) 2012  state of mind
+#
+VERSION="0.8_beta1"
+
+trap clean_exit EXIT
+function clean_exit() {
+	[[ -f "$OLREQUEST" ]] && rm "$OLDREQUEST"
+	[[ -f "$MBREQUEST" ]] && rm "$MBREQUEST"
+}
+
+# We need a mail address
+if [[ $1 ]]; then
+	PROFILE="$1"
+else 
+	echo "Provide the mail address for which configuration settings should be retrieved."
+	read -ep "Mail address: " PROFILE
+fi
+
+DOMAIN="${PROFILE#*@}"
+QUERY_AUTODISC="$(dig +short autodiscover.$DOMAIN)"
+OLREQUEST="$(mktemp)"
+MBREQUEST="$(mktemp)"
+
+if [[ -z $QUERY_AUTODISC ]]; then
+	AUTODISC="$(dig +short -t srv _autodiscover._tcp.$DOMAIN)"
+  	AUTODISC="${AUTODISC//* /}"
+  	AUTODISC="${AUTODISC%.*}"
+else
+	AUTODISC="autodiscover.$DOMAIN"
+fi
+
+# Test Mozilla schema
+CON="http://autoconfig.$DOMAIN/mail/config-v1.1.xml?emailaddress=$PROFILE"
+echo
+echo "Testing Autoconfig ..."
+echo "Connecting to $CON ..."
+echo
+wget -S -O - -q $CON
+
+# Test Microsoft Outlook schema
+CON="https://$AUTODISC/autodiscover/autodiscover.xml"
+cat <<-REQ >$OLREQUEST
+	<?xml version="1.0" encoding="utf-8"?>
+	<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006">
+	  <Request>
+	    <AcceptableResponseSchema>http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a</AcceptableResponseSchema>
+	    <EMailAddress>$PROFILE</EMailAddress>
+	  </Request>
+	</Autodiscover>
+REQ
+
+echo
+echo "Testing Autodiscover (Outlook) ..."
+echo "Connecting to $CON ..."
+echo
+wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON
+rm $OLREQUEST
+
+# Test Microsoft Mobile schema
+cat <<-REQ >$MBREQUEST
+	<?xml version="1.0" encoding="utf-8"?>
+	<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/mobilesync/requestschema/2006">
+	  <Request>
+	    <AcceptableResponseSchema>http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006</AcceptableResponseSchema>
+	    <EMailAddress>$PROFILE</EMailAddress>
+	  </Request>
+	</Autodiscover>
+REQ
+
+echo
+echo "Testing Autodiscover (mobile Outlook) ..."
+echo "Connecting to $CON ..."
+echo
+wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
+rm $MBREQUEST
+
+# EOF
