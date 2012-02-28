@@ -23,7 +23,7 @@ VERSION="0.8_beta1"
 
 trap clean_exit EXIT
 function clean_exit() {
-	[[ -f "$OLREQUEST" ]] && rm "$OLDREQUEST"
+	[[ -f "$OLREQUEST" ]] && rm "$OLREQUEST"
 	[[ -f "$MBREQUEST" ]] && rm "$MBREQUEST"
 }
 
@@ -36,61 +36,74 @@ else
 fi
 
 DOMAIN="${PROFILE#*@}"
-QUERY_AUTODISC="$(dig +short autodiscover.$DOMAIN)"
 OLREQUEST="$(mktemp)"
 MBREQUEST="$(mktemp)"
 
-if [[ -z $QUERY_AUTODISC ]]; then
+
+# Test Mozilla schema
+AUTOCONF="autoconfig.$DOMAIN"
+if [[ $(dig +short $AUTOCONF) ]]; then
+	CON="http://$AUTOCONF/mail/config-v1.1.xml?emailaddress=$PROFILE"
+	echo
+	echo "Testing Autoconfig ..."
+	echo "Connecting to $CON ..."
+	echo
+	wget -S -O - -q $CON
+else
+	echo
+	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
+	echo
+fi
+
+
+# Test Microsoft schema
+AUTODISC="autodiscover.$DOMAIN"
+if [[ -z $(dig +short $AUTODISC) ]]; then
+	# default domain does not exist, try to discover non-default
 	AUTODISC="$(dig +short -t srv _autodiscover._tcp.$DOMAIN)"
   	AUTODISC="${AUTODISC//* /}"
   	AUTODISC="${AUTODISC%.*}"
-else
-	AUTODISC="autodiscover.$DOMAIN"
 fi
-
-# Test Mozilla schema
-CON="http://autoconfig.$DOMAIN/mail/config-v1.1.xml?emailaddress=$PROFILE"
-echo
-echo "Testing Autoconfig ..."
-echo "Connecting to $CON ..."
-echo
-wget -S -O - -q $CON
-
-# Test Microsoft Outlook schema
-CON="https://$AUTODISC/autodiscover/autodiscover.xml"
-cat <<-REQ >$OLREQUEST
-	<?xml version="1.0" encoding="utf-8"?>
-	<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006">
-	  <Request>
-	    <AcceptableResponseSchema>http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a</AcceptableResponseSchema>
-	    <EMailAddress>$PROFILE</EMailAddress>
-	  </Request>
-	</Autodiscover>
-REQ
-
-echo
-echo "Testing Autodiscover (Outlook) ..."
-echo "Connecting to $CON ..."
-echo
-wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON
-rm $OLREQUEST
-
-# Test Microsoft Mobile schema
-cat <<-REQ >$MBREQUEST
-	<?xml version="1.0" encoding="utf-8"?>
-	<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/mobilesync/requestschema/2006">
-	  <Request>
-	    <AcceptableResponseSchema>http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006</AcceptableResponseSchema>
-	    <EMailAddress>$PROFILE</EMailAddress>
-	  </Request>
-	</Autodiscover>
-REQ
-
-echo
-echo "Testing Autodiscover (mobile Outlook) ..."
-echo "Connecting to $CON ..."
-echo
-wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
-rm $MBREQUEST
-
+if [[ $AUTODISC ]]; then
+	# Test Microsoft Outlook schema
+	CON="https://$AUTODISC/autodiscover/autodiscover.xml"
+	cat <<-REQ >$OLREQUEST
+		<?xml version="1.0" encoding="utf-8"?>
+		<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/outlook/requestschema/2006">
+		  <Request>
+		    <AcceptableResponseSchema>http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a</AcceptableResponseSchema>
+		    <EMailAddress>$PROFILE</EMailAddress>
+		  </Request>
+		</Autodiscover>
+	REQ
+	
+	echo
+	echo "Testing Autodiscover (Microsoft Outlook(tm)) ..."
+	echo "Connecting to $CON ..."
+	echo
+	wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON
+	rm $OLREQUEST
+	
+	# Test Microsoft Mobile schema
+	cat <<-REQ >$MBREQUEST
+		<?xml version="1.0" encoding="utf-8"?>
+		<Autodiscover xmlns="http://schemas.microsoft.com/exchange/autodiscover/mobilesync/requestschema/2006">
+		  <Request>
+		    <AcceptableResponseSchema>http://schemas.microsoft.com/exchange/autodiscover/mobilesync/responseschema/2006</AcceptableResponseSchema>
+		    <EMailAddress>$PROFILE</EMailAddress>
+		  </Request>
+		</Autodiscover>
+	REQ
+	
+	echo
+	echo "Testing Autodiscover (mobilesync) ..."
+	echo "Connecting to $CON ..."
+	echo
+	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
+	rm $MBREQUEST
+else
+	echo
+	echo "Autodiscovery domain for Microsoft Outlook(tm) not found (autodiscover.$DOMAIN)"
+	echo
+fi
 # EOF
