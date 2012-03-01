@@ -179,7 +179,7 @@ class Config(object, ConfigParser.RawConfigParser):
                                 filter = "(objectClass=*)",
                                 result_attrs = [],
                                 scope = "sub",
-                                usetls = False,
+                                usetls = "no",
                                 cipher = "TLSv1",
                                 reqcert ="never",
                                 cert = None,
@@ -212,7 +212,6 @@ class Config(object, ConfigParser.RawConfigParser):
                             result = self.__create_list(result)
                             
                         ldap_cfg[opt] = result
-
                 
                 # Do we connect with TLS?
                 if ldap_cfg["usetls"].lower() in ("yes", "true", "1"):
@@ -321,10 +320,11 @@ class Config(object, ConfigParser.RawConfigParser):
                             for key, value in entry[1].items():
                                 # result attributes might be multi values, but
                                 # we only accept the first value.
-                                self.__vars[key] = value[0]
+                                self.__vars[key] = unicode(value[0], "utf-8")
                     else:
                         error = "No LDAP result from server!"
                         print >> self.__environ["wsgi.errors"], error
+                        return OrderedDict()
 
                     try:    
                         con.unbind()
@@ -365,11 +365,17 @@ class Config(object, ConfigParser.RawConfigParser):
                         continue
                     result = connection.execute(sql_cfg["query"])
                     
+                    
                     for row in result:
+                        # No data returned
+                        if len(row) == 0:
+                            return OrderedDict()
+                        
                         keys = row.keys()
                         for key in iter(keys):
                             if key in iter(sql_cfg["result_attrs"]):
                                 self.__vars[key] = row[key]
+
                         # Implicit LIMIT 1 here
                         break
 
@@ -536,9 +542,11 @@ class Config(object, ConfigParser.RawConfigParser):
                 if self.has_option(section, service + "_default"):
                     try:
                         opt = service + "_default"
-                        result = self.__expand_vars(self.getboolean(section,
-                                                                    opt))
-                        
+                        tmp = self.__expand_vars(self.get(section, opt))
+                        if tmp.lower() in ("yes", "true", "1"):
+                            result = "Yes"
+                        else:
+                            result = "No"
                         settings[opt] = result
                     except ValueError:
                         pass
@@ -583,7 +591,10 @@ class Config(object, ConfigParser.RawConfigParser):
                 # string
                 return ""
 
-        result = re.sub(r"\$\{(\w+)\}", repl, str(expression))
+        result = re.sub(r"\$\{(\w+)\}",
+                        repl,
+                        unicode(expression, "utf-8"),
+                        re.UNICODE)
      
         return result
         

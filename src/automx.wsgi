@@ -20,6 +20,8 @@ __version__ = '0.8_beta1'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (C) 2012  state of mind"
 
+import traceback
+
 from cgi import escape
 from urlparse import parse_qs
 from cStringIO import StringIO
@@ -140,15 +142,27 @@ def application(environ, start_response):
     if process:
         try:
             data.configure(environ, emailaddress)
+            if len(data.domain) == 0:
+                # Something went wrong
+                process = False
         except Exception, e:
-            print >> environ['wsgi.errors'], "data.configure(): %s" % e
+            if debug:
+                tb = traceback.format_exc()
+                print >> environ['wsgi.errors'], tb
+            else:
+                print >> environ['wsgi.errors'], "data.configure(): %s" % e
             status = "500 Internal Server Error"
     
+    if process:
         try:
             view = View(data, schema, subschema)
             response_body = view.render()
         except Exception, e:
-            print >> environ['wsgi.errors'], "view.render(): %s" % e
+            if debug:
+                tb = traceback.format_exc()
+                print >> environ['wsgi.errors'], tb
+            else:
+                print >> environ['wsgi.errors'], "view.render(): %s" % e
             status = "500 Internal Server Error"
 
     if debug:

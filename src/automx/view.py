@@ -274,7 +274,7 @@ class View(object):
                 
             if service == "smtp":
                 if elem.has_key(service + "_default"):
-                    value = str(elem[service + "_default"])
+                    value = elem[service + "_default"]
                     
                     c = etree.SubElement(sub_root,
                                          "useGlobalPreferredServer")
