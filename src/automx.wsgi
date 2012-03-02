@@ -145,6 +145,7 @@ def application(environ, start_response):
             if len(data.domain) == 0:
                 # Something went wrong
                 process = False
+                status = "500 Internal Server Error"
         except Exception, e:
             if debug:
                 tb = traceback.format_exc()
