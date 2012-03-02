@@ -49,7 +49,7 @@ if [[ $(dig +short $AUTOCONF) ]]; then
 	echo "Testing Autoconfig ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q $CON
+	wget -S -O - -q --no-check-certificate $CON
 else
 	echo
 	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
