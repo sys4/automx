@@ -36,8 +36,9 @@ else
 fi
 
 DOMAIN="${PROFILE#*@}"
-OLREQUEST="$(mktemp)"
-MBREQUEST="$(mktemp)"
+PROGRAM_NAME=$(basename $0)
+OLREQUEST="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
+MBREQUEST="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
 
 
 # Test Mozilla schema
@@ -48,7 +49,7 @@ if [[ $(dig +short $AUTOCONF) ]]; then
 	echo "Testing Autoconfig ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q $CON
+	wget -S -O - -q --no-check-certificate $CON
 else
 	echo
 	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
