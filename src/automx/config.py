@@ -77,10 +77,12 @@ class Config(object, ConfigParser.RawConfigParser):
                                             defaults=None,
                                             dict_type=OrderedDict)
         self.read("/etc/automx.conf")
-        
-        self.memcache = Memcache(self)
 
-        self.__environ = environ
+        if not self.has_section("automx"):
+            raise Exception("Missing section 'automx'")
+
+        self.err = environ["wsgi.errors"]
+        self.memcache = Memcache(self, environ)
         
     def configure(self, emailaddress):
         if emailaddress == "":
@@ -103,15 +105,12 @@ class Config(object, ConfigParser.RawConfigParser):
         # if we use dynamic backends, we might earn variables
         self.__vars = None
         
-        if self.has_section("automx"):
-            try:
-                self.__automx["provider"] = self.get("automx", "provider")
-                tmp = self.__create_list(self.get("automx", "domains"))
-                self.__automx["domains"] = tmp 
-            except TypeError:
-                raise Exception("Missing options in section automx")
-        else:
-            raise Exception("Missing section 'automx'")
+        try:
+            self.__automx["provider"] = self.get("automx", "provider")
+            tmp = self.__create_list(self.get("automx", "domains"))
+            self.__automx["domains"] = tmp 
+        except TypeError:
+            raise Exception("Missing options in section automx")
 
         # 1. we read default values
         if self.has_section("global"):
@@ -167,8 +166,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     import ldap
                     import ldap.sasl
                 except:
-                    print >> self.__environ['wsgi.errors'], ("python "
-                                                             "ldap missing")
+                    print >> self.err, "python ldap missing"
                     return OrderedDict()
 
                 ldap_cfg = dict(host = "ldap://127.0.0.1/",
@@ -302,15 +300,15 @@ class Config(object, ConfigParser.RawConfigParser):
                                          filter,
                                          ldap_cfg["result_attrs"])
                     except Exception, e:
-                        print >> self.__environ['wsgi.errors'], e
+                        print >> self.err, e
                         return OrderedDict()
             
                     raw_res = (None, None)
                     raw_res = con.result(rid, True, 60)
                     if raw_res[0] == None:
                         con.abandon(rid)
-                        error = "LDAP server timeout reached"
-                        print >> self.__environ['wsgi.errors'], error
+                        error_msg = "LDAP server timeout reached"
+                        print >> self.err, error_msg
                         return OrderedDict()
 
                     # connection established, we have results
@@ -325,7 +323,7 @@ class Config(object, ConfigParser.RawConfigParser):
                                 self.__vars[key] = unicode(value[0], "utf-8")
                     else:
                         error = "No LDAP result from server!"
-                        print >> self.__environ["wsgi.errors"], error
+                        print >> self.err, error
                         return OrderedDict()
 
                     try:    
@@ -341,9 +339,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 try:
                     from sqlalchemy.engine import create_engine
                 except:
-                    print >> self.__environ['wsgi.errors'], ("python "
-                                                             "sqlalchemy "
-                                                             "missing")
+                    print >> self.err, "python sqlalchemy missing"
                     return OrderedDict()
 
                 sql_cfg = dict(host = None, query = "", result_attrs = [])
@@ -366,7 +362,6 @@ class Config(object, ConfigParser.RawConfigParser):
                     except:
                         continue
                     result = connection.execute(sql_cfg["query"])
-                    
                     
                     for row in result:
                         # No data returned
@@ -608,75 +603,75 @@ class Config(object, ConfigParser.RawConfigParser):
     def domain(self):
         return self.__domain
 
-    @property
-    def environ(self):
-        return self.__environ
-
 
 class Memcache(object):
     
-    def __init__(self, config):
+    def __init__(self, config, environ):
         self.__config = config
+        self.__environ = environ
+        
+        self.err = environ["wsgi.errors"]
         
         # Memcache usage is optional
         self.__has_memcache = True
 
-        self.__client = (None, 0)
-        self.__current = 0
+        self.__found = False
+        self.__client = None
+        self.__current = "0"
         
         try:
             import memcache
-
-            dbg = 1 if config.getboolean("automx", "memcache_debug") else 0
-            self.__mc = memcache.Client([config.get("automx", "memcache")],
-                                        debug=dbg)
-        except ValueError, e:
-            print >> config.environ["wsgi.errors"], ("Memcache "
-                                                     "misconfigured: ", e)
-            self.__has_memcache = False
         except:
             self.__has_memcache = False
 
+        try:
+            self.__mc = memcache.Client([config.get("automx", "memcache")])
+        except ValueError, e:
+            print >> self.err, ("Memcache misconfigured: ", e)
+            self.__has_memcache = False
+
     def counter(self):
-        return self.__client[1]
+        return self.__current
 
     def set_client(self):
         if not self.__has_memcache:
             return
 
-        client, counter = self.__client
-        
-        if client is not None:
-            self.__current = counter + 1
+        if self.__config.has_option("automx", "memcache_ttl"):
+            try:
+                ttl = self.__config.getint("automx", "memcache_ttl")
+            except ValueError, e:
+                err = self.err
+                print >> err , "Memcache <memcache_ttl>, using default: ", e
+                ttl = 600
         else:
-            return
+            ttl = 600
 
-        try:
-            ttl = self.__config.getint("automx", "memcache_ttl")
-        except ValueError, e:
-            err = self.__config.environ["wsgi.errors"]
-            print >> err , "Memcachce <memcache_ttl>: ", e
-            return
-
-        self.__mc.set(client, self.__current, time=ttl)
+        if self.__found:
+            self.__current = self.__mc.incr(self.__client)
+        else:
+            self.__mc.set(self.__client, self.__current, time=ttl)
                                                             
     def allow_client(self):
         if not self.__has_memcache:
             return True
 
-        try:
-            limit = self.__config.getint("automx", "client_error_limit")
-        except ValueError, e:
-            err = self.__config.environ["wsgi.errors"]
-            print >> err , "Memcachce <client_error_limit>: ", e
-            return True
+        if self.__config.has_option("automx", "client_error_limit"):
+            try:
+                limit = self.__config.getint("automx", "client_error_limit")
+            except ValueError, e:
+                err = self.err
+                print >> err , ("Memcache <client_error_limit>, "
+                                "using default: ", e)
+                limit = 20
+        else:
+            limit = 20
         
-        client = self.__config.environ["REMOTE_ADDR"]
-        result = self.__mc.get(client)
+        self.__client = self.__environ["REMOTE_ADDR"]
+        result = self.__mc.get(self.__client)
 
         if result is not None:
+            self.__found = True
             self.__current = result
 
-        self.__client = (client, self.__current)
-
-        return True if self.__current < limit else False
+        return True if int(self.__current) < limit else False

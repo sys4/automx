@@ -33,8 +33,10 @@ from automx.view import View
 
 
 def application(environ, start_response):
-    debug = False
-    
+    # HTTP status codes
+    STAT_OK = "200 OK"
+    STAT_ERR = "500 Internal Server Error"
+
     response_body = ""
     emailaddress = ""
     
@@ -43,108 +45,114 @@ def application(environ, start_response):
 
     # subschema currently is either 'mobile' or 'outlook'
     subschema = None
-        
-    data = Config(environ)
+    
+    process = True
+
+    err = environ['wsgi.errors']
+
+    try:
+        data = Config(environ)
+    except:
+        process = False
+        status = STAT_ERR
     
     try:
         if data.has_option("automx", "debug"):
             debug = data.getboolean("automx", "debug")
     except:
-        pass
+        debug = False
+    
+    if process:
+        request_method = environ['REQUEST_METHOD']
+        request_method = escape(request_method)
+    
+        if request_method == "POST":
+            valid_xml = True
+    
+            try:
+                request_body_size = int(environ.get('CONTENT_LENGTH', 0))
+            except ValueError:
+                request_body_size = 0
         
-    request_method = environ['REQUEST_METHOD']
-    request_method = escape(request_method)
-
-    process = True
+            # When the method is POST the query string will be sent
+            # in the HTTP request body which is passed by the WSGI server
+            # in the file like wsgi.input environment variable.
+            request_body = environ['wsgi.input'].read(request_body_size)
     
-    if request_method == "POST":
-        valid_xml = True
-
-        try:
-            request_body_size = int(environ.get('CONTENT_LENGTH', 0))
-        except ValueError:
-            request_body_size = 0
-    
-        # When the method is POST the query string will be sent
-        # in the HTTP request body which is passed by the WSGI server
-        # in the file like wsgi.input environment variable.
-        request_body = environ['wsgi.input'].read(request_body_size)
-
-        fd = StringIO(request_body)
-        try:
-            tree = etree.parse(fd)
-        except XMLSyntaxError:
-            valid_xml = False
+            fd = StringIO(request_body)
+            try:
+                tree = etree.parse(fd)
+            except XMLSyntaxError:
+                valid_xml = False
+            
+            if valid_xml:
+                root = tree.getroot()
         
-        if valid_xml:
-            root = tree.getroot()
-    
-            if debug:
-                debug_msg = etree.tostring(root,
-                                           xml_declaration=True,
-                                           method="xml",
-                                           encoding="utf-8",
-                                           pretty_print=True)
-                print >> environ['wsgi.errors'], ("debug, request POST\n" +
-                                                  debug_msg) 
-    
-            # We need to strip the namespace for XPath
-            expr = "//*[local-name() = $name]"
-    
-            response_schema = root.xpath(expr,
-                                         name="AcceptableResponseSchema")
-            if len(response_schema) == 0:
-                print >> environ['wsgi.errors'], "Error in XML request"
-                process = False
-                status = "500 Internal Server Error"
-                data.memcache.set_client()
-            else:
-                # element.text is a http-URI that has a location part which we
-                # need to scan.
-                if "/mobilesync/" in response_schema[0].text:
-                    subschema = "mobile"
-                elif "/outlook/" in response_schema[0].text:
-                    subschema = "outlook"
-    
-                emailaddresses = root.xpath(expr, name="EMailAddress")
-                if len(emailaddresses) == 0:
-                    print >> environ['wsgi.errors'], "Error in XML request"
+                if debug:
+                    debug_msg = etree.tostring(root,
+                                               xml_declaration=True,
+                                               method="xml",
+                                               encoding="utf-8",
+                                               pretty_print=True)
+                    print >> err, "Debug, request POST\n" + debug_msg 
+        
+                # We need to strip the namespace for XPath
+                expr = "//*[local-name() = $name]"
+        
+                response_schema = root.xpath(expr,
+                                             name="AcceptableResponseSchema")
+                if len(response_schema) == 0:
+                    print >> err, "Error in XML request"
                     process = False
-                    status = "500 Internal Server Error"
+                    status = STAT_ERR
                     data.memcache.set_client()
                 else:
-                    emailaddress = emailaddresses[0].text
-                    schema = "autodiscover"
-            
-            status = "200 OK"
-
-        else:
-            process = False
-            status = "500 Internal Server Error"
-            data.memcache.set_client()
-
-    elif request_method == "GET":
-        # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
-        if "autodiscover" in (environ["HTTP_HOST"],
-                              environ["REQUEST_URI"].lower()):
-            process = False
-            status = "500 Internal Server Error"
+                    # element.text is a http-URI that has a location part
+                    # which we need to scan.
+                    if "/mobilesync/" in response_schema[0].text:
+                        subschema = "mobile"
+                    elif "/outlook/" in response_schema[0].text:
+                        subschema = "outlook"
         
-        # autoconfig
-        else:            
-            d = parse_qs(environ['QUERY_STRING'])
-        
-            emailaddress = d.get('emailaddress', [''])[0]
-            if emailaddress is None:
-                status = "500 OK"
-            else:
-                schema = "autoconfig"
+                    emailaddresses = root.xpath(expr, name="EMailAddress")
+                    if len(emailaddresses) == 0:
+                        print >> err, "Error in XML request"
+                        process = False
+                        status = STAT_ERR
+                        data.memcache.set_client()
+                    else:
+                        emailaddress = emailaddresses[0].text
+                        schema = "autodiscover"
                 
-            if debug:
-                print >> environ['wsgi.errors'], ("debug, request GET: "
-                                                  "QUERY_STRING=%s" % d)
-
-            status = "200 OK"
+                status = STAT_OK
+    
+            else:
+                process = False
+                status = STAT_ERR
+                data.memcache.set_client()
+    
+        elif request_method == "GET":
+            # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
+            if "autodiscover" in (environ["HTTP_HOST"],
+                                  environ["REQUEST_URI"].lower()):
+                process = False
+                status = STAT_ERR
+            
+            # autoconfig
+            else:            
+                d = parse_qs(environ['QUERY_STRING'])
+            
+                emailaddress = d.get('emailaddress', [''])[0]
+                if emailaddress is None:
+                    process = False
+                    status = STAT_ERR
+                else:
+                    schema = "autoconfig"
+                    
+                if debug:
+                    print >> err, "Debug, request GET: QUERY_STRING=%s" % d
+    
+                status = STAT_OK
 
     if process:
         try:
@@ -153,24 +161,25 @@ def application(environ, start_response):
                 if len(data.domain) == 0:
                     # Something went wrong
                     process = False
-                    status = "500 Internal Server Error"
+                    status = STAT_ERR
                     data.memcache.set_client()
-                    print >> environ['wsgi.errors'], ("Request %d [%s]"
-                                                  % (data.memcache.counter(),
-                                                     environ["REMOTE_ADDR"]))
+                    print >> err, ("Request %s [%s]"
+                                   % (data.memcache.counter(),
+                                      environ["REMOTE_ADDR"]))
             else:
-                print >> environ['wsgi.errors'], ("Request %d [%s] blocked!"
-                                                  % (data.memcache.counter(),
-                                                     environ["REMOTE_ADDR"]))
                 process = False
-                status = "500 Internal Server Error"
+                status = STAT_ERR
+                print >> err, ("Request %s [%s] blocked!"
+                               % (data.memcache.counter(),
+                                  environ["REMOTE_ADDR"]))
         except Exception, e:
             if debug:
                 tb = traceback.format_exc()
-                print >> environ['wsgi.errors'], tb
+                print >> err, tb
             else:
-                print >> environ['wsgi.errors'], "data.configure(): %s" % e
-            status = "500 Internal Server Error"
+                print >> err, "data.configure(): %s" % e
+            process = False
+            status = STAT_ERR
     
     if process:
         try:
@@ -179,13 +188,13 @@ def application(environ, start_response):
         except Exception, e:
             if debug:
                 tb = traceback.format_exc()
-                print >> environ['wsgi.errors'], tb
+                print >> err, tb
             else:
-                print >> environ['wsgi.errors'], "view.render(): %s" % e
-            status = "500 Internal Server Error"
+                print >> err, "view.render(): %s" % e
+            status = STAT_ERR
 
     if debug:
-        print >> environ['wsgi.errors'], "debug, response:\n" + response_body
+        print >> err, "Debug, response:\n" + response_body
 
     response_headers = [('Content-Type', 'text/xml'),
                         ('Content-Length', str(len(response_body)))]
