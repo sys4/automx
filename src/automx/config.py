@@ -72,18 +72,20 @@ class Config(object, ConfigParser.RawConfigParser):
     may contain variables, which, if found in the vars-dictionary, are used.
     
     """
-    def __init__(self):
+    def __init__(self, environ):
         ConfigParser.RawConfigParser.__init__(self,
                                             defaults=None,
                                             dict_type=OrderedDict)
         self.read("/etc/automx.conf")
         
-    def configure(self, environ, emailaddress):
-        if emailaddress == "":
-            return OrderedDict()
+        self.memcache = Memcache(self)
 
         self.__environ = environ
         
+    def configure(self, emailaddress):
+        if emailaddress == "":
+            return OrderedDict()
+
         # Full email address containing local part _and_ domain
         self.__emailaddress = emailaddress
         
@@ -605,3 +607,73 @@ class Config(object, ConfigParser.RawConfigParser):
     @property       
     def domain(self):
         return self.__domain
+
+    @property
+    def environ(self):
+        return self.__environ
+
+
+class Memcache(object):
+    
+    def __init__(self, config):
+        self.__config = config
+        
+        # Memcache usage is optional
+        self.__has_memcache = True
+
+        self.__client = (None, 0)
+        self.__current = 0
+        
+        try:
+            import memcache
+
+            dbg = 1 if config.getboolean("automx", "memcache_debug") else 0
+            self.__mc = memcache.Client([config.get("automx", "memcache")],
+                                        debug=dbg)
+        except ValueError, e:
+            print >> config.environ["wsgi.errors"], ("Memcache "
+                                                     "misconfigured: ", e)
+            self.__has_memcache = False
+        except:
+            self.__has_memcache = False
+
+    def set_client(self):
+        if not self.__has_memcache:
+            return
+
+        client, counter = self.__client
+        
+        if client is not None:
+            self.__current += counter + 1
+        else:
+            return
+
+        try:
+            ttl = self.__config.getint("automx", "memcache_ttl")
+        except ValueError, e:
+            err = self.__config.environ["wsgi.errors"]
+            print >> err , "Memcachce <memcache_ttl>: ", e
+            return
+
+        self.__mc.set(client, self.__current, time=ttl)
+                                                            
+    def allow_client(self):
+        if not self.__has_memcache:
+            return True
+
+        try:
+            limit = self.__config.getint("automx", "client_error_limit")
+        except ValueError, e:
+            err = self.__config.environ["wsgi.errors"]
+            print >> err , "Memcachce <client_error_limit>: ", e
+            return True
+        
+        client = self.__config.environ["REMOTE_ADDR"]
+        result = self.__mc.get(client)
+
+        if result is not None:
+            self.__current = result
+
+        self.__client = (client, self.__current)
+
+        return True if self.__current < limit else False

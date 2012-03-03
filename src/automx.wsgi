@@ -44,7 +44,7 @@ def application(environ, start_response):
     # subschema currently is either 'mobile' or 'outlook'
     subschema = None
         
-    data = Config()
+    data = Config(environ)
     
     try:
         if data.has_option("automx", "debug"):
@@ -95,6 +95,9 @@ def application(environ, start_response):
                                          name="AcceptableResponseSchema")
             if len(response_schema) == 0:
                 print >> environ['wsgi.errors'], "Error in XML request"
+                process = False
+                status = "500 Internal Server Error"
+                data.memcache.set_client()
             else:
                 # element.text is a http-URI that has a location part which we
                 # need to scan.
@@ -106,6 +109,9 @@ def application(environ, start_response):
                 emailaddresses = root.xpath(expr, name="EMailAddress")
                 if len(emailaddresses) == 0:
                     print >> environ['wsgi.errors'], "Error in XML request"
+                    process = False
+                    status = "500 Internal Server Error"
+                    data.memcache.set_client()
                 else:
                     emailaddress = emailaddresses[0].text
                     schema = "autodiscover"
@@ -115,6 +121,7 @@ def application(environ, start_response):
         else:
             process = False
             status = "500 Internal Server Error"
+            data.memcache.set_client()
 
     elif request_method == "GET":
         # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
@@ -141,9 +148,17 @@ def application(environ, start_response):
 
     if process:
         try:
-            data.configure(environ, emailaddress)
-            if len(data.domain) == 0:
-                # Something went wrong
+            if data.memcache.allow_client():
+                data.configure(emailaddress)
+                if len(data.domain) == 0:
+                    # Something went wrong
+                    process = False
+                    status = "500 Internal Server Error"
+                    data.memcache.set_client()
+            else:
+                if debug:
+                    print >> environ['wsgi.errors'], ("Client [%s] blocked!"
+                                                      % environ["REMOTE_ADDR"])
                 process = False
                 status = "500 Internal Server Error"
         except Exception, e:
