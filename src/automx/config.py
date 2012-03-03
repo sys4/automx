@@ -637,6 +637,9 @@ class Memcache(object):
         except:
             self.__has_memcache = False
 
+    def counter(self):
+        return self.__client[1]
+
     def set_client(self):
         if not self.__has_memcache:
             return
@@ -644,7 +647,7 @@ class Memcache(object):
         client, counter = self.__client
         
         if client is not None:
-            self.__current += counter + 1
+            self.__current = counter + 1
         else:
             return
 

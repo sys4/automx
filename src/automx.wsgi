@@ -155,10 +155,13 @@ def application(environ, start_response):
                     process = False
                     status = "500 Internal Server Error"
                     data.memcache.set_client()
+                    print >> environ['wsgi.errors'], ("Request %d [%s]"
+                                                  % (data.memcache.counter(),
+                                                     environ["REMOTE_ADDR"]))
             else:
-                if debug:
-                    print >> environ['wsgi.errors'], ("Client [%s] blocked!"
-                                                      % environ["REMOTE_ADDR"])
+                print >> environ['wsgi.errors'], ("Request %d [%s] blocked!"
+                                                  % (data.memcache.counter(),
+                                                     environ["REMOTE_ADDR"]))
                 process = False
                 status = "500 Internal Server Error"
         except Exception, e:
