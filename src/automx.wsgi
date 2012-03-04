@@ -163,13 +163,13 @@ def application(environ, start_response):
                     process = False
                     status = STAT_ERR
                     data.memcache.set_client()
-                    print >> err, ("Request %s [%s]"
+                    print >> err, ("Request %d [%s]"
                                    % (data.memcache.counter(),
                                       environ["REMOTE_ADDR"]))
             else:
                 process = False
                 status = STAT_ERR
-                print >> err, ("Request %s [%s] blocked!"
+                print >> err, ("Request %d [%s] blocked!"
                                % (data.memcache.counter(),
                                   environ["REMOTE_ADDR"]))
         except Exception, e:

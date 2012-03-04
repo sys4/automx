@@ -617,7 +617,7 @@ class Memcache(object):
 
         self.__found = False
         self.__client = None
-        self.__current = "0"
+        self.__current = 0
         
         try:
             import memcache
@@ -648,9 +648,9 @@ class Memcache(object):
             ttl = 600
 
         if self.__found:
-            self.__current = self.__mc.incr(self.__client)
-        else:
-            self.__mc.set(self.__client, self.__current, time=ttl)
+            self.__current += 1
+
+        self.__mc.set(self.__client, self.__current, time=ttl)
                                                             
     def allow_client(self):
         if not self.__has_memcache:
@@ -674,4 +674,8 @@ class Memcache(object):
             self.__found = True
             self.__current = result
 
-        return True if int(self.__current) < limit else False
+        if self.__current < limit:
+            return True
+        else:
+            self.set_client()
+            return False
