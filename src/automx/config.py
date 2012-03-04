@@ -27,8 +27,10 @@ import subprocess
 import shlex
 import StringIO
 import re
+import memcache
 
 from ConfigParser import NoOptionError
+from ipaddr import IPAddress, IPNetwork
 
 try:
     # Python 2.7
@@ -107,7 +109,7 @@ class Config(object, ConfigParser.RawConfigParser):
         
         try:
             self.__automx["provider"] = self.get("automx", "provider")
-            tmp = self.__create_list(self.get("automx", "domains"))
+            tmp = self.create_list(self.get("automx", "domains"))
             self.__automx["domains"] = tmp 
         except TypeError:
             raise Exception("Missing options in section automx")
@@ -209,7 +211,7 @@ class Config(object, ConfigParser.RawConfigParser):
                         result = self.get(section, opt)
                         
                         if opt in ("host", "result_attrs"):
-                            result = self.__create_list(result)
+                            result = self.create_list(result)
                             
                         ldap_cfg[opt] = result
                 
@@ -346,7 +348,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 
                 for opt in iter(self.options(section)):
                     if opt in ("host", "result_attrs"):
-                        result = self.__create_list(self.get(section, opt))
+                        result = self.create_list(self.get(section, opt))
                         sql_cfg[opt] = result
 
                 if self.has_option(section, "query"):
@@ -386,7 +388,7 @@ class Config(object, ConfigParser.RawConfigParser):
 
             elif backend == "filter":
                 if self.has_option(section, "section_filter"):
-                    tmp = self.__create_list(self.get(section,
+                    tmp = self.create_list(self.get(section,
                                                       "section_filter"))
                     special_opts = tmp
 
@@ -553,7 +555,7 @@ class Config(object, ConfigParser.RawConfigParser):
 
         return service_category
     
-    def __create_list(self, value):
+    def create_list(self, value):
         result = value.split()
         
         if len(result) > 1:
@@ -620,11 +622,6 @@ class Memcache(object):
         self.__current = 0
         
         try:
-            import memcache
-        except:
-            self.__has_memcache = False
-
-        try:
             self.__mc = memcache.Client([config.get("automx", "memcache")])
         except ValueError, e:
             print >> self.err, ("Memcache misconfigured: ", e)
@@ -635,6 +632,9 @@ class Memcache(object):
 
     def set_client(self):
         if not self.__has_memcache:
+            return
+
+        if self.__is_trusted_network():
             return
 
         if self.__config.has_option("automx", "memcache_ttl"):
@@ -656,6 +656,11 @@ class Memcache(object):
         if not self.__has_memcache:
             return True
 
+        self.__client = self.__environ["REMOTE_ADDR"]
+
+        if self.__is_trusted_network():
+            return True
+        
         if self.__config.has_option("automx", "client_error_limit"):
             try:
                 limit = self.__config.getint("automx", "client_error_limit")
@@ -667,7 +672,6 @@ class Memcache(object):
         else:
             limit = 20
         
-        self.__client = self.__environ["REMOTE_ADDR"]
         result = self.__mc.get(self.__client)
 
         if result is not None:
@@ -679,3 +683,18 @@ class Memcache(object):
         else:
             self.set_client()
             return False
+
+    def __is_trusted_network(self):
+        if self.__config.has_option("automx",
+                                    "rate_limit_exception_networks"):
+            networks = self.__config.get("automx",
+                                        "rate_limit_exception_networks")
+            networks = self.__config.create_list(networks)
+        else:
+            networks = ("127.0.0.1", "::1/128")
+        
+        for network in iter(networks):
+            if IPAddress(self.__client) in IPNetwork(network):
+                return True
+        
+        return False
