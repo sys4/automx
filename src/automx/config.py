@@ -86,6 +86,12 @@ class Config(object, ConfigParser.RawConfigParser):
         self.err = environ["wsgi.errors"]
         self.memcache = Memcache(self, environ)
         
+        try:
+            if self.has_option("automx", "debug"):
+                self.debug = self.getboolean("automx", "debug")
+        except:
+            self.debug = False
+        
     def configure(self, emailaddress):
         if emailaddress is None:
             return OrderedDict()
@@ -129,7 +135,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 # we need to use default values from config file
                 self.__domain = self.__defaults
                     
-    def __eval_options(self, section, backend=None):
+    def __eval_options(self, section, backend=None, upper_level=None):
         settings = OrderedDict()
 
         settings["domain"] = self.__search_domain
@@ -142,28 +148,55 @@ class Config(object, ConfigParser.RawConfigParser):
                 except NoOptionError:
                     raise Exception("Missing option <backend>")
                 
-            if backend == "static":
+            if backend in ("static", "static_append"):
                 for opt in iter(self.options(section)):
                     if opt in ("action",
                                "account_type",
                                "account_name",
                                "account_name_short",
                                "display_name"):
-
                         tmp = self.get(section, opt)
                         result = self.__expand_vars(tmp)
-
                         settings[opt] = result
                     elif opt == "smtp":
-                        settings.update(self.__service(section, "smtp"))
+                        service = self.__service(section, "smtp")
                     elif opt == "imap":
-                        settings.update(self.__service(section, "imap"))
+                        service = self.__service(section, "imap")
                     elif opt == "pop":
-                        settings.update(self.__service(section, "pop"))
+                        service = self.__service(section, "pop")
                     else:
                         pass
+                    
+                    if opt in ("smtp", "imap", "pop"):
+                        if backend == "static_append":
+                            if self.debug:
+                                print >> self.err, backend
+                            if upper_level.has_key(opt):
+                                if self.debug:
+                                    print >> self.err, "APPEND %s" % service
+                                upper_level[opt].append(service)
+                            else:
+                                if self.debug:
+                                    print >> self.err, ("APPEND NEW %s"
+                                                        % service)
+                                settings[opt] = [service]
+                        else:
+                            # do not include empty services
+                            if len(service) != 0:
+                                if self.debug:
+                                    print >> self.err, "STATIC %s" % service
+                                service_category = OrderedDict()
+                                service_category[opt] = [service]
+                                settings.update(service_category)
 
-            elif backend == "ldap":
+                # always follow at the end!
+                if "follow" in self.options(section):
+                    tmp = self.get(section, "follow")
+                    result = self.__expand_vars(tmp)
+                    settings.update(self.__eval_options(result,
+                                                        upper_level=settings))
+
+            elif backend in ("ldap", "ldap_append"):
                 try:
                     import ldap
                     import ldap.sasl
@@ -332,9 +365,14 @@ class Config(object, ConfigParser.RawConfigParser):
                         pass
 
                 # then we call ourself again for static addons
-                settings.update(self.__eval_options(section, backend="static"))
+                if backend == "ldap":
+                    extra = self.__eval_options(section, backend="static")
+                else:
+                    extra = self.__eval_options(section,
+                                                backend="static_append")
+                settings.update(extra)
             
-            elif backend == "sql":
+            elif backend in ("sql", "sql_append"):
                 try:
                     from sqlalchemy.engine import create_engine
                 except:
@@ -380,7 +418,12 @@ class Config(object, ConfigParser.RawConfigParser):
                     break
 
                 # then we call ourself again for static addons
-                settings.update(self.__eval_options(section, backend="static"))
+                if backend == "sql":
+                    extra = self.__eval_options(section, backend="static")
+                else:
+                    extra = self.__eval_options(section,
+                                                backend="static_append")
+                settings.update(extra)
 
             elif backend == "filter":
                 if self.has_option(section, "section_filter"):
@@ -441,7 +484,7 @@ class Config(object, ConfigParser.RawConfigParser):
             elif backend == "global":
                 return self.__defaults
             
-            elif backend == "file":
+            elif backend in ("file", "file_append"):
                 for opt in iter(self.options(section)):
                     if opt in ("autoconfig", "autodiscover"):
                         tmp = self.get(section, opt)
@@ -450,8 +493,12 @@ class Config(object, ConfigParser.RawConfigParser):
                         if os.path.exists(result):
                             settings[opt] = result
 
-                # then we call ourself again for static addons
-                settings.update(self.__eval_options(section, backend="static"))
+                if backend == "file":
+                    extra = self.__eval_options(section, backend="static")
+                else:
+                    extra = self.__eval_options(section,
+                                                backend="static_append")
+                settings.update(extra)
             else:
                 raise Exception("Unknown backend specified")
 
@@ -544,10 +591,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     except ValueError:
                         pass
 
-        service_category = OrderedDict()
-        service_category[service] = settings
-
-        return service_category
+        return settings
     
     def create_list(self, value):
         result = value.split()

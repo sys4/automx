@@ -78,8 +78,8 @@ class View(object):
                 if self.__model.domain.has_key("smtp"):
                     smtp = self.__model.domain["smtp"]
     
-                    if smtp.has_key("smtp_author"):
-                        email = smtp["smtp_author"]
+                    if smtp[0].has_key("smtp_author"):
+                        email = smtp[0]["smtp_author"]
     
                         smtp_author = etree.SubElement(user,
                                                    "AutoDiscoverSMTPAddress")
@@ -132,9 +132,13 @@ class View(object):
         self.__xml = root
         
     def __service(self, service, root):
-        elem = self.__model.domain[service]
+        l = self.__model.domain[service]
 
         if self.__schema == "autodiscover":
+            # we assume, autodiscover only supports single protocols! So we
+            # only use the first defined list element
+            elem = l[0]
+            
             c = etree.SubElement(root, "Type")
             
             if service in ("smtp", "imap"):
@@ -210,74 +214,76 @@ class View(object):
                     c.text = "on"
 
         elif self.__schema == "autoconfig":
-            if service == "smtp":
-                sub_root = etree.SubElement(root,
-                                            "outgoingServer",
-                                            type=service)
-            elif service == "imap":
-                sub_root = etree.SubElement(root,
-                                            "incomingServer",
-                                            type=service)
-            elif service == "pop":
-                sub_root = etree.SubElement(root,
-                                            "incomingServer",
-                                            type="pop3")
-            
-            if elem.has_key(service + "_server"):
-                c = etree.SubElement(sub_root, "hostname")
-                c.text = elem[service + "_server"]
-
-            if elem.has_key(service + "_port"):
-                c = etree.SubElement(sub_root, "port")
-                c.text = elem[service + "_port"]
-
-            if elem.has_key(service + "_encryption"):
-                c = etree.SubElement(sub_root, "socketType")
-
-                value = elem[service + "_encryption"]
-
-                if value in ("ssl", "starttls"):
-                    c.text = value.upper()
-                elif value in ("none", "auto"):
-                    # autoconfig does not know anything about auto
-                    c.text = value
-
-            if elem.has_key(service + "_auth"):
-                c = etree.SubElement(sub_root, "authentication")
-
-                value = elem[service + "_auth"]
-                result = ""
-
-                if value == "cleartext":
-                    result = "password-cleartext"
-                elif value == "encrypted":
-                    result = "password-encrypted"
-                elif value == "ntlm":
-                    result = "NTLM"
-                elif value == "gssapi":
-                    result = "GSSAPI"
-                elif value == "client-ip-address":
-                    result = "client-IP-address"
-                elif value == "tls-client-cert":
-                    result = "TLS-client-cert"
-                elif value == "none":
-                    result = "none"
-                elif value == "smtp-after-pop":
-                    if service == "smtp":
-                        result = "SMTP-after-POP"
+            for elem in iter(l):
+                if service == "smtp":
+                    sub_root = etree.SubElement(root,
+                                                "outgoingServer",
+                                                type=service)
+                elif service == "imap":
+                    sub_root = etree.SubElement(root,
+                                                "incomingServer",
+                                                type=service)
+                elif service == "pop":
+                    sub_root = etree.SubElement(root,
+                                                "incomingServer",
+                                                type="pop3")
                 
-                c.text = result
-
-            if elem.has_key(service + "_auth_identity"):
-                c = etree.SubElement(sub_root, "username")
-                c.text = elem[service + "_auth_identity"]
-                
-            if service == "smtp":
-                if elem.has_key(service + "_default"):
-                    value = elem[service + "_default"]
+                if elem.has_key(service + "_server"):
+                    c = etree.SubElement(sub_root, "hostname")
+                    c.text = elem[service + "_server"]
+    
+                if elem.has_key(service + "_port"):
+                    c = etree.SubElement(sub_root, "port")
+                    c.text = elem[service + "_port"]
+    
+                if elem.has_key(service + "_encryption"):
+                    c = etree.SubElement(sub_root, "socketType")
+    
+                    value = elem[service + "_encryption"]
+    
+                    if value in ("ssl", "starttls"):
+                        c.text = value.upper()
+                    elif value in ("none", "auto"):
+                        # autoconfig does not know anything about auto
+                        c.text = value
+    
+                if elem.has_key(service + "_auth"):
+                    c = etree.SubElement(sub_root, "authentication")
+    
+                    value = elem[service + "_auth"]
+                    result = ""
+    
+                    if value == "cleartext":
+                        result = "password-cleartext"
+                    elif value == "encrypted":
+                        result = "password-encrypted"
+                    elif value == "ntlm":
+                        result = "NTLM"
+                    elif value == "gssapi":
+                        result = "GSSAPI"
+                    elif value == "client-ip-address":
+                        result = "client-IP-address"
+                    elif value == "tls-client-cert":
+                        result = "TLS-client-cert"
+                    elif value == "none":
+                        result = "none"
+                    elif value == "smtp-after-pop":
+                        if service == "smtp":
+                            result = "SMTP-after-POP"
                     
-                    c = etree.SubElement(sub_root, "useGlobalPreferredServer")
-                    c.text = value.lower()
+                    c.text = result
+    
+                if elem.has_key(service + "_auth_identity"):
+                    c = etree.SubElement(sub_root, "username")
+                    c.text = elem[service + "_auth_identity"]
+                    
+                if service == "smtp":
+                    if elem.has_key(service + "_default"):
+                        value = elem[service + "_default"]
+                        
+                        c = etree.SubElement(sub_root,
+                                             "useGlobalPreferredServer")
+                        c.text = value.lower()
                     
     def render(self):
         """Return the XML result of the view as a character string.

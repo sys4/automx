@@ -30,6 +30,7 @@ from lxml.etree import XMLSyntaxError
 
 from automx.config import Config
 from automx.view import View
+from pprint import pformat as pformat
 
 
 def application(environ, start_response):
@@ -55,12 +56,6 @@ def application(environ, start_response):
     except:
         process = False
         status = STAT_ERR
-    
-    try:
-        if data.has_option("automx", "debug"):
-            debug = data.getboolean("automx", "debug")
-    except:
-        debug = False
     
     if process:
         request_method = environ['REQUEST_METHOD']
@@ -88,7 +83,7 @@ def application(environ, start_response):
             if valid_xml:
                 root = tree.getroot()
         
-                if debug:
+                if data.debug:
                     debug_msg = etree.tostring(root,
                                                xml_declaration=True,
                                                method="xml",
@@ -150,8 +145,8 @@ def application(environ, start_response):
                 else:
                     schema = "autoconfig"
                     
-                if debug:
-                    print >> err, "Debug, request GET: QUERY_STRING=%s" % qs
+                if data.debug:
+                    print >> err, "Debug, request GET: QUERY_STRING: %s" % qs
     
                 status = STAT_OK
 
@@ -174,7 +169,7 @@ def application(environ, start_response):
                                % (data.memcache.counter(),
                                   environ["REMOTE_ADDR"]))
         except Exception, e:
-            if debug:
+            if data.debug:
                 tb = traceback.format_exc()
                 print >> err, tb
             else:
@@ -189,14 +184,14 @@ def application(environ, start_response):
             if response_body == "":
                 status = STAT_ERR
         except Exception, e:
-            if debug:
+            if data.debug:
                 tb = traceback.format_exc()
                 print >> err, tb
             else:
                 print >> err, "view.render(): %s" % e
             status = STAT_ERR
 
-    if debug:
+    if data.debug:
         print >> err, "Debug, response:\n" + response_body
 
     response_headers = [('Content-Type', 'text/xml'),
