@@ -28,9 +28,8 @@ from cStringIO import StringIO
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 
-from automx.config import Config
+from automx.config import Config, DataNotFoundException
 from automx.view import View
-from pprint import pformat as pformat
 
 
 def application(environ, start_response):
@@ -154,20 +153,18 @@ def application(environ, start_response):
         try:
             if data.memcache.allow_client():
                 data.configure(emailaddress)
-                if len(data.domain) == 0:
-                    # Something went wrong
-                    process = False
-                    status = STAT_ERR
-                    data.memcache.set_client()
-                    print >> err, ("Request %d [%s]"
-                                   % (data.memcache.counter(),
-                                      environ["REMOTE_ADDR"]))
             else:
                 process = False
                 status = STAT_ERR
                 print >> err, ("Request %d [%s] blocked!"
                                % (data.memcache.counter(),
                                   environ["REMOTE_ADDR"]))
+        except DataNotFoundException:
+            process = False
+            status = STAT_ERR
+            data.memcache.set_client()
+            print >> err, ("Request %d [%s]" % (data.memcache.counter(),
+                                                environ["REMOTE_ADDR"]))
         except Exception, e:
             if data.debug:
                 tb = traceback.format_exc()

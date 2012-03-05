@@ -40,6 +40,10 @@ except:
     from automx.ordereddict import OrderedDict
 
 
+class DataNotFoundException(Exception):
+    pass
+
+
 class Config(object, ConfigParser.RawConfigParser):
     """
     This class creates the internal data structure that is completely
@@ -111,7 +115,7 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__domain = OrderedDict()
         
         # if we use dynamic backends, we might earn variables
-        self.__vars = None
+        self.__vars = dict()
         
         try:
             self.__automx["provider"] = self.get("automx", "provider")
@@ -120,21 +124,20 @@ class Config(object, ConfigParser.RawConfigParser):
         except TypeError:
             raise Exception("Missing options in section automx")
 
-        # 1. we read default values
-        if self.has_section("global"):
-            self.__defaults = self.__eval_options("global")
-        else:
-            raise Exception("Missing section 'global'")
-
-        # 2. if a domain has its own section, use settings from it
+        # if a domain has its own section, use settings from it
         if (domain in iter(self.__automx["domains"]) or
             self.__automx["domains"][0] == "*"):
             if self.has_section(domain):
                 self.__domain = self.__eval_options(domain)
             else:
+                if self.has_section("global"):
+                    self.__defaults = self.__eval_options("global")
+                    self.__defaults = self.__replace_makro(self.__defaults)
+                else:
+                    raise Exception("Missing section 'global'")
                 # we need to use default values from config file
                 self.__domain = self.__defaults
-                    
+
     def __eval_options(self, section, backend=None, upper_level=None):
         settings = OrderedDict()
 
@@ -157,6 +160,7 @@ class Config(object, ConfigParser.RawConfigParser):
                                "display_name"):
                         tmp = self.get(section, opt)
                         result = self.__expand_vars(tmp)
+                        result = self.__replace_makro(result)
                         settings[opt] = result
                     elif opt == "smtp":
                         service = self.__service(section, "smtp")
@@ -169,8 +173,6 @@ class Config(object, ConfigParser.RawConfigParser):
                     
                     if opt in ("smtp", "imap", "pop"):
                         if backend == "static_append":
-                            if self.debug:
-                                print >> self.err, backend
                             if upper_level.has_key(opt):
                                 if self.debug:
                                     print >> self.err, "APPEND %s" % service
@@ -193,6 +195,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 if "follow" in self.options(section):
                     tmp = self.get(section, "follow")
                     result = self.__expand_vars(tmp)
+                    result = self.__replace_makro(result)
                     settings.update(self.__eval_options(result,
                                                         upper_level=settings))
 
@@ -357,7 +360,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     else:
                         error = "No LDAP result from server!"
                         print >> self.err, error
-                        return OrderedDict()
+                        raise DataNotFoundException
 
                     try:    
                         con.unbind()
@@ -401,10 +404,6 @@ class Config(object, ConfigParser.RawConfigParser):
                     result = connection.execute(sql_cfg["query"])
                     
                     for row in result:
-                        # No data returned
-                        if len(row) == 0:
-                            return OrderedDict()
-                        
                         keys = row.keys()
                         for key in iter(keys):
                             if key in iter(sql_cfg["result_attrs"]):
@@ -412,6 +411,11 @@ class Config(object, ConfigParser.RawConfigParser):
 
                         # Implicit LIMIT 1 here
                         break
+                    else:
+                        error = "No SQL result from server!"
+                        print >> self.err, error
+                        connection.close()
+                        raise DataNotFoundException
 
                     connection.close()
                     
@@ -424,6 +428,24 @@ class Config(object, ConfigParser.RawConfigParser):
                     extra = self.__eval_options(section,
                                                 backend="static_append")
                 settings.update(extra)
+
+            elif backend in ("file", "file_append"):
+                for opt in iter(self.options(section)):
+                    if opt in ("autoconfig", "autodiscover"):
+                        tmp = self.get(section, opt)
+                        result = self.__expand_vars(tmp)
+                        
+                        if os.path.exists(result):
+                            settings[opt] = result
+
+                if backend == "file":
+                    extra = self.__eval_options(section, backend="static")
+                else:
+                    extra = self.__eval_options(section,
+                                                backend="static_append")
+                settings.update(extra)
+
+            ### backends beyond this line do not have a follow option ###
 
             elif backend == "filter":
                 if self.has_option(section, "section_filter"):
@@ -482,23 +504,12 @@ class Config(object, ConfigParser.RawConfigParser):
                             settings.update(self.__eval_options(special_opt))
                             
             elif backend == "global":
-                return self.__defaults
-            
-            elif backend in ("file", "file_append"):
-                for opt in iter(self.options(section)):
-                    if opt in ("autoconfig", "autodiscover"):
-                        tmp = self.get(section, opt)
-                        result = self.__expand_vars(tmp)
-                        
-                        if os.path.exists(result):
-                            settings[opt] = result
-
-                if backend == "file":
-                    extra = self.__eval_options(section, backend="static")
+                if self.has_section("global"):
+                    settings = self.__eval_options("global")
+                    settings = self.__replace_makro(settings)
                 else:
-                    extra = self.__eval_options(section,
-                                                backend="static_append")
-                settings.update(extra)
+                    raise Exception("Missing section 'global'")
+
             else:
                 raise Exception("Unknown backend specified")
 
@@ -617,7 +628,7 @@ class Config(object, ConfigParser.RawConfigParser):
 
     def __expand_vars(self, expression):
         # do we have some dynamic variables?
-        if self.__vars is None:
+        if len(self.__vars) == 0:
             return expression
         
         def repl(mobj):
