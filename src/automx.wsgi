@@ -38,7 +38,7 @@ def application(environ, start_response):
     STAT_ERR = "500 Internal Server Error"
 
     response_body = ""
-    emailaddress = ""
+    emailaddress = None
     
     # schema currently may be  'autoconfig' or 'autodiscover'
     schema = None
@@ -139,10 +139,11 @@ def application(environ, start_response):
                 status = STAT_ERR
             
             # autoconfig
-            else:            
-                d = parse_qs(environ['QUERY_STRING'])
+            else:
+                qs = environ['QUERY_STRING']
+                d = parse_qs(qs)
             
-                emailaddress = d.get('emailaddress', [''])[0]
+                emailaddress = d.get("emailaddress")[0]
                 if emailaddress is None:
                     process = False
                     status = STAT_ERR
@@ -150,7 +151,7 @@ def application(environ, start_response):
                     schema = "autoconfig"
                     
                 if debug:
-                    print >> err, "Debug, request GET: QUERY_STRING=%s" % d
+                    print >> err, "Debug, request GET: QUERY_STRING=%s" % qs
     
                 status = STAT_OK
 
@@ -185,6 +186,8 @@ def application(environ, start_response):
         try:
             view = View(data, schema, subschema)
             response_body = view.render()
+            if response_body == "":
+                status = STAT_ERR
         except Exception, e:
             if debug:
                 tb = traceback.format_exc()

@@ -276,8 +276,7 @@ class View(object):
                 if elem.has_key(service + "_default"):
                     value = elem[service + "_default"]
                     
-                    c = etree.SubElement(sub_root,
-                                         "useGlobalPreferredServer")
+                    c = etree.SubElement(sub_root, "useGlobalPreferredServer")
                     c.text = value.lower()
                     
     def render(self):

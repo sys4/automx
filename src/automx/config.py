@@ -87,7 +87,7 @@ class Config(object, ConfigParser.RawConfigParser):
         self.memcache = Memcache(self, environ)
         
     def configure(self, emailaddress):
-        if emailaddress == "":
+        if emailaddress is None:
             return OrderedDict()
 
         # Full email address containing local part _and_ domain
@@ -231,8 +231,7 @@ class Config(object, ConfigParser.RawConfigParser):
                         elif rc == "demand":
                             reqcert = ldap.OPT_X_TLS_DEMAND
 
-                    ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT,
-                                    reqcert)
+                    ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, reqcert)
                     ldap.set_option(ldap.OPT_X_TLS_CIPHER_SUITE,
                                     ldap_cfg["cipher"])
 
@@ -265,8 +264,7 @@ class Config(object, ConfigParser.RawConfigParser):
                             auth_tokens = ldap.sasl.external(
                                                         ldap_cfg["authzid"])
                         elif mech.lower() == "gssapi":
-                            auth_tokens = ldap.sasl.gssapi(
-                                                        ldap_cfg["authzid"])
+                            auth_tokens = ldap.sasl.gssapi(ldap_cfg["authzid"])
 
                     sasl = True
         
@@ -334,8 +332,7 @@ class Config(object, ConfigParser.RawConfigParser):
                         pass
 
                 # then we call ourself again for static addons
-                settings.update(self.__eval_options(section,
-                                                    backend="static"))
+                settings.update(self.__eval_options(section, backend="static"))
             
             elif backend == "sql":
                 try:
@@ -383,13 +380,11 @@ class Config(object, ConfigParser.RawConfigParser):
                     break
 
                 # then we call ourself again for static addons
-                settings.update(self.__eval_options(section,
-                                                    backend="static"))
+                settings.update(self.__eval_options(section, backend="static"))
 
             elif backend == "filter":
                 if self.has_option(section, "section_filter"):
-                    tmp = self.create_list(self.get(section,
-                                                      "section_filter"))
+                    tmp = self.create_list(self.get(section, "section_filter"))
                     special_opts = tmp
 
                     for special_opt in iter(special_opts):
@@ -448,8 +443,7 @@ class Config(object, ConfigParser.RawConfigParser):
             
             elif backend == "file":
                 for opt in iter(self.options(section)):
-                    if opt in ("autoconfig",
-                               "autodiscover"):
+                    if opt in ("autoconfig", "autodiscover"):
                         tmp = self.get(section, opt)
                         result = self.__expand_vars(tmp)
                         
@@ -457,8 +451,7 @@ class Config(object, ConfigParser.RawConfigParser):
                             settings[opt] = result
 
                 # then we call ourself again for static addons
-                settings.update(self.__eval_options(section,
-                                                    backend="static"))
+                settings.update(self.__eval_options(section, backend="static"))
             else:
                 raise Exception("Unknown backend specified")
 
@@ -528,7 +521,8 @@ class Config(object, ConfigParser.RawConfigParser):
                 result = self.__expand_vars(self.get(section, opt))
                 settings[opt] = self.__replace_makro(result)
             else:
-                settings[service + "_auth_identity"] = "%EMAILLOCALPART%"
+                emaillocalpart = self.__replace_makro("%u")
+                settings[service + "_auth_identity"] = emaillocalpart
             
             if service == "smtp":
                 if self.has_option(section, service + "_author"):
@@ -685,8 +679,7 @@ class Memcache(object):
             return False
 
     def __is_trusted_network(self):
-        if self.__config.has_option("automx",
-                                    "rate_limit_exception_networks"):
+        if self.__config.has_option("automx", "rate_limit_exception_networks"):
             networks = self.__config.get("automx",
                                         "rate_limit_exception_networks")
             networks = self.__config.create_list(networks)
