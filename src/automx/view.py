@@ -65,7 +65,7 @@ class View(object):
             
             if (self.__model.domain.has_key("display_name") or
                 (self.__model.domain.has_key("smtp") and
-                 self.__model.domain["smtp"].has_key("smtp_author"))):
+                 self.__model.domain["smtp"][0].has_key("smtp_author"))):
                 
                 has_user = True
                 
