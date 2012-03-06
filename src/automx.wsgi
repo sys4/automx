@@ -16,11 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.8_beta1'
+__version__ = '0.9'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (C) 2012  state of mind"
 
 import traceback
+import logging
 
 from cgi import escape
 from urlparse import parse_qs
@@ -48,14 +49,19 @@ def application(environ, start_response):
     
     process = True
 
-    err = environ['wsgi.errors']
-
     try:
         data = Config(environ)
     except:
         process = False
         status = STAT_ERR
     
+    try:
+        logging.basicConfig(filename=data.logfile,
+                            format='%(asctime)s %(levelname)s: %(message)s',
+                            level=logging.DEBUG)
+    except IOError, e:
+        print >> environ["wsgi.errors"], e
+  
     if process:
         request_method = environ['REQUEST_METHOD']
         request_method = escape(request_method)
@@ -88,7 +94,7 @@ def application(environ, start_response):
                                                method="xml",
                                                encoding="utf-8",
                                                pretty_print=True)
-                    print >> err, "Debug, request POST\n" + debug_msg 
+                    logging.debug("Request POST\n" + debug_msg) 
         
                 # We need to strip the namespace for XPath
                 expr = "//*[local-name() = $name]"
@@ -96,7 +102,7 @@ def application(environ, start_response):
                 response_schema = root.xpath(expr,
                                              name="AcceptableResponseSchema")
                 if len(response_schema) == 0:
-                    print >> err, "Error in XML request"
+                    logging.warning("Error in XML request")
                     process = False
                     status = STAT_ERR
                     data.memcache.set_client()
@@ -110,7 +116,7 @@ def application(environ, start_response):
         
                     emailaddresses = root.xpath(expr, name="EMailAddress")
                     if len(emailaddresses) == 0:
-                        print >> err, "Error in XML request"
+                        logging.warning("Error in XML request")
                         process = False
                         status = STAT_ERR
                         data.memcache.set_client()
@@ -145,7 +151,7 @@ def application(environ, start_response):
                     schema = "autoconfig"
                     
                 if data.debug:
-                    print >> err, "Debug, request GET: QUERY_STRING: %s" % qs
+                    logging.debug("Request GET: QUERY_STRING: %s" % qs)
     
                 status = STAT_OK
 
@@ -156,21 +162,21 @@ def application(environ, start_response):
             else:
                 process = False
                 status = STAT_ERR
-                print >> err, ("Request %d [%s] blocked!"
-                               % (data.memcache.counter(),
-                                  environ["REMOTE_ADDR"]))
+                logging.warning("Request %d [%s] blocked!"
+                                % (data.memcache.counter(),
+                                   environ["REMOTE_ADDR"]))
         except DataNotFoundException:
             process = False
             status = STAT_ERR
             data.memcache.set_client()
-            print >> err, ("Request %d [%s]" % (data.memcache.counter(),
-                                                environ["REMOTE_ADDR"]))
+            logging.warning("Request %d [%s]" % (data.memcache.counter(),
+                                                 environ["REMOTE_ADDR"]))
         except Exception, e:
             if data.debug:
                 tb = traceback.format_exc()
-                print >> err, tb
+                logging.error(tb)
             else:
-                print >> err, "data.configure(): %s" % e
+                logging.error("data.configure(): %s" % e)
             process = False
             status = STAT_ERR
     
@@ -183,13 +189,13 @@ def application(environ, start_response):
         except Exception, e:
             if data.debug:
                 tb = traceback.format_exc()
-                print >> err, tb
+                logging.error(tb)
             else:
-                print >> err, "view.render(): %s" % e
+                logging.error("view.render(): %s" % e)
             status = STAT_ERR
 
     if data.debug:
-        print >> err, "Debug, response:\n" + response_body
+        logging.debug("Response:\n" + response_body)
 
     response_headers = [('Content-Type', 'text/xml'),
                         ('Content-Length', str(len(response_body)))]

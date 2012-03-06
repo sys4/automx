@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.8_beta1'
+__version__ = '0.9'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (C) 2012  state of mind"
 
@@ -28,6 +28,7 @@ import shlex
 import StringIO
 import re
 import memcache
+import logging
 
 from ConfigParser import NoOptionError
 from ipaddr import IPAddress, IPNetwork
@@ -87,7 +88,12 @@ class Config(object, ConfigParser.RawConfigParser):
         if not self.has_section("automx"):
             raise Exception("Missing section 'automx'")
 
-        self.err = environ["wsgi.errors"]
+        try:
+            if self.has_option("automx", "logfile"):
+                self.logfile = self.get("automx", "logfile")
+        except:
+            self.logfile = None
+
         self.memcache = Memcache(self, environ)
         
         try:
@@ -175,18 +181,17 @@ class Config(object, ConfigParser.RawConfigParser):
                         if backend == "static_append":
                             if upper_level.has_key(opt):
                                 if self.debug:
-                                    print >> self.err, "APPEND %s" % service
+                                    logging.debug("APPEND %s" % service)
                                 upper_level[opt].append(service)
                             else:
                                 if self.debug:
-                                    print >> self.err, ("APPEND NEW %s"
-                                                        % service)
+                                    logging.debug("APPEND NEW %s" % service)
                                 settings[opt] = [service]
                         else:
                             # do not include empty services
                             if len(service) != 0:
                                 if self.debug:
-                                    print >> self.err, "STATIC %s" % service
+                                    logging.debug("STATIC %s" % service)
                                 service_category = OrderedDict()
                                 service_category[opt] = [service]
                                 settings.update(service_category)
@@ -204,8 +209,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     import ldap
                     import ldap.sasl
                 except:
-                    print >> self.err, "python ldap missing"
-                    return OrderedDict()
+                    raise Exception("python ldap missing")
 
                 ldap_cfg = dict(host = "ldap://127.0.0.1/",
                                 base = "",
@@ -330,22 +334,16 @@ class Config(object, ConfigParser.RawConfigParser):
 
                     filter = self.__replace_makro(ldap_cfg["filter"])
                                             
-                    try:
-                        rid = con.search(ldap_cfg["base"],
-                                         scope,
-                                         filter,
-                                         ldap_cfg["result_attrs"])
-                    except Exception, e:
-                        print >> self.err, e
-                        return OrderedDict()
+                    rid = con.search(ldap_cfg["base"],
+                                     scope,
+                                     filter,
+                                     ldap_cfg["result_attrs"])
             
                     raw_res = (None, None)
                     raw_res = con.result(rid, True, 60)
                     if raw_res[0] == None:
                         con.abandon(rid)
-                        error_msg = "LDAP server timeout reached"
-                        print >> self.err, error_msg
-                        return OrderedDict()
+                        raise Exception("LDAP server timeout reached")
 
                     # connection established, we have results
                     self.__vars = dict()
@@ -358,8 +356,7 @@ class Config(object, ConfigParser.RawConfigParser):
                                 # we only accept the first value.
                                 self.__vars[key] = unicode(value[0], "utf-8")
                     else:
-                        error = "No LDAP result from server!"
-                        print >> self.err, error
+                        logging.warning("No LDAP result from server!")
                         raise DataNotFoundException
 
                     try:    
@@ -379,8 +376,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 try:
                     from sqlalchemy.engine import create_engine
                 except:
-                    print >> self.err, "python sqlalchemy missing"
-                    return OrderedDict()
+                    raise Exception("python sqlalchemy missing")
 
                 sql_cfg = dict(host = None, query = "", result_attrs = [])
                 
@@ -412,8 +408,7 @@ class Config(object, ConfigParser.RawConfigParser):
                         # Implicit LIMIT 1 here
                         break
                     else:
-                        error = "No SQL result from server!"
-                        print >> self.err, error
+                        logging.warning("No SQL result from server!")
                         connection.close()
                         raise DataNotFoundException
 
@@ -660,9 +655,7 @@ class Memcache(object):
     def __init__(self, config, environ):
         self.__config = config
         self.__environ = environ
-        
-        self.err = environ["wsgi.errors"]
-        
+                
         # Memcache usage is optional
         self.__has_memcache = True
 
@@ -673,7 +666,7 @@ class Memcache(object):
         try:
             self.__mc = memcache.Client([config.get("automx", "memcache")])
         except ValueError, e:
-            print >> self.err, ("Memcache misconfigured: ", e)
+            logging.warning("Memcache misconfigured: ", e)
             self.__has_memcache = False
 
     def counter(self):
@@ -690,8 +683,7 @@ class Memcache(object):
             try:
                 ttl = self.__config.getint("automx", "memcache_ttl")
             except ValueError, e:
-                err = self.err
-                print >> err , "Memcache <memcache_ttl>, using default: ", e
+                logging.warning("Memcache <memcache_ttl>, using default: ", e)
                 ttl = 600
         else:
             ttl = 600
@@ -714,8 +706,7 @@ class Memcache(object):
             try:
                 limit = self.__config.getint("automx", "client_error_limit")
             except ValueError, e:
-                err = self.err
-                print >> err , ("Memcache <client_error_limit>, "
+                logging.warning("Memcache <client_error_limit>, "
                                 "using default: ", e)
                 limit = 20
         else:
