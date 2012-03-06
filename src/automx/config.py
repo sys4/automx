@@ -577,6 +577,16 @@ class Config(object, ConfigParser.RawConfigParser):
                 emaillocalpart = self.__replace_makro("%u")
                 settings[service + "_auth_identity"] = emaillocalpart
             
+            if self.has_option(section, service + "_expiration_date"):
+                opt = service + "_expiration_date"
+                result = self.__expand_vars(self.get(section, opt))
+                settings[opt] = result
+                
+            if self.has_option(section, service + "_refresh_ttl"):
+                opt = service + "_refresh_ttl"
+                result = self.__expand_vars(self.get(section, opt))
+                settings[opt] = result
+
             if service == "smtp":
                 if self.has_option(section, service + "_author"):
                     opt = service + "_author"

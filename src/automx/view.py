@@ -203,9 +203,13 @@ class View(object):
             else:
                 c.text = "off"
 
-            # We do not support rediscovery
-            c = etree.SubElement(root, "TTL")
-            c.text = "0"
+            if elem.has_key(service + "_expiration_date"):
+                c = etree.SubElement(root, "ExpirationDate")
+                c.text = elem[service + "_expiration_date"]
+
+            if elem.has_key(service + "_refresh_ttl"):
+                c = etree.SubElement(root, "TTL")
+                c.text = elem[service + "_refresh_ttl"]
 
             if service == "smtp":
                 if (elem.has_key(service + "_auth") and
