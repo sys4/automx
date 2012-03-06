@@ -586,10 +586,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 
             if self.has_option(section, service + "_refresh_ttl"):
                 opt = service + "_refresh_ttl"
-                # we try to read the value as int(). If that fails, an error
-                # is logged and processing is aborted.
-                result = self.getint(section, opt)
-                result = self.__expand_vars(str(result))
+                result = self.get(section, opt)
                 settings[opt] = result
 
             if service == "smtp":
