@@ -32,6 +32,7 @@ import logging
 
 from ConfigParser import NoOptionError
 from ipaddr import IPAddress, IPNetwork
+from dateutil import parser
 
 try:
     # Python 2.7
@@ -580,11 +581,15 @@ class Config(object, ConfigParser.RawConfigParser):
             if self.has_option(section, service + "_expiration_date"):
                 opt = service + "_expiration_date"
                 result = self.__expand_vars(self.get(section, opt))
-                settings[opt] = result
+                dt = parser.parse(result, fuzzy=True)
+                settings[opt] = dt.strftime("%Y%m%d")
                 
             if self.has_option(section, service + "_refresh_ttl"):
                 opt = service + "_refresh_ttl"
-                result = self.__expand_vars(self.get(section, opt))
+                # we try to read the value as int(). If that fails, an error
+                # is logged and processing is aborted.
+                result = self.getint(section, opt)
+                result = self.__expand_vars(str(result))
                 settings[opt] = result
 
             if service == "smtp":
