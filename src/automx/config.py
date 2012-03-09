@@ -180,13 +180,15 @@ class Config(object, ConfigParser.RawConfigParser):
                     
                     if opt in ("smtp", "imap", "pop"):
                         if backend == "static_append":
-                            if upper_level.has_key(opt):
+                            if (upper_level is not None and
+                                upper_level.has_key(opt)):
                                 if self.debug:
                                     logging.debug("APPEND %s" % service)
                                 upper_level[opt].append(service)
                             else:
                                 if self.debug:
-                                    logging.debug("APPEND NEW %s" % service)
+                                    logging.debug("APPEND NEW %s"
+                                                  % service)
                                 settings[opt] = [service]
                         else:
                             # do not include empty services
@@ -486,13 +488,14 @@ class Config(object, ConfigParser.RawConfigParser):
                             else:
                                 new_emailaddress = recv.strip()
 
-                            # The result seems not to be a email address
+                            # The result seems not to be an email address
                             if '@' not in new_emailaddress:
                                 continue
+
+                            logging.debug("Email address from filter: %s"
+                                          % new_emailaddress)
                             
                             got_data = True
-                            
-                            domain = new_emailaddress.split('@')[1]
                             
                             # we replace our search_domain 
                             self.__search_domain = special_opt
