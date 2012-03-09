@@ -447,7 +447,9 @@ class Config(object, ConfigParser.RawConfigParser):
                 if self.has_option(section, "section_filter"):
                     tmp = self.create_list(self.get(section, "section_filter"))
                     special_opts = tmp
-
+                    
+                    got_data = False
+                    
                     for special_opt in iter(special_opts):
                         if self.has_option(section, special_opt):
                             cmd = shlex.split(self.get(section, special_opt)) 
@@ -488,16 +490,20 @@ class Config(object, ConfigParser.RawConfigParser):
                             if '@' not in new_emailaddress:
                                 continue
                             
+                            got_data = True
+                            
                             domain = new_emailaddress.split('@')[1]
                             
                             # we replace our search_domain 
                             self.__search_domain = special_opt
-                            lpart = self.__emailaddress.split("@")[0]
-                            self.__emailaddress = lpart + "@" + domain
+                            self.__emailaddress = new_emailaddress
 
                             # recurse again, because we now have a new section
                             # that we need to scan
                             settings.update(self.__eval_options(special_opt))
+                
+                    if not got_data:
+                        raise DataNotFoundException
                             
             elif backend == "global":
                 if self.has_section("global"):
