@@ -636,10 +636,10 @@ class Config(object, ConfigParser.RawConfigParser):
         if "%u" in expression:
             user = self.__emailaddress.split("@")[0]
             expression = expression.replace("%u", user)
-        elif "%d" in expression:
+        if "%d" in expression:
             domain = self.__search_domain
             expression = expression.replace("%d", domain)
-        elif "%s" in expression:
+        if "%s" in expression:
             email = self.__emailaddress
             expression = expression.replace("%s", email)
 
