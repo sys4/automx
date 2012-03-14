@@ -504,6 +504,9 @@ class Config(object, ConfigParser.RawConfigParser):
                             # recurse again, because we now have a new section
                             # that we need to scan
                             settings.update(self.__eval_options(special_opt))
+                            
+                            # we already got a result. Do not continue!
+                            break
                 
                     if not got_data:
                         raise DataNotFoundException
