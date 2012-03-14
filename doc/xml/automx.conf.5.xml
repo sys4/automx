@@ -744,7 +744,10 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
         <term><option>%s</option></term>
 
         <listitem>
-          <para>This macro is replaced by the input key.</para>
+          <para>When the input key is an address of the form
+          <literal>localpart@domainpart</literal>, this macro will be replaced
+          by this (<ulink url="http://www.ietf.org/rfc/rfc2253.txt">RFC
+          2253</ulink>) quoted mail address.</para>
         </listitem>
       </varlistentry>
 
