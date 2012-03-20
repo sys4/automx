@@ -99,7 +99,7 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__domain = OrderedDict()
         
         # if we use dynamic backends, we might earn variables
-        self.__vars = None
+        self.__vars = dict()
         
         if self.has_section("automx"):
             try:
