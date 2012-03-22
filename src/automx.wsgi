@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.8_rc1'
+__version__ = '0.8_rc2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (C) 2012  state of mind"
 
