@@ -665,13 +665,13 @@ class Config(object, ConfigParser.RawConfigParser):
      
         return result
         
-    @property
-    def provider(self):
+    def get_provider(self):
         return self.__automx["provider"]
+    provider = property(fget=get_provider)
 
-    @property       
-    def domain(self):
+    def get_domain(self):
         return self.__domain
+    domain = property(fget=get_domain)
 
 
 class Memcache(object):
