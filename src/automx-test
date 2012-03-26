@@ -19,7 +19,7 @@
 # Authors Christian Roessner, Patrick Ben Koetter, Marc Schiffbauer
 # Copyright (C) 2012  state of mind
 #
-VERSION="0.8_rc1"
+VERSION="0.8"
 
 trap clean_exit EXIT
 function clean_exit() {
