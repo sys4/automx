@@ -29,6 +29,10 @@ protection mentioned above. So if one single part in the protocol backend chain
 does not retrieve results, the whole process is interrupted and the server
 counts one (more) failure for this attempt.
 
+As we made some changes to the code, we realized that it important to change
+logging behavior. So we now log all automx messages to an extra file and also
+the debugging output does give us much more information as the version 0.8.
+
 Many changes have been done inside the code itself. Code cleanups and a better
 exception handling for situations, where no data could be retrieved from
 databases. Also the main file now is much cleaner, as we introduced some
