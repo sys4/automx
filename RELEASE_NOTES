@@ -1,0 +1,37 @@
+Version 0.8 to 0.9:
+
+We have implemented some kind of Denial-of-Service-Attack protection in a way
+that we added a failure counter for bad email address requests. An attacker
+might try to iterate a list of email addresses against automx to see, if the
+server returns valid results or 500 temp errors. Especially users who use
+database driven backends with automx might like this feature, as it stops
+querying the database on errors, when a border limit has been reached. This also
+protects the database from massive queries.
+
+The protection is built using memcached, as it allows a central instance to
+collect for multiple automx processes.
+
+One big new feature is multi protocol support. The Mozilla specs do allow the
+defenition of many protocols of the same type. Yet, this functionallity seems
+not to be included in any of the mozilla thunderbird versions, but it also is
+not declared as being obsolete. Automx as a young project is trying to implement
+as much of the specs as currently possible.
+
+We spent some time of thinking on how to implement this new feature, as we
+always want to keep setting up automx as simple as possible. And at the same
+time being downwards compatible (One golden rule is to never change
+interfaces!). For this we added several new backends and a new option that
+allows automx to follow any further backends. These backends may either
+substitue the former settings or add new information.
+
+But the new backends still guarantee the main protocol order and the DoS
+protection mentioned above. So if one single part in the protocol backend chain
+does not retrieve results, the whole process is interrupted and the server
+counts one (more) failure for this attempt.
+
+Many changes have been done inside the code itself. Code cleanups and a better
+exception handling for situations, where no data could be retrieved from
+databases. Also the main file now is much cleaner, as we introduced some
+constant variables for error codes.
+
+# vim: tw=80
