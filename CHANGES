@@ -1,0 +1,7 @@
+* Version 0.9_beta1 - 2012/04/04
+---------------------------------
+- NEW: Denial-of-Service-Attack protection
+- NEW: Multiple service profiles
+- NEW: Centralized logging
+- Code cleanup
+- Improved exception handling
