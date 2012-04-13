@@ -669,14 +669,15 @@ class Config(object, ConfigParser.RawConfigParser):
                         result = result.split("@")[1]
                         
                     # now the macro may only be part of a FQDN hostname
-                    dcs = result.split(".")
-                    if macro in ("%1", "%2", "%3", "%4", "%5",
-                                 "%6", "%7", "%8", "%9"):
-                        i = int(macro[1])
-                        if len(dcs) < i:
-                            return ""
-                        
-                        return dcs[-i]
+                    if "." in result:
+                        dcs = result.split(".")
+                        if macro in ("%1", "%2", "%3", "%4", "%5",
+                                     "%6", "%7", "%8", "%9"):
+                            i = int(macro[1])
+                            if len(dcs) < i:
+                                return ""
+                            
+                            return dcs[-i]
                     
                 return result
             else:
