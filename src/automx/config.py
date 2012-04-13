@@ -492,8 +492,9 @@ class Config(object, ConfigParser.RawConfigParser):
                             if '@' not in new_emailaddress:
                                 continue
 
-                            logging.debug("Email address from filter: %s"
-                                          % new_emailaddress)
+                            if self.debug:
+                                logging.debug("Email address from filter: %s"
+                                              % new_emailaddress)
                             
                             got_data = True
                             
@@ -652,13 +653,38 @@ class Config(object, ConfigParser.RawConfigParser):
         
         def repl(mobj):
             if self.__vars.has_key(mobj.group(1)):
-                return self.__vars[mobj.group(1)]
+                result = self.__vars[mobj.group(1)]
+                
+                if mobj.group(2) is not None:
+                    macro = mobj.group(2)[1:]
+                    
+                    if "@" in result:
+                        if macro == "%u":
+                            return result.split("@")[0]
+                        if macro == "%d":
+                            return result.split("@")[1]
+                        if macro == "%s":
+                            return result
+                        
+                        result = result.split("@")[1]
+                        
+                    # now the macro may only be part of a FQDN hostname
+                    dcs = result.split(".")
+                    if macro in ("%1", "%2", "%3", "%4", "%5",
+                                 "%6", "%7", "%8", "%9"):
+                        i = int(macro[1])
+                        if len(dcs) < i:
+                            return ""
+                        
+                        return dcs[-i]
+                    
+                return result
             else:
                 # we always must expand variables. Even if it is the empty
                 # string
                 return ""
 
-        result = re.sub(r"\$\{(\w+)\}",
+        result = re.sub(r"\$\{(\w+)(:%[sud1-9])?\}",
                         repl,
                         unicode(expression, "utf-8"),
                         re.UNICODE)
