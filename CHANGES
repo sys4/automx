@@ -1,3 +1,7 @@
+* Version 0.9_beta2 - 2012/04/18
+---------------------------------
+- NEW: Result modifiers for dynamic backends
+
 * Version 0.9_beta1 - 2012/04/04
 ---------------------------------
 - NEW: Denial-of-Service-Attack protection
