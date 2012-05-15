@@ -511,6 +511,71 @@ class Config(object, ConfigParser.RawConfigParser):
                 
                     if not got_data:
                         raise DataNotFoundException
+            
+            elif backend in ("script", "script_append"):
+                if self.has_option(section, "script"):
+                    script_args = self.get(section, "script")
+                else:
+                    raise Exception("Missing option <script>")
+
+                if self.has_option(section, "result_attrs"):
+                    result_attrs = self.create_list(self.get(section,
+                                                             "result_attrs"))
+                else:
+                    raise Exception("Missing option <result_attrs>")
+
+                seperator = None
+                if self.has_option(section, "seperator"):
+                    seperator = self.get(section, "seperator")
+
+                cmd = shlex.split(self.get(section, "script"))
+                for i, item in enumerate(cmd):
+                    cmd[i] = self.__replace_makro(item)
+
+                stdout_fd = sys.__stdout__.fileno()
+                pipe_in, pipe_out = os.pipe()
+                pid = os.fork()
+
+                if pid == 0:
+                    # child
+                    os.close(pipe_in)
+                    os.dup2(pipe_out, stdout_fd)
+
+                    os.execvp(cmd[0], cmd)
+
+                    raise Exception("ERROR in execvp()" )
+                elif pid > 0:
+                    # parent
+                    os.close(pipe_out)
+                    recv = os.read(pipe_in, 1024)
+
+                    result = os.waitpid(pid, 0)
+
+                # check return code
+                if result[1] != 0:
+                    raise Exception("ERROR while calling script",
+                                    result,
+                                    recv.strip())
+
+                if len(recv) == 0:
+                     logging.warning("No result from script!")
+                     raise DataNotFoundException
+
+                result = recv.strip().split(seperator, len(result_attrs))
+
+                for i in range(min(len(result_attrs), len(result))):
+                    self.__vars[result_attrs[i]] = result[i].strip()
+
+                # then we call ourself again for static addons
+                settings.update(self.__eval_options(section,
+                                                  backend="static"))
+
+                if backend == "script":
+                    extra = self.__eval_options(section, backend="static")
+                else:
+                    extra = self.__eval_options(section,
+                                                backend="static_append")
+                settings.update(extra)
                             
             elif backend == "global":
                 if self.has_section("global"):
