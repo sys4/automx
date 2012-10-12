@@ -164,7 +164,9 @@ class Config(object, ConfigParser.RawConfigParser):
                                "account_type",
                                "account_name",
                                "account_name_short",
-                               "display_name"):
+                               "display_name",
+                               "server_url",
+                               "server_name"):
                         tmp = self.get(section, opt)
                         result = self.__expand_vars(tmp)
                         result = self.__replace_makro(result)

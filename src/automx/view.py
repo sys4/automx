@@ -55,55 +55,98 @@ class View(object):
             if self.__subschema == "outlook":
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/outlook/responseschema/2006a")
-            else:
-                # Maybe we need more information here?
+
+                root = etree.Element("Autodiscover", xmlns=NS_AutoDiscover)
+                response = etree.SubElement(root,
+                                            "Response",
+                                            xmlns=NS_Response)
+                
+                if (self.__model.domain.has_key("display_name") or
+                    (self.__model.domain.has_key("smtp") and
+                     self.__model.domain["smtp"][0].has_key("smtp_author"))):
+                    
+                    has_user = True
+                    
+                    user = etree.SubElement(response, "User")
+                    
+                    if self.__model.domain.has_key("display_name"):
+                        displayname = etree.SubElement(user, "DisplayName")
+                        displayname.text = self.__model.domain["display_name"]
+    
+                    if self.__model.domain.has_key("smtp"):
+                        smtp = self.__model.domain["smtp"]
+        
+                        if smtp[0].has_key("smtp_author"):
+                            email = smtp[0]["smtp_author"]
+        
+                            smtp_author = etree.SubElement(user,
+                                                    "AutoDiscoverSMTPAddress")
+                            smtp_author.text = email
+    
+                account = etree.SubElement(response, "Account")
+    
+                if self.__model.domain.has_key("account_type"):
+                    account_type = etree.SubElement(account, "AccountType")
+                    account_type.text = self.__model.domain["account_type"]
+                else:
+                    raise Exception("Missing attribute <account_type>")
+                
+                if self.__model.domain.has_key("action"):
+                    action = etree.SubElement(account, "Action")
+                    action.text = self.__model.domain["action"]
+                else:
+                    raise Exception("Missing attribute <action>")
+    
+                for key, value in self.__model.domain.iteritems():
+                    if key in ("smtp", "imap", "pop"):
+                        if len(value) != 0:
+                            protocol = etree.SubElement(account, "Protocol")
+                            self.__service(key, protocol)
+
+            elif self.__subschema == "mobile":
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
-                               "autodiscover/outlook/responseschema/2006a")
+                               "autodiscover/mobilesync/responseschema/2006")
+
+                root = etree.Element("Autodiscover", xmlns=NS_AutoDiscover)
+                response = etree.SubElement(root,
+                                            "Response",
+                                            xmlns=NS_Response)
                 
-            root = etree.Element("Autodiscover", xmlns=NS_AutoDiscover)
-            response = etree.SubElement(root, "Response", xmlns=NS_Response)
-            
-            if (self.__model.domain.has_key("display_name") or
-                (self.__model.domain.has_key("smtp") and
-                 self.__model.domain["smtp"][0].has_key("smtp_author"))):
-                
-                has_user = True
+                # TODO: do we need a Culture option?
+                culture = etree.SubElement(response, "Culture")
+                culture.text = "en:us"
                 
                 user = etree.SubElement(response, "User")
                 
                 if self.__model.domain.has_key("display_name"):
                     displayname = etree.SubElement(user, "DisplayName")
                     displayname.text = self.__model.domain["display_name"]
+                
+                emailaddress = etree.SubElement(user, "EmailAddress")
+                emailaddress.text = self.__model.domain["emailaddress"]
 
-                if self.__model.domain.has_key("smtp"):
-                    smtp = self.__model.domain["smtp"]
-    
-                    if smtp[0].has_key("smtp_author"):
-                        email = smtp[0]["smtp_author"]
-    
-                        smtp_author = etree.SubElement(user,
-                                                   "AutoDiscoverSMTPAddress")
-                        smtp_author.text = email
-
-            account = etree.SubElement(response, "Account")
-
-            if self.__model.domain.has_key("account_type"):
-                account_type = etree.SubElement(account, "AccountType")
-                account_type.text = self.__model.domain["account_type"]
-            else:
-                raise Exception("Missing attribute <account_type>")
+                action = etree.SubElement(response, "Action")
+                
+                settings = etree.SubElement(action, "Settings")
+                
+                server = etree.SubElement(settings, "Server")
+                
+                servertype = etree.SubElement(server, "Type")
+                servertype.text = "MobileSync"
+                
+                if self.__model.domain.has_key("server_url"):
+                    serverurl = etree.SubElement(server, "Url")
+                    serverurl.text = self.__model.domain["server_url"]
+                
+                if self.__model.domain.has_key("server_name"):
+                    servername = etree.SubElement(server, "Name")
+                    servername.text = self.__model.domain["server_name"]
+                elif self.__model.domain.has_key("server_url"):
+                    servername = etree.SubElement(server, "Name")
+                    servername.text = self.__model.domain["server_url"]
             
-            if self.__model.domain.has_key("action"):
-                action = etree.SubElement(account, "Action")
-                action.text = self.__model.domain["action"]
             else:
-                raise Exception("Missing attribute <action>")
-
-            for key, value in self.__model.domain.iteritems():
-                if key in ("smtp", "imap", "pop"):
-                    if len(value) != 0:
-                        protocol = etree.SubElement(account, "Protocol")
-                        self.__service(key, protocol)
+                return
 
         elif self.__schema == "autoconfig":
             root = etree.Element("clientConfig", version="1.1")
