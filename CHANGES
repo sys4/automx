@@ -1,3 +1,7 @@
+* Version 0.9 - 2012/10/12
+---------------------------------
+- NEW: Added ActiveSync MobileSync support
+
 * Version 0.9_beta2 - 2012/04/18
 ---------------------------------
 - NEW: Result modifiers for dynamic backends
