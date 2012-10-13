@@ -11,6 +11,6 @@ setup(name='automx',
       py_modules=['automx_wsgi'],
       packages=['automx'],
       package_dir={'': 'src'},
-      data_files=[('etc', ['src/conf/automx.conf'])],
+      data_files=[('/etc', ['src/conf/automx.conf'])],
       )
 
