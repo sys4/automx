@@ -13,7 +13,7 @@
 
         <contrib>Wrote the program.</contrib>
 
-        <email>c@roessner-network-solutions.com</email>
+        <email>cr@sys4.de</email>
       </author>
 
       <editor>
@@ -25,7 +25,7 @@
 
         <contrib>Wrote the documentation.</contrib>
 
-        <email>p@state-of-mind.de</email>
+        <email>p@sys4.de</email>
       </editor>
     </authorgroup>
   </refentryinfo>
@@ -35,7 +35,7 @@
 
     <manvolnum>5</manvolnum>
 
-    <refmiscinfo>Version 0.8_beta1</refmiscinfo>
+    <refmiscinfo>Version 0.9.1</refmiscinfo>
 
     <refmiscinfo>automx Manual</refmiscinfo>
   </refmeta>
@@ -359,6 +359,10 @@
         <manvolnum>5</manvolnum>
       </citerefentry>, <citerefentry>
         <refentrytitle>automx_ldap</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_script</refentrytitle>
 
         <manvolnum>5</manvolnum>
       </citerefentry>, <citerefentry>

@@ -13,7 +13,7 @@
 
         <contrib>Wrote the program.</contrib>
 
-        <email>c@roessner-network-solutions.com</email>
+        <email>cr@sys4.de</email>
       </author>
 
       <editor>
@@ -25,7 +25,7 @@
 
         <contrib>Wrote the documentation.</contrib>
 
-        <email>p@state-of-mind.de</email>
+        <email>p@sys4.de</email>
       </editor>
     </authorgroup>
   </articleinfo>
@@ -212,7 +212,7 @@ account_name_short = Example <co id="DEFAULT_account_name_short"/></programlisti
 
       <subtitle>A global backend</subtitle>
 
-      <para> Setting this section is mandatory, but it may remain empty. It
+      <para>Setting this section is mandatory, but it may remain empty. It
       provides a backend, which will be used whenever automx should serve a
       domain, but no section with domain-specific settings has been
       specified.</para>
@@ -226,8 +226,8 @@ account_name_short = Example <co id="DEFAULT_account_name_short"/></programlisti
 
       <note>
         <para>This is useful when many domains should use the same backend or
-        when automx domain property configures it to run as wildcard service.
-        </para>
+        when automx domain property configures it to run as wildcard
+        service.</para>
       </note>
 
       <example>

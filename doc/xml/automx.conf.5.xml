@@ -13,7 +13,7 @@
 
         <contrib>Wrote the program.</contrib>
 
-        <email>c@roessner-network-solutions.com</email>
+        <email>cr@sys4.de</email>
       </author>
 
       <editor>
@@ -25,7 +25,7 @@
 
         <contrib>Wrote the documentation.</contrib>
 
-        <email>p@state-of-mind.de</email>
+        <email>p@sys4.de</email>
       </editor>
     </authorgroup>
   </refentryinfo>
@@ -35,7 +35,7 @@
 
     <manvolnum>5</manvolnum>
 
-    <refmiscinfo>Version 0.8_beta1</refmiscinfo>
+    <refmiscinfo>Version 0.9.1</refmiscinfo>
 
     <refmiscinfo>automx Manual</refmiscinfo>
   </refmeta>
@@ -137,7 +137,7 @@
 
     <para>Service names available in automx are shown in the following list.
     The service options to create parameters are specified in <xref
-    linkend="parameters" />:</para>
+    linkend="parameters"/>:</para>
 
     <variablelist>
       <varlistentry>
@@ -477,8 +477,7 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
         <listitem>
           <para>Specifies the service type that should be provided in the
           configuration response. By default all services are disabled. See
-          <xref linkend="services" /> for a list of valid service
-          names.</para>
+          <xref linkend="services"/> for a list of valid service names.</para>
         </listitem>
       </varlistentry>
 
@@ -489,7 +488,7 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
         <listitem>
           <para>Specifies the login name the client should use when it
           identifies the user in order to gain access to the service. See
-          <xref linkend="macros" /> for available options.</para>
+          <xref linkend="macros"/> for available options.</para>
         </listitem>
       </varlistentry>
 
@@ -684,7 +683,7 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
 
         <listitem>
           <para>Specifies the envelope sender address used when the client
-          sends a message. See <xref linkend="macros" /> for available
+          sends a message. See <xref linkend="macros"/> for available
           options.</para>
 
           <note>
@@ -786,6 +785,10 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
         <manvolnum>5</manvolnum>
       </citerefentry>, <citerefentry>
         <refentrytitle>automx_ldap</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_script</refentrytitle>
 
         <manvolnum>5</manvolnum>
       </citerefentry>, <citerefentry>
