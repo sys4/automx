@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry>
+  <refentryinfo>
+    <title>automx_script</title>
+
+    <authorgroup>
+      <author>
+        <firstname>Christian</firstname>
+
+        <surname>Roessner</surname>
+
+        <contrib>Wrote the program.</contrib>
+
+        <email>cr@sys4.de</email>
+      </author>
+
+      <author>
+        <firstname>Michael</firstname>
+
+        <surname>Menge</surname>
+
+        <contrib>Wrote and contributed this backend.</contrib>
+      </author>
+
+      <editor>
+        <firstname>Patrick</firstname>
+
+        <othername>Ben</othername>
+
+        <surname>Koetter</surname>
+
+        <contrib>Wrote the documentation.</contrib>
+
+        <email>p@sys4.de</email>
+      </editor>
+    </authorgroup>
+  </refentryinfo>
+
+  <refmeta>
+    <refentrytitle>automx_script</refentrytitle>
+
+    <manvolnum>5</manvolnum>
+
+    <refmiscinfo>Version 0.9.1</refmiscinfo>
+
+    <refmiscinfo>automx Manual</refmiscinfo>
+  </refmeta>
+
+  <refnamediv>
+    <refname><filename>automx_script</filename></refname>
+
+    <refpurpose>automx script backend configuration parameters</refpurpose>
+  </refnamediv>
+
+  <refsection>
+    <title>Description</title>
+
+    <para>The <citerefentry>
+        <refentrytitle>automx_script</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry> man page specifies all parameters that control access
+    from within <systemitem class="service">automx</systemitem> to a script
+    backend.</para>
+
+    <para>The script backend provides automx with configuration values by
+    running an external script. The results of the script are handed back to
+    automx. automx assigns the results as values to account configuration
+    parameters.</para>
+  </refsection>
+
+  <refsection>
+    <title id="parameters">Parameters</title>
+
+    <variablelist>
+      <varlistentry>
+        <term><parameter>result_attrs</parameter> (default: none)</term>
+
+        <listitem>
+          <para>Specifies a list of one or more variables. The output of the
+          external script will assign values to these variables. Results will
+          be assigned in the same order as variables have been listed.</para>
+
+          <programlisting>result_attrs = </programlisting>
+
+          <important>
+            <para><citerefentry>
+                <refentrytitle>automx_script</refentrytitle>
+
+                <manvolnum>5</manvolnum>
+              </citerefentry> does not check if the number of values returned
+            matches the ones expected. Too many return values will be
+            discarded. If the script returns too few <citerefentry>
+                <refentrytitle>automx_script</refentrytitle>
+
+                <manvolnum>5</manvolnum>
+              </citerefentry> will use the corresponding result attribute
+            name.</para>
+          </important>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><parameter>script</parameter> (default: none)</term>
+
+        <listitem>
+          <para>Specifies the absolute path to the script which should be run
+          by the backend <citerefentry>
+              <refentrytitle>automx_script</refentrytitle>
+
+              <manvolnum>5</manvolnum>
+            </citerefentry> backend.</para>
+
+          <programlisting>script = /usr/local/bin/example_com.sh</programlisting>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><parameter>separator</parameter> (default: whitespace)</term>
+
+        <listitem>
+          <para>Specifies the character that separates values returned by the
+          external script.</para>
+
+          <programlisting>separator</programlisting>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+
+  <refsection>
+    <title>See also</title>
+
+    <para><citerefentry>
+        <refentrytitle>automx</refentrytitle>
+
+        <manvolnum>8</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx.conf</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_ldap</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_script</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx_sql</refentrytitle>
+
+        <manvolnum>5</manvolnum>
+      </citerefentry>, <citerefentry>
+        <refentrytitle>automx-test</refentrytitle>
+
+        <manvolnum>1</manvolnum>
+      </citerefentry></para>
+  </refsection>
+</refentry>
