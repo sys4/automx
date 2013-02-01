@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Basic Configuration</title><link rel="stylesheet" type="text/css" href="screen.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div class="article" title="Basic Configuration"><div class="titlepage"><div><div><h2 class="title"><a id="idp173824"></a>Basic Configuration</h2></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">Christian</span> <span class="surname">Rößner</span></h3><span class="contrib">Wrote the program.</span> <code class="email">&lt;<a class="email" href="mailto:cr@sys4.de">cr@sys4.de</a>&gt;</code></div><div class="editor"><h4 class="editedby">Edited by</h4><h3 class="editor"><span class="firstname">Patrick</span> <span class="othername">Ben</span> <span class="surname">Koetter</span></h3><span class="contrib">Wrote the documentation.</span> <code class="email">&lt;<a class="email" href="mailto:p@sys4.de">p@sys4.de</a>&gt;</code></div></div></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#idp30320">1. Format</a></span></dt><dt><span class="section"><a href="#idp168128">2. Sections</a></span></dt><dd><dl><dt><span class="section"><a href="#idp170688">2.1. [automx]</a></span></dt><dt><span class="section"><a href="#idp4853728">2.2. [DEFAULT]</a></span></dt><dt><span class="section"><a href="#idp5601152">2.3. [global]</a></span></dt></dl></dd></dl></div><div class="abstract" title="Abstract"><div class="titlepage"></div><p>This document contains information for initial and/or basic
+    configuration of automx.</p></div><p>automx reads runtime behaviour and all settings controlling a domains
+  account provisioning from a single configuration file. By default automx
+  expects to find this file at <code class="filename">/etc/automx.conf</code>.</p><div class="section" title="1. Format"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp30320"></a>1. Format</h2></div></div></div><p>The general format of the <code class="filename">automx.conf</code> file is
+    as follows:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The basic element contained in an INI file is the property.
+        Every property has a name and a value, delimited by an equals sign
+        (<span class="quote">“<span class="quote">=</span>”</span>). The name appears to the left of the equals
+        sign.</p></li><li class="listitem"><p>Properties are grouped into sections. The section name appears
+        on a line by itself, in square brackets (<span class="quote">“<span class="quote">[</span>”</span> and
+        <span class="quote">“<span class="quote">]</span>”</span>). All properties after the section declaration are
+        associated with that section. There is no explicit <span class="quote">“<span class="quote">end of
+        section</span>”</span> delimiter; sections end at the next section
+        declaration, or the end of the file. Sections may not be
+        nested.</p></li><li class="listitem"><p>Section and property names are case sensitive.</p></li><li class="listitem"><p>A line with a number sign (<span class="quote">“<span class="quote">#</span>”</span>) begins a comment.
+        Anything following a number sign will be ignored by automx.</p></li></ul></div></div><div class="section" title="2. Sections"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp168128"></a>2. Sections</h2></div></div></div><p>Sections create a namespace in which properties specific to a domain
+    are defined. The section name identifies the domain. The three section
+    names <code class="option">[automx]</code>, <code class="option">[DEFAULT]</code> and
+    <code class="option">[global]</code> are reserved for special purposes within
+    automx.</p><div class="section" title="2.1. [automx]"><div class="titlepage"><div><div><h3 class="title"><a id="idp170688"></a>2.1. [automx]</h3></div><div><h4 class="subtitle">Controlling automx Runtime Behaviour</h4></div></div></div><p>This section is mandatory - it lists all options controlling
+      automx runtime behaviour. The properties <em class="parameter"><code>provider</code></em>
+      and <em class="parameter"><code>domains</code></em> are also mandatory. Usage of
+      <em class="parameter"><code>memcache</code></em> and all of its associated properties is
+      highly recommended.</p><div class="example"><a id="idp954512"></a><p class="title"><strong>Example 1. [automx]</strong></p><div class="example-contents"><p>The following example shows a typical <code class="option">[automx]</code>
+        section setup:</p><pre class="programlisting">[automx]
+provider = example.com <a id="automx_provider"></a><img src="images/callouts/1.png" alt="1" border="0" />
+domains = * <a id="automx_domains"></a><img src="images/callouts/2.png" alt="2" border="0" />
+logfile = /var/log/automx/automx.log <a id="automx_logfile"></a><img src="images/callouts/3.png" alt="3" border="0" />
+debug = yes <a id="automx_debug"></a><img src="images/callouts/4.png" alt="4" border="0" />
+memcache = 127.0.0.1:11211 <a id="automx_memcache"></a><img src="images/callouts/5.png" alt="5" border="0" />
+memcache_ttl = 86400
+client_error_limit = 5 <a id="automx_client_error_limit"></a><img src="images/callouts/6.png" alt="6" border="0" />
+rate_limit_exception_networks = 127.0.0.0/8, ::1/128 <a id="automx_rate_limit_exception_networks"></a><img src="images/callouts/7.png" alt="7" border="0" /></pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left"><p><a href="#automx_provider"><img src="images/callouts/1.png" alt="1" border="0" /></a> </p></td><td valign="top" align="left"><p>The <em class="parameter"><code>provider</code></em> property configures
+            automx to identify the webservice as
+            <code class="option">example.com</code>.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#automx_domains"><img src="images/callouts/2.png" alt="2" border="0" /></a> </p></td><td valign="top" align="left"><p>The wildcard option <code class="option">*</code> used in
+            <em class="parameter"><code>domains</code></em> instructs automx to answer any
+            configuration request regardless of the domain sent by the mail
+            client.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#automx_logfile"><img src="images/callouts/3.png" alt="3" border="0" /></a> </p></td><td valign="top" align="left"><p>All log information should go to
+            /var/log/automx/automx.log.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#automx_debug"><img src="images/callouts/4.png" alt="4" border="0" /></a> </p></td><td valign="top" align="left"><p>Debugging is enabled and infos will be sent to
+            <em class="parameter"><code>logfile</code></em>.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#automx_memcache"><img src="images/callouts/5.png" alt="5" border="0" /></a> </p></td><td valign="top" align="left"><p>Statistical data controlling errors caused by clients
+            accessing database backends will be sent to the specified
+            <code class="systemitem">memcache</code> service.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#automx_client_error_limit"><img src="images/callouts/6.png" alt="6" border="0" /></a> </p></td><td valign="top" align="left"><p>In this example a client may not cause more than
+            <code class="option">5</code> errors before automx will refuse to answer
+            further queries.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#automx_rate_limit_exception_networks"><img src="images/callouts/7.png" alt="7" border="0" /></a> </p></td><td valign="top" align="left"><p>Clients listed in
+            <em class="parameter"><code>rate_limit_exception_networks</code></em> are excluded
+            from rate limiting.</p></td></tr></table></div></div></div><br class="example-break" /></div><div class="section" title="2.2. [DEFAULT]"><div class="titlepage"><div><div><h3 class="title"><a id="idp4853728"></a>2.2. [DEFAULT]</h3></div><div><h4 class="subtitle">Properties present in all other sections</h4></div></div></div><p>This section is optional. Settings in this section define
+      properties which will be present in all other sections. It is useful to
+      avoid redundancy.</p><div class="example"><a id="idp2895504"></a><p class="title"><strong>Example 2. [DEFAULT]</strong></p><div class="example-contents"><p>The following example shows a typical <code class="option">[DEFAULT]</code>
+        section setup:</p><pre class="programlisting">[DEFAULT]
+action = settings <a id="DEFAULT_action"></a><img src="images/callouts/1.png" alt="1" border="0" />
+
+account_type = email <a id="DEFAULT_account_type"></a><img src="images/callouts/2.png" alt="2" border="0" />
+account_name = Example Inc. <a id="DEFAULT_account_name"></a><img src="images/callouts/3.png" alt="3" border="0" />
+account_name_short = Example <a id="DEFAULT_account_name_short"></a><img src="images/callouts/4.png" alt="4" border="0" /></pre><div class="calloutlist"><table border="0" summary="Callout list"><tr><td width="5%" valign="top" align="left"><p><a href="#DEFAULT_action"><img src="images/callouts/1.png" alt="1" border="0" /></a> </p></td><td valign="top" align="left"><p>The default action for automx is to provide account
+            settings.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>The Microsoft schema forsees other actions that account
+              provisioning.</p></td></tr></table></div></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#DEFAULT_account_type"><img src="images/callouts/2.png" alt="2" border="0" /></a> </p></td><td valign="top" align="left"><p>The <em class="parameter"><code>account_type</code></em> should be an email
+            account.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#DEFAULT_account_name"><img src="images/callouts/3.png" alt="3" border="0" /></a> </p></td><td valign="top" align="left"><p>The account should show up as <code class="option">Example Inc.</code>
+            in the clients account list.</p></td></tr><tr><td width="5%" valign="top" align="left"><p><a href="#DEFAULT_account_name_short"><img src="images/callouts/4.png" alt="4" border="0" /></a> </p></td><td valign="top" align="left"><p>The accounts short name should be
+            <code class="option">Example</code>.</p></td></tr></table></div></div></div><br class="example-break" /></div><div class="section" title="2.3. [global]"><div class="titlepage"><div><div><h3 class="title"><a id="idp5601152"></a>2.3. [global]</h3></div><div><h4 class="subtitle">A global backend</h4></div></div></div><p>Setting this section is mandatory, but it may remain empty. It
+      provides a backend, which will be used whenever automx should serve a
+      domain, but no section with domain-specific settings has been
+      specified.</p><p>Other sections may either explicitly or implicitly refer to the
+      <code class="option">[global]</code> section as a whole. An explicit reference
+      specifies <code class="option">global</code> as backend property. Implicit
+      references simply announce the domain in automx'
+      <em class="parameter"><code>domains</code></em> list and omit an explicit section
+      definition for that domain.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This is useful when many domains should use the same backend or
+        when automx domain property configures it to run as wildcard
+        service.</p></td></tr></table></div><div class="example"><a id="idp5605616"></a><p class="title"><strong>Example 3. [global]</strong></p><div class="example-contents"><p>The following example configures automx to query a LDAP
+        directory service. Refer to <span class="citerefentry"><span class="refentrytitle">automx_ldap</span>(5)</span> for a detailed discussion of parameters and their
+        meaning.</p><pre class="programlisting">[global]
+backend = ldap
+
+account_name = ${cn} (Example Inc.)
+display_name = ${givenName} ${sn}
+
+smtp = yes
+smtp_server = mail.example.com
+smtp_port = 587
+smtp_encryption = starttls
+smtp_auth = plaintext
+smtp_auth_identity = ${mail}
+smtp_expiration_date = 2012-12-31
+smtp_refresh_ttl = 0
+smtp_default = yes
+
+imap = yes
+imap_server = mail.example.com
+imap_port = 993
+imap_encryption = ssl
+imap_auth = plaintext
+imap_auth_identity = ${mail}
+imap_expiration_date = 2012-12-31
+imap_refresh_ttl = 0
+
+pop = no
+pop_server = mail.example.com
+pop_port = 995
+pop_encryption = ssl
+pop_auth = plaintext
+pop_auth_identity = ${mail}
+pop_expiration_date = 2012-12-31
+pop_refresh_ttl = 0
+
+host = ldap://ldap.example.com
+base = ou=people,dc=example,dc=com
+result_attrs = mail, cn, givenName, sn
+scope = sub
+filter = (&amp;(objectClass=*)(uniqueIdentifier=%s))
+
+bindmethod = sasl
+saslmech = EXTERNAL
+usetls = yes
+reqcert = demand
+cert = /etc/ssl/certs/mail.example.com.crt.pem
+key = /etc/ssl/private/mail.example.com.key.pem
+cacert = /etc/ssl/certs/ca-certificates.crt</pre></div></div><br class="example-break" /></div></div></div></body></html>

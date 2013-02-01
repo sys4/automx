@@ -2,13 +2,13 @@ INSTALL
 
 Christian Roessner
 
-   Wrote the program. <c@roessner-network-solutions.com>
+   Wrote the program. <cr@sys4.de>
 
 Edited by
 
 Patrick Ben Koetter
 
-   Wrote the documentation. <p@state-of-mind.de>
+   Wrote the documentation. <p@sys4.de>
      __________________________________________________________________
 
    Table of Contents
@@ -26,8 +26,6 @@ Patrick Ben Koetter
    4. DNS Configuration
    5. Web Server Configuration
    6. Testing And Debugging automx
-
-   Abstract
 
    This document contains step by step instructions to install automx.
 
@@ -164,7 +162,8 @@ autodiscover.example.com.     IN    A     192.168.2.1
   ServerAdmin webmaster@example.com
 
   <IfModule mod_wsgi.c>
-    WSGIScriptAlias /mail/config-v1.1.xml /usr/local/lib/automx/automx.wsgi
+    WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx
+/automx.wsgi
     <Directory "/usr/local/lib/automx">
       Order allow,deny
       Allow from all
@@ -176,14 +175,12 @@ autodiscover.example.com.     IN    A     192.168.2.1
 <VirtualHost *:443>
 
   ServerName example.com:443
-  ServerAlias autoconfig.example.com:443
+  ServerAlias autodiscover.example.com:443
   ServerAdmin webmaster@example.com
 
   <IfModule mod_wsgi.c>
-    WSGIScriptAlias /Autodiscover/Autodiscover.xml /usr/local/lib/automx/automx.
-wsgi
-    WSGIScriptAlias /autodiscover/autodiscover.xml /usr/local/lib/automx/automx.
-wsgi
+    WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx
+/automx.wsgi
     <Directory "/usr/local/lib/automx">
       Order allow,deny
       Allow from all

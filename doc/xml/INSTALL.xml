@@ -248,7 +248,7 @@ autodiscover.example.com.     IN    A     192.168.2.1</programlisting>
   ServerAdmin webmaster@example.com
 
   &lt;IfModule mod_wsgi.c&gt;
-    WSGIScriptAlias /mail/config-v1.1.xml /usr/local/lib/automx/automx.wsgi
+    WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx/automx.wsgi
     &lt;Directory "/usr/local/lib/automx"&gt;
       Order allow,deny
       Allow from all
@@ -260,12 +260,11 @@ autodiscover.example.com.     IN    A     192.168.2.1</programlisting>
 &lt;VirtualHost *:443&gt;
 
   ServerName example.com:443
-  ServerAlias autoconfig.example.com:443
+  ServerAlias autodiscover.example.com:443
   ServerAdmin webmaster@example.com
 
   &lt;IfModule mod_wsgi.c&gt;
-    WSGIScriptAlias /Autodiscover/Autodiscover.xml /usr/local/lib/automx/automx.wsgi
-    WSGIScriptAlias /autodiscover/autodiscover.xml /usr/local/lib/automx/automx.wsgi
+    WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx/automx.wsgi
     &lt;Directory "/usr/local/lib/automx"&gt;
       Order allow,deny
       Allow from all

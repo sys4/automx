@@ -1,13 +1,13 @@
 '\" t
-.\"     Title: automx_sql
+.\"     Title: automx_script
 .\"    Author: Christian Roessner <cr@sys4.de>
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
 .\"      Date: 02/01/2013
-.\"    Manual: automx_sql
+.\"    Manual: automx_script
 .\"    Source: Version 0.9.1
 .\"  Language: English
 .\"
-.TH "AUTOMX_SQL" "5" "02/01/2013" "Version 0.9.1" "automx_sql"
+.TH "AUTOMX_SCRIPT" "5" "02/01/2013" "Version 0.9.1" "automx_script"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -28,92 +28,77 @@
 .\" * MAIN CONTENT STARTS HERE *
 .\" -----------------------------------------------------------------
 .SH "NAME"
-automx_sql \- automx SQL backend configuration parameters
+automx_script \- automx script backend configuration parameters
 .SH "DESCRIPTION"
 .PP
 The
-\fBautomx_sql\fR(5)
+\fBautomx_script\fR(5)
 man page specifies all parameters that control access from within
 automx
-to a SQL backend\&.
+to a script backend\&.
+.PP
+The script backend provides automx with configuration values by running an external script\&. The results of the script are handed back to automx\&. automx assigns the results as values to account configuration parameters\&.
 .SH "PARAMETERS"
-.PP
-\fBhost\fR (default: none)
-.RS 4
-Specifies one or more SQL servers separated by commas\&. Each server specification must provide database driver, username and password to access a database on a host as shown in the following example:
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-host = driver://username:password@hostname/database
-.fi
-.if n \{\
-.RE
-.\}
-.if n \{\
-.sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBListing two and more servers\fR
-.ps -1
-.br
-Subsequent servers to the first serve
-\fIonly for fallback purposes\fR, i\&.e\&. a server to the right will only be queried if the server left to it cannot be reached\&. If a server can be reached no further attempts will be made regardless if the query returned a result or not\&.
-.sp .5v
-.RE
-.RE
-.PP
-\fBquery\fR (default: none)
-.RS 4
-Specifies the query that should be sent to the database specified with the
-\fBhost\fR
-parameter\&.
-.sp
-.if n \{\
-.RS 4
-.\}
-.nf
-query = SELECT displayname, mailaddr FROM mail WHERE mailaddr=\*(Aq%s\*(Aq;
-.fi
-.if n \{\
-.RE
-.\}
-.if n \{\
-.sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBNote\fR
-.ps -1
-.br
-See the section called
-\(lqMacros and Variables\(rq
-in
-\fBautomx.conf\fR(5)
-for a list of available query macros\&.
-.sp .5v
-.RE
-.RE
 .PP
 \fBresult_attrs\fR (default: none)
 .RS 4
-Specifies the attributes whose values should be used in an automx account setup\&.
+Specifies a list of one or more variables\&. The output of the external script will assign values to these variables\&. Results will be assigned in the same order as variables have been listed\&.
 .sp
 .if n \{\
 .RS 4
 .\}
 .nf
-result_attrs = displayname, mailaddr
+result_attrs = server, email, auth, socket
+.fi
+.if n \{\
+.RE
+.\}
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBImportant\fR
+.ps -1
+.br
+\fBautomx_script\fR(5)
+does not check if the number of values returned matches the ones expected\&. Too many return values will be discarded\&. If the script returns too few
+\fBautomx_script\fR(5)
+will use the corresponding result attribute name\&.
+.sp .5v
+.RE
+.RE
+.PP
+\fBscript\fR (default: none)
+.RS 4
+Specifies the absolute path to the script which should be run by the backend
+\fBautomx_script\fR(5)
+backend\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+script = /usr/local/bin/example_com\&.sh "%s"
+.fi
+.if n \{\
+.RE
+.\}
+.RE
+.PP
+\fBseparator\fR (default: whitespace)
+.RS 4
+Specifies the character that separates values returned by the external script\&.
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+separator = ,
 .fi
 .if n \{\
 .RE
@@ -132,6 +117,11 @@ result_attrs = displayname, mailaddr
 \fBChristian Roessner\fR <\&cr@sys4\&.de\&>
 .RS 4
 Wrote the program\&.
+.RE
+.PP
+\fBMichael Menge\fR
+.RS 4
+Wrote and contributed this backend\&.
 .RE
 .PP
 \fBPatrick Ben Koetter\fR <\&p@sys4\&.de\&>

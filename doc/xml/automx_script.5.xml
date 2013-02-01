@@ -83,7 +83,7 @@
           external script will assign values to these variables. Results will
           be assigned in the same order as variables have been listed.</para>
 
-          <programlisting>result_attrs = </programlisting>
+          <programlisting>result_attrs = server, email, auth, socket</programlisting>
 
           <important>
             <para><citerefentry>
@@ -113,7 +113,7 @@
               <manvolnum>5</manvolnum>
             </citerefentry> backend.</para>
 
-          <programlisting>script = /usr/local/bin/example_com.sh</programlisting>
+          <programlisting>script = /usr/local/bin/example_com.sh "%s"</programlisting>
         </listitem>
       </varlistentry>
 
@@ -124,7 +124,7 @@
           <para>Specifies the character that separates values returned by the
           external script.</para>
 
-          <programlisting>separator</programlisting>
+          <programlisting>separator = ,</programlisting>
         </listitem>
       </varlistentry>
     </variablelist>
