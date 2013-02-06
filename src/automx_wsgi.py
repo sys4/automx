@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.9'
+__version__ = '0.9.1'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2012 [*] sys4 AG"
 
@@ -143,17 +143,21 @@ def application(environ, start_response):
                 qs = environ['QUERY_STRING']
                 d = parse_qs(qs)
             
-                emailaddress = d.get("emailaddress")[0]
-                if emailaddress is None:
-                    process = False
-                    status = STAT_ERR
+                if d is not None:
+                    emailaddress = d.get("emailaddress")[0]
+                    if emailaddress is None:
+                        process = False
+                        status = STAT_ERR
+                    else:
+                        schema = "autoconfig"
+                        
+                    if data.debug:
+                        logging.debug("Request GET: QUERY_STRING: %s" % qs)
+            
+                    status = STAT_OK
                 else:
-                    schema = "autoconfig"
-                    
-                if data.debug:
-                    logging.debug("Request GET: QUERY_STRING: %s" % qs)
-    
-                status = STAT_OK
+                    logging.debug("Request GET: QUERY_STRING failed!")
+                    status = STAT_ERR
 
     if process:
         try:
