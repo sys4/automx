@@ -19,7 +19,7 @@
 # Authors Christian Roessner, Patrick Ben Koetter, Marc Schiffbauer
 # Copyright (c) 2012 [*] sys4 AG
 #
-VERSION="0.9"
+VERSION="0.9.1"
 
 trap clean_exit EXIT
 function clean_exit() {
