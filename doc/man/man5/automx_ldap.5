@@ -1,279 +1,147 @@
-'\" t
-.\"     Title: automx_ldap
-.\"    Author: Christian Roessner <cr@sys4.de>
-.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 02/01/2013
-.\"    Manual: automx_ldap
-.\"    Source: Version 0.9.1
-.\"  Language: English
-.\"
-.TH "AUTOMX_LDAP" "5" "02/01/2013" "Version 0.9.1" "automx_ldap"
-.\" -----------------------------------------------------------------
-.\" * Define some portability stuff
-.\" -----------------------------------------------------------------
-.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.\" http://bugs.debian.org/507673
-.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
-.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.ie \n(.g .ds Aq \(aq
-.el       .ds Aq '
-.\" -----------------------------------------------------------------
-.\" * set default formatting
-.\" -----------------------------------------------------------------
-.\" disable hyphenation
-.nh
-.\" disable justification (adjust text to left margin only)
-.ad l
-.\" -----------------------------------------------------------------
-.\" * MAIN CONTENT STARTS HERE *
-.\" -----------------------------------------------------------------
-.SH "NAME"
+.\" Man page generated from reStructeredText.
+.
+.TH AUTOMX_LDAP 5 "02/08/2013" "" "automx"
+.SH NAME
 automx_ldap \- automx LDAP backend configuration parameters
-.SH "DESCRIPTION"
-.PP
-The
-\fBautomx_ldap\fR(5)
-man page specifies all parameters that control access from within
-automx
-to a LDAP backend\&.
-.SH "PARAMETERS"
-.PP
-\fBauthzid\fR (no default)
-.RS 4
-Specifies the SASL proxy authorization identity\&.
-.RE
-.PP
-\fBbase\fR (default: none)
-.RS 4
-Specifies the default base DN to use when performing ldap operations\&. The base must be specified as a Distinguished Name in LDAP format\&.
-.RE
-.PP
-\fBbinddn\fR (default: none)
-.RS 4
-Specifies the default bind DN to use when performing ldap operations\&. The bind DN must be specified as a Distinguished Name in LDAP format\&.
-.RE
-.PP
-\fBbindmethod\fR (default: \fIsimple\fR)
-.RS 4
-Specifies how authentication should take place\&. Valid options are either
-\fIsimple\fR
-for a simple bind or
-\fIsasl\fR
-for a bind that requires SASL authentication\&.
-.RE
-.PP
-\fBbindpw\fR (default: none)
-.RS 4
-Specifies the password used when
-\fBbinddn\fR
-identifies itself with the LDAP server\&.
-.RE
-.PP
-\fBcacert\fR (default: none)
-.RS 4
-Specifies the path to a file that contains all certificates of Certification Authorities automx should trust\&.
-.RE
-.PP
-\fBcert\fR (default: none)
-.RS 4
-Specifies the path to a file that contains automx\*(Aqs certificate\&.
-.RE
-.PP
-\fBcipher\fR (default: \fITLSv1\fR)
-.RS 4
-See
-\fBciphers\fR(1)
-for a list of valid options\&.
-.RE
-.PP
-\fBfilter\fR (default: \fI(objectClass=*)\fR)
-.RS 4
-Specifies the search filter to select appropriate LDAP objects\&. The filter should conform to the string representation for search filters as defined in RFC 4515\&.
-.if n \{\
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
 .sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBNote\fR
-.ps -1
-.br
-See the section
-\(lqMacros and Variables\(rq
-in
-\fBautomx.conf\fR(5)
-for a list of available query macros\&.
-.sp .5v
+The automx_ldap(5) man page specifies all parameters that control access from
+within automx to a LDAP backend.
+.SH PARAMETERS
+.INDENT 0.0
+.TP
+.B authzid (no default)
+Specifies the SASL proxy authorization identity.
+.TP
+.B base (default: none)
+Specifies the default base DN to use when performing ldap operations. The base must be specified as a Distinguished Name in LDAP format.
+.TP
+.B binddn (default: none)
+Specifies the default bind DN to use when performing ldap operations. The bind DN must be specified as a Distinguished Name in LDAP format.
+.TP
+.B bindmethod (default: simple)
+Specifies how authentication should take place. Valid options are either simple for a simple bind or sasl for a bind that requires SASL authentication.
+.TP
+.B bindpw (default: none)
+Specifies the password used when binddn identifies itself with the LDAP server.
+.TP
+.B cacert (default: none)
+Specifies the path to a file that contains all certificates of Certification Authorities automx should trust.
+.TP
+.B cert (default: none)
+Specifies the path to a file that contains automx\(aqs certificate.
+.TP
+.B cipher (default: TLSv1)
+See ciphers(1) for a list of valid options.
+.TP
+.B filter (default: (objectClass=*))
+Specifies the search filter to select appropriate LDAP objects. The filter should conform to the string representation for search filters as defined in RFC 4515.
+.IP Note
+See the section “Macros and Variables” in automx.conf(5) for a list of available query macros.
 .RE
-.RE
-.PP
-\fBhost\fR (default: \fIldap://127\&.0\&.0\&.1/\fR)
-.RS 4
+.TP
+.B host (default: \fI\%ldap://127.0.0.1/\fP)
 Specifies one or more LDAP servers separated by commas as shown in the following example:
 .sp
-.if n \{\
-.RS 4
-.\}
 .nf
-host = ldap://127\&.0\&.0\&.1, ldap://192\&.168\&.2\&.1
+.ft C
+host = ldap://127.0.0.1, ldap://192.168.2.1
+.ft P
 .fi
-.if n \{\
+.IP Important
+Subsequent servers to the first serve only for fallback purposes, i.e. a server to the right will only be queried if the server left to it cannot be reached. If a server can be reached no further attempts will be made regardless if the query returned a result or not.
 .RE
-.\}
-.if n \{\
+.TP
+.B key (default: none)
+Specifies the path to a file that contains automx\(aqs private key, which matches automx certificate given with cert.
+.TP
+.B reqcert (default: never)
+Specifies what checks to perform on server certificates in a TLS session, if any. The <level> can be specified as one of the following keywords:
+.INDENT 7.0
+.TP
+.B never
+The client will not request or check any server certificate. This is the default setting.
+.TP
+.B allow
+The server certificate is requested. If no certificate is provided, the session proceeds normally. If a bad certificate is provided, it will be ignored and the session proceeds normally.
+.TP
+.B try
+The server certificate is requested. If no certificate is provided, the session proceeds normally. If a bad certificate is provided, the session is immediately terminated.
+.TP
+.B demand
+These keywords are equivalent. The server certificate is requested. If no certificate is provided, or a bad certificate is provided, the session is immediately terminated.
+.UNINDENT
+.TP
+.B result_attrs (default: none)
+If automx finds one or more entries, the attributes specified by result_attrs are returned. If * is listed, all user attributes are returned.
+.TP
+.B saslmech (default: none)
+Specifies the SASL mechanism to be used for authentication.
+.INDENT 7.0
+.TP
+.B cram\-md5
+The SASL cram\-md5 mechanism (see: RFC 2195) will be used to authenticate LDAP bind requests.
+.TP
+.B digest\-md5
+The SASL digest\-md5 mechanism (see: RFC 2831) will be used to authenticate LDAP bind requests.
+.TP
+.B external
+The SASL external mechanism (see: RFC 4422) will be used to authenticate LDAP bind requests.
+.TP
+.B gssapi
+The SASL gssapi mechanism (see: RFC 4752) will be used to authenticate LDAP bind requests.
+.TP
+.B none
+No SASL mechanism will be use to authenticate LDAP bind requests.
+.UNINDENT
+.TP
+.B scope (default: sub)
+Specify the scope of the search to be one of base (or exact), one (or onelevel), sub (or substree), to specify a base object, one\-level, or subtree search.
+.TP
+.B usetls (default: false)
+Specifies if automx should use TLS when it connects to the LDAP host.
+.UNINDENT
+.SH AUTHORS
+.INDENT 0.0
+.TP
+.B Christian Roessner <\fI\%cr@sys4.de\fP>
+Wrote the program.
+.TP
+.B Patrick Ben Koetter <\fI\%p@sys4.de\fP>
+Wrote the documentation.
+.UNINDENT
+.SH SEE ALSO
 .sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBListing two and more servers\fR
-.ps -1
-.br
-Subsequent servers to the first serve
-\fIonly for fallback purposes\fR, i\&.e\&. a server to the right will only be queried if the server left to it cannot be reached\&. If a server can be reached no further attempts will be made regardless if the query returned a result or not\&.
-.sp .5v
-.RE
-.RE
-.PP
-\fBkey\fR (default: none)
-.RS 4
-Specifies the path to a file that contains automx\*(Aqs private key, which matches automx certificate given with
-\fBcert\fR\&.
-.RE
-.PP
-\fBreqcert\fR (default: \fInever\fR)
-.RS 4
-Specifies what checks to perform on server certificates in a TLS session, if any\&. The <level> can be specified as one of the following keywords:
-.PP
-never
-.RS 4
-The client will not request or check any server certificate\&. This is the default setting\&.
-.RE
-.PP
-allow
-.RS 4
-The server certificate is requested\&. If no certificate is provided, the session proceeds normally\&. If a bad certificate is provided, it will be ignored and the session proceeds normally\&.
-.RE
-.PP
-try
-.RS 4
-The server certificate is requested\&. If no certificate is provided, the session proceeds normally\&. If a bad certificate is provided, the session is immediately terminated\&.
-.RE
-.PP
-demand
-.RS 4
-These keywords are equivalent\&. The server certificate is requested\&. If no certificate is provided, or a bad certificate is provided, the session is immediately terminated\&.
-.RE
-.RE
-.PP
-\fBresult_attrs\fR (default: none)
-.RS 4
-If automx finds one or more entries, the attributes specified by result_attrs are returned\&. If * is listed, all user attributes are returned\&.
-.RE
-.PP
-\fBsaslmech\fR (default: none)
-.RS 4
-Specifies the SASL mechanism to be used for authentication\&.
-.PP
-cram\-md5
-.RS 4
-The SASL
-\fIcram\-md5\fR
-mechanism (see:
-\m[blue]\fBRFC 2195\fR\m[]\&\s-2\u[1]\d\s+2) will be used to authenticate LDAP bind requests\&.
-.RE
-.PP
-digest\-md5
-.RS 4
-The SASL
-\fIdigest\-md5\fR
-mechanism (see:
-\m[blue]\fBRFC 2831\fR\m[]\&\s-2\u[2]\d\s+2) will be used to authenticate LDAP bind requests\&.
-.RE
-.PP
-external
-.RS 4
-The SASL
-\fIexternal\fR
-mechanism (see:
-\m[blue]\fBRFC 4422\fR\m[]\&\s-2\u[3]\d\s+2) will be used to authenticate LDAP bind requests\&.
-.RE
-.PP
-gssapi
-.RS 4
-The SASL
-\fIgssapi\fR
-mechanism (see:
-\m[blue]\fBRFC 4752\fR\m[]\&\s-2\u[4]\d\s+2) will be used to authenticate LDAP bind requests\&.
-.RE
-.PP
-none
-.RS 4
-No SASL mechanism will be use to authenticate LDAP bind requests\&.
-.RE
-.RE
-.PP
-\fBscope\fR (default: \fIsub\fR)
-.RS 4
-Specify the scope of the search to be one of
-\fIbase\fR
-(or
-\fIexact\fR),
-\fIone\fR
-(or
-\fIonelevel\fR),
-\fIsub\fR
-(or
-\fIsubstree\fR), to specify a base object, one\-level, or subtree search\&.
-.RE
-.PP
-\fBusetls\fR (default: \fIfalse\fR)
-.RS 4
-Specifies if automx should use TLS when it connects to the LDAP host\&.
-.RE
-.SH "SEE ALSO"
-.PP
-\fBautomx\fR(8),
-\fBautomx.conf\fR(5),
-\fBautomx_ldap\fR(5),
-\fBautomx_script\fR(5),
-\fBautomx_sql\fR(5),
-\fBautomx-test\fR(1)
-.SH "AUTHORS"
-.PP
-\fBChristian Roessner\fR <\&cr@sys4\&.de\&>
-.RS 4
-Wrote the program\&.
-.RE
-.PP
-\fBPatrick Ben Koetter\fR <\&p@sys4\&.de\&>
-.RS 4
-Wrote the documentation\&.
-.RE
-.SH "NOTES"
-.IP " 1." 4
-RFC 2195
-.RS 4
-\%http://tools.ietf.org/rfc/rfc2195.txt
-.RE
-.IP " 2." 4
-RFC 2831
-.RS 4
-\%http://www.ietf.org/rfc/rfc2831.txt
-.RE
-.IP " 3." 4
-RFC 4422
-.RS 4
-\%http://tools.ietf.org/rfc/rfc4422.txt
-.RE
-.IP " 4." 4
-RFC 4752
-.RS 4
-\%http://www.ietf.org/rfc/rfc4752.txt
-.RE
+\fI\%automx(8)\fP, \fI\%automx.conf(5)\fP, \fI\%automx_ldap(5)\fP, \fI\%automx_script(5)\fP, \fI\%automx_sql(5)\fP, \fI\%automx\-test(1)\fP
+.SH COPYRIGHT
+This document has been placed in the public domain.
+.\" Generated by docutils manpage writer.
+.\" 
+.

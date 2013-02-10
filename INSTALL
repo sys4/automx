@@ -1,44 +1,17 @@
-INSTALL
-
-Christian Roessner
-
-   Wrote the program. <cr@sys4.de>
-
-Edited by
-
-Patrick Ben Koetter
-
-   Wrote the documentation. <p@sys4.de>
-     __________________________________________________________________
-
-   Table of Contents
-
-   1. automx Download
-   2. Software Requirements
-   3. Installing automx
-
-        3.1. Installing the program
-        3.2. Installing the test program
-        3.3. Installing automx-specific libraries
-        3.4. Installing the configuration file
-        3.5. Installing man Pages
-
-   4. DNS Configuration
-   5. Web Server Configuration
-   6. Testing And Debugging automx
+Install
 
    This document contains step by step instructions to install automx.
 
-1. automx Download
+automx Download
 
-   If you haven't done so yet download automx from its website.
+   If you haven't done so yet download automx from its website:
 $ wget http://automx.org/download/latest.tar.gz
 
-   Unpack the tar archive and change into the newly created directory.
+   Unpack the tar archive and change into the newly created directory:
 $ tar xzf latest.tar.gz
 $ cd automx-VERSION
 
-2. Software Requirements
+Software Requirements
 
    automx is a Python application. You must install a few extra modules to
    handle frontend and backend communication as well to deal with XML
@@ -62,60 +35,61 @@ $ cd automx-VERSION
    Once you've satisfied the requirements, you can start to install
    automx.
 
-3. Installing automx
+Installing automx
 
    automx is a wsgi script depending on some automx-specific libraries. It
    reads its configuration from a single configuration file. The program,
    the libraries and the configuration file need to be installed at
    different locations.
 
-3.1. Installing the program
+Installing the program
 
    Create a directory for the automx program and copy it to that location:
 % mkdir -p /usr/local/lib/automx
 % cp automx-VERSION/automx.wsgi /usr/local/lib/automx/
 
-3.2. Installing the test program
+Installing the test program
 
    Copy the automx-test program to a location that is in your $PATH:
 % cp automx-VERSION/automx-test /usr/local/bin/automx-test
 
-3.3. Installing automx-specific libraries
+Installing automx-specific libraries
 
    Python provides a directory with site specific packages, called
    site-packages. Copy the automx directory including all its files to
    site-packages:
 % cp automx-VERSION/automx /usr/local/lib/python2.6/site-packages/
 
-   [Note] site-packages
+.. NOTE:: site-packages
 
-          The location of that directory depends on the Python version and the
-          distribution you use.
+        The location of that directory depends on the Python version
+        and the distribution you use.
 
-3.4. Installing the configuration file
+Installing the configuration file
 
-   Place the sample automx.conf file into /etc.
+   Place the sample automx.conf file into /etc:
 % cp automx-VERSION/src/conf/automx.conf /etc/
 
    Follow automx.conf(5) Adopt this configuration file to your needs. You
    may find detailed information in the man page automx.conf(5).
-   [Tip] Tip
 
-         Set debug=yes in the section automx while you setup, configure and test
-         automx. It will help you detect problems more easily. This will log the
-         request GET/POST and the response to the error.log file(s).
+   Tip
 
-3.5. Installing man Pages
+   Set debug=yes in the section automx while you setup, configure and test
+   automx. It will help you detect problems more easily. This will log the
+   request GET/POST and the response to the error.log file(s).
+
+Installing man Pages
 
    Try using the manpath command to find out where man pages are stored on
    your computer:
 $ manpath
 /usr/local/man:/usr/local/share/man:/usr/share/man
 
-   Copy the man pages to that location.
+   Copy the man pages to that location:
 % cp -a automx-VERSION/doc/man/ /usr/local/share/man
 
-4. DNS Configuration
+DNS Configuration
 
    Mail clients seeking mail account autoconfiguration will either request
    an IP address for autoconfig.example.com (Mozilla schema) or
@@ -124,7 +98,7 @@ $ manpath
 autoconfig.example.com.       IN    A     192.168.2.1
 autodiscover.example.com.     IN    A     192.168.2.1
 
-5. Web Server Configuration
+Web Server Configuration
 
    Finally configure the web server. It will accept configuration requests
    from mail clients, pass the information to automx and in turn will
@@ -156,11 +130,9 @@ autodiscover.example.com.     IN    A     192.168.2.1
    Here is a simple example that configures an autoconfig and an
    autodiscover service - both use the same automx script:
 <VirtualHost *:80>
-
   ServerName example.com
   ServerAlias autoconfig.example.com
   ServerAdmin webmaster@example.com
-
   <IfModule mod_wsgi.c>
     WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx
 /automx.wsgi
@@ -169,15 +141,12 @@ autodiscover.example.com.     IN    A     192.168.2.1
       Allow from all
     </Directory>
   </IfModule>
-
 </VirtualHost>
 
 <VirtualHost *:443>
-
   ServerName example.com:443
   ServerAlias autodiscover.example.com:443
   ServerAdmin webmaster@example.com
-
   <IfModule mod_wsgi.c>
     WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx
 /automx.wsgi
@@ -186,32 +155,32 @@ autodiscover.example.com.     IN    A     192.168.2.1
       Allow from all
     </Directory>
   </IfModule>
-
 </VirtualHost>
 
-[Note] ISPs
 
-          In an advanced environment with thousands of domains, you can redirect
-          mail clients via DNS entries to your ISP automx provisioning server for
-          Microsoft clients and a web server instance with a wild card ServerName
-          autoconfig.* to serve the Mozilla schema.
-       autoconfig.example.com.       IN    A     192.168.2.1
-       autodiscover.example.com.     IN    A     192.168.2.1
+
+.. NOTE:: ISPs
+
+In an advanced environment with thousands of domains, you can redirect
+mail clients via DNS entries to your ISP automx provisioning server for
+Microsoft clients and a web server instance with a wild card ServerName
+autoconfig.* to serve the Mozilla schema::
+
+        autoconfig.example.com.       IN    A     192.168.2.1
+        autodiscover.example.com.     IN    A     192.168.2.1
 
    automx comes with a little utility that helps testing proper operation.
    The next section explains how to use it.
 
-6. Testing And Debugging automx
+Testing And Debugging automx
 
    The automx-test utility sends configuration requests for Microsoft and
    Mozilla clients to the web server:
-$ automx-test user@example.com  1
+$ automx-test user@example.com
 
-   1
-
-    The domainpart in the address determines the list of hostnames that
-    will be queried. In this example autoconfig.example.com and
-    autodiscover.example.com will be contacted.
+   The domainpart in the address determines the list of hostnames that
+   will be queried. In this example autoconfig.example.com and
+   autodiscover.example.com will be contacted.
 
    You should see the web server header and get XML results from the
    server.
@@ -219,9 +188,18 @@ $ automx-test user@example.com  1
    If things go wrong, the error.log is your friend. It will indicate
    configuration issues, if python modules are missing, if your database
    can not be queried or anything else that might go wrong.
-   [Note] Note
 
-          If you split error logs by port, e.g. port 80 and 443, you need to
-          check both. Autoconfig requests will mostly show up in the port 80
-          error.log, whereas autodiscover will only show up in your 443
-          error.log.
+   Note
+
+   If you split error logs by port, e.g. port 80 and 443, you need to
+   check both. Autoconfig requests will mostly show up in the port 80
+   error.log, whereas autodiscover will only show up in your 443
+   error.log.
+
+Authors
+
+   Christian Rößner <cr@ys4.de>
+          Wrote the program.
+
+   Patrick Ben Koetter <p@sys4.de>
+          Wrote the documentation.
