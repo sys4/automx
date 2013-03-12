@@ -1,6 +1,9 @@
 Version 0.9 to 1.0:
 
-We may implement a web services backend.
+* We may implement a web services backend.
+
+* Starting with 0.10.0, we will drop python 2.6.x and below support. We will
+  make automx compatible with 2.7.x and 3.x versions.
 
 No further plans at this time of writing.
 
