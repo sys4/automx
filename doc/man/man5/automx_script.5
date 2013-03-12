@@ -1,130 +1,90 @@
-'\" t
-.\"     Title: automx_script
-.\"    Author: Christian Roessner <cr@sys4.de>
-.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 02/01/2013
-.\"    Manual: automx_script
-.\"    Source: Version 0.9.1
-.\"  Language: English
-.\"
-.TH "AUTOMX_SCRIPT" "5" "02/01/2013" "Version 0.9.1" "automx_script"
-.\" -----------------------------------------------------------------
-.\" * Define some portability stuff
-.\" -----------------------------------------------------------------
-.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.\" http://bugs.debian.org/507673
-.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
-.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.ie \n(.g .ds Aq \(aq
-.el       .ds Aq '
-.\" -----------------------------------------------------------------
-.\" * set default formatting
-.\" -----------------------------------------------------------------
-.\" disable hyphenation
-.nh
-.\" disable justification (adjust text to left margin only)
-.ad l
-.\" -----------------------------------------------------------------
-.\" * MAIN CONTENT STARTS HERE *
-.\" -----------------------------------------------------------------
-.SH "NAME"
+.\" Man page generated from reStructeredText.
+.
+.TH AUTOMX_SCRIPT 5 "02/08/2013" "" "automx"
+.SH NAME
 automx_script \- automx script backend configuration parameters
-.SH "DESCRIPTION"
-.PP
-The
-\fBautomx_script\fR(5)
-man page specifies all parameters that control access from within
-automx
-to a script backend\&.
-.PP
-The script backend provides automx with configuration values by running an external script\&. The results of the script are handed back to automx\&. automx assigns the results as values to account configuration parameters\&.
-.SH "PARAMETERS"
-.PP
-\fBresult_attrs\fR (default: none)
-.RS 4
-Specifies a list of one or more variables\&. The output of the external script will assign values to these variables\&. Results will be assigned in the same order as variables have been listed\&.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
 .sp
-.if n \{\
-.RS 4
-.\}
+The automx_sript(5) man page specifies all parameters that control access from within automx to a script backend.
+.SH PARAMETERS
+.INDENT 0.0
+.TP
+.B result_attrs (default: none)
+Specifies a list of one or more variables. The output of the external script will assign values to these variables. Results will be assigned in the same order as variables have been listed:
+.sp
 .nf
+.ft C
 result_attrs = server, email, auth, socket
+.ft P
 .fi
-.if n \{\
+.UNINDENT
+.IP Important
+automx_script(5) does not check if the number of values returned matches the ones expected. Too many return values will be discarded. If the script returns too few automx_script(5) will use the corresponding result attribute name.
 .RE
-.\}
-.if n \{\
+.INDENT 0.0
+.TP
+.B script (default: none)
+Specifies the absolute path to the script which should be run by the backend automx_script(5) backend:
 .sp
-.\}
-.RS 4
-.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.ps +1
-\fBImportant\fR
-.ps -1
-.br
-\fBautomx_script\fR(5)
-does not check if the number of values returned matches the ones expected\&. Too many return values will be discarded\&. If the script returns too few
-\fBautomx_script\fR(5)
-will use the corresponding result attribute name\&.
-.sp .5v
-.RE
-.RE
-.PP
-\fBscript\fR (default: none)
-.RS 4
-Specifies the absolute path to the script which should be run by the backend
-\fBautomx_script\fR(5)
-backend\&.
-.sp
-.if n \{\
-.RS 4
-.\}
 .nf
-script = /usr/local/bin/example_com\&.sh "%s"
+.ft C
+script = /usr/local/bin/example_com.sh "%s"
+.ft P
 .fi
-.if n \{\
-.RE
-.\}
-.RE
-.PP
-\fBseparator\fR (default: whitespace)
-.RS 4
-Specifies the character that separates values returned by the external script\&.
+.TP
+.B separator (default: whitespace)
+Specifies the character that separates values returned by the external script:
 .sp
-.if n \{\
-.RS 4
-.\}
 .nf
+.ft C
 separator = ,
+.ft P
 .fi
-.if n \{\
-.RE
-.\}
-.RE
-.SH "SEE ALSO"
-.PP
-\fBautomx\fR(8),
-\fBautomx.conf\fR(5),
-\fBautomx_ldap\fR(5),
-\fBautomx_script\fR(5),
-\fBautomx_sql\fR(5),
-\fBautomx-test\fR(1)
-.SH "AUTHORS"
-.PP
-\fBChristian Roessner\fR <\&cr@sys4\&.de\&>
-.RS 4
-Wrote the program\&.
-.RE
-.PP
-\fBMichael Menge\fR
-.RS 4
-Wrote and contributed this backend\&.
-.RE
-.PP
-\fBPatrick Ben Koetter\fR <\&p@sys4\&.de\&>
-.RS 4
-Wrote the documentation\&.
-.RE
+.UNINDENT
+.SH AUTHORS
+.INDENT 0.0
+.TP
+.B Christian Roessner <\fI\%cr@sys4.de\fP>
+Wrote the program.
+.TP
+.B Michael Menge
+Wrote and contributed this backend.
+.TP
+.B Patrick Ben Koetter <\fI\%p@sys4.de\fP>
+Wrote the documentation.
+.UNINDENT
+.SH SEE ALSO
+.sp
+\fI\%automx(8)\fP, \fI\%automx.conf(5)\fP, \fI\%automx_ldap(5)\fP, \fI\%automx_script(5)\fP, \fI\%automx_sql(5)\fP, \fI\%automx\-test(1)\fP
+.SH COPYRIGHT
+This document has been placed in the public domain.
+.\" Generated by docutils manpage writer.
+.\" 
+.

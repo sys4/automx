@@ -1,146 +1,691 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>automx.conf</title><link rel="stylesheet" type="text/css" href="screen.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div class="refentry" title="automx.conf"><a id="idp217904"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p><code class="filename">automx.conf</code> — automx configuration parameters</p></div><div class="refsection" title="Description"><a id="idp79408"></a><h2>Description</h2><p>The <code class="systemitem">automx</code>
-    <code class="filename">automx.conf</code> configuration file specifies all
-    parameters that control the <code class="systemitem">automx</code> configuration system. Parameters not
-    specified in <code class="filename">automx.conf</code> are left at their default
-    values.</p></div><div class="refsection" title="Syntax"><a id="idp209968"></a><h2>Syntax</h2><p>The general format of the <code class="filename">automx.conf</code> file is
-    as follows:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Each logical line has the form <span class="quote">“<span class="quote">parameter = value</span>”</span>.
-        Whitespace around the <span class="quote">“<span class="quote">=</span>”</span> is ignored, as is whitespace at
-        the end of a logical line.</p></li><li class="listitem"><p>Empty lines and whitespace-only lines are ignored, as are lines
-        whose first non-whitespace character is a <span class="quote">“<span class="quote">#</span>”</span>.</p></li><li class="listitem"><p>When the same parameter is defined multiple times, only the last
-        instance is remembered.</p></li><li class="listitem"><p>Uppercase and lowercase matters. Use parameter names, macros and
-        variables exactly as specified.</p></li></ul></div></div><div class="refsection" title="Structure"><a id="idp945824"></a><h2>Structure</h2><p>The configuration file is split into sections.</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>A section begins with the section name surrounded by square
-        brackets, e.g. [example.com].</p></li><li class="listitem"><p>A section name identifies a domain or subdomain automx should
-        respond with autoconfiguration instructions upon client
-        request.</p></li><li class="listitem"><p>A section defines services which will be sent as
-        autoconfiguration instructions to a client.</p></li><li class="listitem"><p>Section names <code class="option">automx</code>, <code class="option">default</code>
-        and <code class="option">GLOBAL</code> are reserved - they have special
-        meaning.</p></li></ul></div></div><div class="refsection" title="Services"><a id="services"></a><h2>Services</h2><p>Each section may specify one more services that should be provided
-    to the client. A service must be defined in a section in order to be
-    enabled. Options specific to a service are given using a concatenation of
-    a service name and the parameter it should configure.</p><div class="example"><a id="idp3989088"></a><p class="title"><strong>Example 1. Defining a service option</strong></p><div class="example-contents"><p>The following concatenation of service name <code class="option">smtp</code>
-      and service option <em class="parameter"><code>_server</code></em> creates the
-      <em class="parameter"><code>smtp_server</code></em> parameter:</p><pre class="programlisting">smtp_server = mail.example.com</pre></div></div><br class="example-break" /><p>Service names available in automx are shown in the following list.
-    The service options to create parameters are specified in <a class="xref" href="#parameters">the section called “Parameters”</a>:</p><div class="variablelist"><dl><dt><span class="term"><code class="option">imap</code></span></dt><dd><p>This name specifies a service as defined in <a class="ulink" href="http://www.rfc-editor.org/rfc/rfc3501.txt" target="_top">RFC 3501</a>.
-          The protocol to connect to this server is IMAP. Specifying this name
-          is only applicable for <em class="parameter"><code>account_type</code></em> =
-          <code class="option">email</code>.</p></dd><dt><span class="term"><code class="option">pop</code></span></dt><dd><p>This name specifies a service as defined in <a class="ulink" href="http://www.rfc-editor.org/rfc/rfc1939.txt" target="_top">RFC 1939</a>.
-          The protocol to connect to this server is POP3. Specifying this name
-          is only applicable for <em class="parameter"><code>account_type</code></em> =
-          <code class="option">email</code>.</p></dd><dt><span class="term"><code class="option">smtp</code></span></dt><dd><p>This name specifies an SMTP service as defined in <a class="ulink" href="http://www.rfc-editor.org/rfc/rfc5321.txt" target="_top">RFC 5321</a>.
-          The protocol to connect to this server is SMTP. Specifying this name
-          is only applicable for <em class="parameter"><code>account_type</code></em> =
-          <code class="option">email</code>.</p></dd></dl></div></div><div class="refsection" title="Parameters"><a id="idp956656"></a><h2>Parameters</h2><div class="variablelist"><dl><dt><span class="term">autoconfig (no default)</span></dt><dd><p>Specifies a path to a file that contains static
-          autoconfiguration options following to the Mozilla schema.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This parameter is valid only if backend = file has been
-            specified.</p></td></tr></table></div></dd><dt><span class="term">autodiscover (no default)</span></dt><dd><p>Specifies a path to a file that contains static
-          autoconfiguration options following to the Microsoft schema.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This parameter is valid only if backend = file has been
-            specified.</p></td></tr></table></div></dd><dt><span class="term"><em class="parameter"><code>account_name</code></em> (no default,
-        mandatory)</span></dt><dd><p>Specifies a display name in MUA account listings.</p></dd><dt><span class="term"><em class="parameter"><code>account_name_short</code></em> (no default,
-        mandatory)</span></dt><dd><p>Specifies a short display name in MUA account listings.</p></dd><dt><span class="term"><em class="parameter"><code>account_type</code></em> (default:
-        <code class="option">email</code>, mandatory)</span></dt><dd><p>Specifies the account type that should be configured:</p><div class="variablelist"><dl><dt><span class="term"><code class="option">email</code></span></dt><dd><p>Setting this option will create an email
-                configuration.</p></dd></dl></div><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>The Microsoft schema specifies additional account_types.
-            Currently automx only supports <code class="option">email</code>.</p></td></tr></table></div></dd><dt><span class="term"><em class="parameter"><code>action</code></em> (default:
-        <code class="option">settings</code>, mandatory)</span></dt><dd><p>Specifies whether the response to the client contains
-          configuration settings or if it should visit a different server or
-          use a different address.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This option applies to Microsoft schema only.</p></td></tr></table></div><div class="variablelist"><dl><dt><span class="term">settings</span></dt><dd><p>The client should use the configuration settings sent in
-                this response.</p></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code>backend</code></em> (default:
-        <code class="option">DEFAULT</code>, mandatory)</span></dt><dd><p>Specifies the backend method to lookup configuration data. The
-          following options are available:</p><div class="variablelist"><dl><dt><span class="term"><code class="option">file</code></span></dt><dd><p><code class="systemitem">automx</code> should use logic
-                provided within this section to identify a different section
-                which holds configuration settings.</p><pre class="programlisting">backend = file</pre></dd><dt><span class="term"><code class="option">filter</code></span></dt><dd><p><code class="systemitem">automx</code> should use logic
-                provided within this section to identify a different section
-                which holds configuration settings.</p><pre class="programlisting">backend = filter</pre></dd><dt><span class="term"><code class="option">global</code></span></dt><dd><p><code class="systemitem">automx</code> should use general
-                settings defined in the <code class="option">global</code>
-                section.</p><pre class="programlisting">backend = global</pre></dd><dt><span class="term"><code class="option">ldap</code></span></dt><dd><p><code class="systemitem">automx</code> should use a mixture of
-                general and individual settings. General settings are set like
-                static settings. Individual settings should be retrieved from
-                an LDAP query.</p><pre class="programlisting">backend = ldap</pre><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>See also <span class="citerefentry"><span class="refentrytitle">automx_ldap</span>(5)</span> for a list of LDAP related configuration
-                  options.</p></td></tr></table></div></dd><dt><span class="term"><code class="option">sql</code></span></dt><dd><p><code class="systemitem">automx</code> should use a mixture of
-                general and individual settings. General settings are set like
-                static settings. Individual settings should be retrieved from
-                an SQL query.</p><pre class="programlisting">backend = sql</pre><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>See also <span class="citerefentry"><span class="refentrytitle">automx_sql</span>(5)</span> for a list of SQL related configuration
-                  options.</p></td></tr></table></div></dd><dt><span class="term"><code class="option">static</code></span></dt><dd><p><code class="systemitem">automx</code> should use general
-                settings provided within the current section.</p><pre class="programlisting">backend = static</pre></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code>debug</code></em> (default: no)</span></dt><dd><p>Specifies if automx should note client request and server
-          response to the (SSL) error log.</p></dd><dt><span class="term"><em class="parameter"><code>display_name</code></em> (no default,
-        optional)</span></dt><dd><p>Specifies an <span class="quote">“<span class="quote">optional display name that indicates the
-          name of the sender (...) that could be displayed to the user of a
-          mail application</span>”</span> (see: 3.4. Address Specification in <a class="ulink" href="http://tools.ietf.org/rfc/rfc5322.txt" target="_top">RFC 5322</a>). The
-          client can decide to accept or change the name.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This option applies to Microsoft schema only.</p></td></tr></table></div></dd><dt><span class="term"><em class="parameter"><code>domains</code></em> (no default)</span></dt><dd><p>Specifies a list of domains automx will output
-          autoconfiguration information for.</p><div class="variablelist"><dl><dt><span class="term"><code class="option">*</code></span></dt><dd><p>Specify <code class="option">*</code> to let automx reply for any
-                domains listed in a section.</p></dd><dt><span class="term"><code class="option">domain, domain, ...</code></span></dt><dd><p>Specify a comma separated list of domains automx should
-                provide autoconfiguration for.</p></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code>provider</code></em> (no default, mandatory)</span></dt><dd><p>The FQDN domain name of the domain that provides the
-          configuration service.</p><pre class="programlisting">provider = example.com</pre></dd><dt><span class="term"><em class="parameter"><code>section_filter</code></em> (default:
-        <code class="option">domainpart</code>, optional)</span></dt><dd><p>Specifies a list of one or more filters whose result outputs a
-          section name. The filters will be used in order specified. The first
-          match ends execution of subsequent filters.</p><p>These filters will be used instead of the hard coded, internal
-          <code class="option">domainpart</code> filter, which strictly uses the
-          domainpart taken from the email address the client submitted in its
-          configuration request.</p><pre class="programlisting">section_filters = server_1, server_2
-server_1 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
-    sed -e 's/^.*@\(\.*\)/\1/g' | grep internal.example.com
-server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
-    sed -e 's/^.*@\(\.*\)/\1/g' | grep dmz.example.com</pre></dd><dt><span class="term"><em class="parameter"><code><em class="replaceable"><code>service</code></em></code></em>
-        (default: <code class="option">no</code>)</span></dt><dd><p>Specifies the service type that should be provided in the
-          configuration response. By default all services are disabled. See
-          <a class="xref" href="#services" title="Services">the section called “Services”</a> for a list of valid service names.</p></dd><dt><span class="term"><em class="parameter"><code><em class="replaceable"><code>service</code></em>_auth_identity</code></em>
-        (no default)</span></dt><dd><p>Specifies the login name the client should use when it
-          identifies the user in order to gain access to the service. See
-          <a class="xref" href="#macros" title="Macros and Variables">the section called “Macros and Variables”</a> for available options.</p></dd><dt><span class="term"><em class="parameter"><code><em class="replaceable"><code>service</code></em>_auth</code></em>
-        (no default)</span></dt><dd><p>Specifies the method the client should use when it identifies
-          the user in order to gain access to the service. The following
-          options are available:</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>Thunderbird 3.0 accepts only <span class="quote">“<span class="quote">plain</span>”</span> and
-            <span class="quote">“<span class="quote">secure</span>”</span>. It will ignore the whole XML file, if other
-            values are given.</p></td></tr></table></div><div class="variablelist"><dl><dt><span class="term"><code class="option">plaintext</code></span></dt><dd><p>The client should use the SASL mechanisms
-                <code class="option">PLAIN</code> or <code class="option">LOGIN</code> to identify
-                the user.</p></dd><dt><span class="term"><code class="option">encrypted</code></span></dt><dd><p>The client should use the SASL mechanisms
-                <code class="option">CRAM-MD5</code> or <code class="option">DIGEST-MD5</code> to
-                identify the user.</p></dd><dt><span class="term"><code class="option">ntlm</code></span></dt><dd><p>The client should use the SASL <code class="option">NTLM</code>
-                mechanism to identify the user.</p></dd><dt><span class="term"><code class="option">gssapi</code></span></dt><dd><p>The client should use the SASL <code class="option">GSSAPI</code>
-                mechanism to identify the user.</p></dd><dt><span class="term"><code class="option">client-ip-address</code></span></dt><dd><p>The client will not send identification data. Instead
-                the server should recognize the user based on the clients IP
-                address.</p></dd><dt><span class="term"><code class="option">tls-client-cert</code></span></dt><dd><p>The client should send a TLS client certificate when the
-                server requests one.</p></dd><dt><span class="term">smtp-after-pop</span></dt><dd><p>The client should authenticate using POP first, and then
-                start sending messages over SMTP later.</p></dd><dt><span class="term"><code class="option">none</code></span></dt><dd><p>The client should not send any identification
-                data.</p></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code><em class="replaceable"><code>service</code></em>_port</code></em>
-        (no default)</span></dt><dd><p>Specifies port number on which the service is offered.
-          Typical, standardized port numbers are:</p></dd><dt><span class="term"><em class="parameter"><code><em class="replaceable"><code>service</code></em>_server</code></em>
-        (no default)</span></dt><dd><p>Specifies the IP address or hostname on which the service is
-          offered.</p></dd><dt><span class="term"><em class="parameter"><code><em class="replaceable"><code>service</code></em>_encryption</code></em>
-        (no default)</span></dt><dd><p>Specifies whether the client should use a plaintext or an
-          encrypted transport layer for client-server communication. The
-          following options are available:</p><div class="variablelist"><dl><dt><span class="term"><code class="option">auto</code></span></dt><dd><p>The client should try to start with
-                <code class="option">starttls</code>, proceed with <code class="option">ssl</code>
-                and settle with <code class="option">none</code>, if only that is
-                available.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This feature is not available in clients following the
-                  Mozilla schema. For these clients automx will always output
-                  <code class="option">none</code> as encryption level.</p></td></tr></table></div></dd><dt><span class="term"><code class="option">none</code></span></dt><dd><p>The client should use an unencrypted transport
-                layer.</p></dd><dt><span class="term"><code class="option">ssl</code></span></dt><dd><p>The client should use an SSL3 or TLS1 encrypted
-                transport layer from the start.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This option is typical for <code class="option">smtps</code>,
-                  <code class="option">pop3s</code> and <code class="option">imaps</code> services
-                  and usually requires a dedicated port on the server for SSL
-                  encryption only.</p></td></tr></table></div></dd><dt><span class="term"><code class="option">starttls</code></span></dt><dd><p>The client should begin communication on an unencrypted
-                port and then upgrade the communication to TLS via the
-                STARTTLS command.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This option is typical for <code class="option">smtp</code>,
-                  <code class="option">pop3</code> and <code class="option">imap</code>
-                  services.</p></td></tr></table></div></dd></dl></div></dd><dt><span class="term"><em class="parameter"><code>smtp_author</code></em> (default:
-        <code class="option">%s</code>)</span></dt><dd><p>Specifies the envelope sender address used when the client
-          sends a message. See <a class="xref" href="#macros" title="Macros and Variables">the section called “Macros and Variables”</a> for available
-          options.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This parameter is experimental. The feature is available for
-            Microsoft clients only. For a definition of <span class="quote">“<span class="quote">author</span>”</span>
-            see also <a class="ulink" href="http://tools.ietf.org/html/rfc5598#section-2.1" target="_top">RFC 5598,
-            Section 2.1 User Actors</a>.</p></td></tr></table></div></dd><dt><span class="term"><em class="parameter"><code>smtp_default</code></em> (no default)</span></dt><dd><p>Specifies if this service should be used globally for all
-          outgoing messages from all accounts.</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.svg" /></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>This feature is available to clients following the Mozilla
-            schema only.</p></td></tr></table></div></dd></dl></div></div><div class="refsection" title="Macros and Variables"><a id="macros"></a><h2>Macros and Variables</h2><p>The following macros and variables can be used within
-    <code class="systemitem">automx</code> to build service configuration.</p><div class="variablelist"><dl><dt><span class="term"><code class="option">%%</code></span></dt><dd><p>This is replaced by a literal <span class="quote">“<span class="quote">%</span>”</span>
-          character.</p></dd><dt><span class="term"><code class="option">%d</code></span></dt><dd><p>When the input key is an address of the form
-          <code class="literal">localpart@domainpart</code>, this macro will be replaced
-          by the (<a class="ulink" href="http://www.ietf.org/rfc/rfc2253.txt" target="_top">RFC
-          2253</a>) quoted domain part of the address.</p></dd><dt><span class="term"><code class="option">%s</code></span></dt><dd><p>When the input key is an address of the form
-          <code class="literal">localpart@domainpart</code>, this macro will be replaced
-          by this (<a class="ulink" href="http://www.ietf.org/rfc/rfc2253.txt" target="_top">RFC
-          2253</a>) quoted mail address.</p></dd><dt><span class="term"><code class="option">${varname}</code></span></dt><dd><p>The value of <code class="varname">${varname}</code>, retrieved from an
-          LDAP or SQL query, will be used.</p></dd><dt><span class="term"><code class="option">%u</code></span></dt><dd><p>When the input key is an address of the form
-          <code class="literal">localpart@domainpart</code>, this macro will be replaced
-          by the (<a class="ulink" href="http://www.ietf.org/rfc/rfc2253.txt" target="_top">RFC
-          2253</a>) quoted local part of the address.</p></dd></dl></div></div><div class="refsection" title="See also"><a id="idp5715952"></a><h2>See also</h2><p><span class="citerefentry"><span class="refentrytitle">automx</span>(8)</span>, <span class="citerefentry"><span class="refentrytitle">automx.conf</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx_ldap</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx_script</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx_sql</span>(5)</span>, <span class="citerefentry"><span class="refentrytitle">automx-test</span>(1)</span></p></div></div></body></html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
+<title>automx.conf</title>
+<meta name="date" content="02/08/2013" />
+<meta name="copyright" content="This document has been placed in the public domain." />
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="automx-conf">
+<h1 class="title">automx.conf</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Date:</th>
+<td>02/08/2013</td></tr>
+<tr class="field"><th class="docinfo-name">Subtitle:</th><td class="field-body">automx configuration parameters</td>
+</tr>
+<tr class="field"><th class="docinfo-name">Manual Section:</th><td class="field-body">5</td>
+</tr>
+<tr class="field"><th class="docinfo-name">Manual Group:</th><td class="field-body">automx</td>
+</tr>
+<tr><th class="docinfo-name">Copyright:</th>
+<td>This document has been placed in the public domain.</td></tr>
+</tbody>
+</table>
+<div class="section" id="description">
+<h1>Description</h1>
+<p>The <tt class="docutils literal">automx</tt> automx.conf configuration file specifies all parameters that control
+the <tt class="docutils literal">automx</tt> configuration system. Parameters not specified in automx.conf are
+left at their default values.</p>
+</div>
+<div class="section" id="syntax">
+<h1>Syntax</h1>
+<p>The general format of the automx.conf file is as follows:</p>
+<ul class="simple">
+<li>Each logical line has the form <tt class="docutils literal">parameter = value</tt>. Whitespace around the <tt class="docutils literal">=</tt> is ignored, as is whitespace at the end of a logical line.</li>
+<li>Empty lines and whitespace-only lines are ignored, as are lines whose first non-whitespace character is a <tt class="docutils literal">#</tt>.</li>
+<li>When the same parameter is defined multiple times, only the last instance is remembered.</li>
+<li>Uppercase and lowercase matters. Use parameter names, macros and variables exactly as specified.</li>
+</ul>
+</div>
+<div class="section" id="structure">
+<h1>Structure</h1>
+<p>The configuration file is split into sections.</p>
+<ul class="simple">
+<li>A section begins with the section name surrounded by square brackets, e.g. <tt class="docutils literal">[example.com]</tt>.</li>
+<li>A section name identifies a domain or subdomain automx should respond with autoconfiguration instructions upon client request.</li>
+<li>A section defines services which will be sent as autoconfiguration instructions to a client.</li>
+<li>Section names <tt class="docutils literal">automx</tt>, <tt class="docutils literal">default</tt> and <tt class="docutils literal">GLOBAL</tt> are reserved - they have special meaning.</li>
+</ul>
+</div>
+<div class="section" id="services">
+<h1>Services</h1>
+<p>Each section may specify one more services that should be provided to the
+client. A service must be defined in a section in order to be enabled. Options
+specific to a service are given using a concatenation of a service name and the
+parameter it should configure.</p>
+<p>The following concatenation of service name smtp and service option _server
+creates the smtp_server parameter:</p>
+<pre class="literal-block">
+smtp_server = mail.example.com
+</pre>
+<p>Service names available in automx are shown in the following list. The service
+options to create parameters are specified in the section called <a class="reference internal" href="#parameters">Parameters</a>:</p>
+<dl class="docutils">
+<dt>imap</dt>
+<dd>This name specifies a service as defined in RFC 3501. The protocol to
+connect to this server is IMAP. Specifying this name is only applicable
+for account_type = email.</dd>
+<dt>pop</dt>
+<dd>This name specifies a service as defined in RFC 1939. The protocol to
+connect to this server is POP3. Specifying this name is only applicable
+for account_type = email.</dd>
+<dt>smtp</dt>
+<dd>This name specifies an SMTP service as defined in RFC 5321. The
+protocol to connect to this server is SMTP. Specifying this name is
+only applicable for account_type = email.</dd>
+</dl>
+</div>
+<div class="section" id="parameters">
+<h1>Parameters</h1>
+<dl class="docutils">
+<dt>autoconfig (no default)</dt>
+<dd><p class="first">Specifies a path to a file that contains static autoconfiguration
+options following to the Mozilla schema.</p>
+<blockquote class="last">
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This parameter is valid only if backend = file has been specified.</p>
+</div>
+</blockquote>
+</dd>
+<dt>autodiscover (no default)</dt>
+<dd><p class="first">Specifies a path to a file that contains static autoconfiguration
+options following to the Microsoft schema.</p>
+<blockquote class="last">
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This parameter is valid only if backend = file has been specified.</p>
+</div>
+</blockquote>
+</dd>
+<dt>account_name (no default, mandatory)</dt>
+<dd>Specifies a display name in MUA account listings.</dd>
+<dt>account_name_short (no default, mandatory)</dt>
+<dd>Specifies a short display name in MUA account listings.</dd>
+<dt>account_type (default: email, mandatory)</dt>
+<dd><p class="first">Specifies the account type that should be configured:</p>
+<dl class="last docutils">
+<dt>email</dt>
+<dd><p class="first">Setting this option will create an email configuration.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">The Microsoft schema specifies additional account_types. Currently automx only supports email.</p>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>action (default: settings, mandatory)</dt>
+<dd><p class="first">Specifies whether the response to the client contains configuration
+settings or if it should visit a different server or use a different
+address.</p>
+<blockquote>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option applies to Microsoft schema only.</p>
+</div>
+</blockquote>
+<dl class="last docutils">
+<dt>settings</dt>
+<dd>The client should use the configuration settings sent in this
+response.</dd>
+<dt>backend (default: DEFAULT, mandatory)</dt>
+<dd>Specifies the backend method to lookup configuration data. The
+following options are available:</dd>
+<dt>file</dt>
+<dd><p class="first">automx should use logic provided within this section to
+identify a different section which holds configuration
+settings:</p>
+<pre class="last literal-block">
+backend = file
+</pre>
+</dd>
+<dt>filter</dt>
+<dd><p class="first">automx should use logic provided within this section to
+identify a different section which holds configuration
+settings:</p>
+<pre class="last literal-block">
+backend = filter
+</pre>
+</dd>
+<dt>global</dt>
+<dd><p class="first">automx should use general settings defined in the global
+section:</p>
+<pre class="last literal-block">
+backend = global
+</pre>
+</dd>
+<dt>ldap</dt>
+<dd><p class="first">automx should use a mixture of general and individual
+settings. General settings are set like static settings.
+Individual settings should be retrieved from an LDAP
+query:</p>
+<pre class="literal-block">
+backend = ldap
+</pre>
+<p class="last">See also automx_ldap(5) for a list of LDAP related configuration options.</p>
+</dd>
+<dt>sql</dt>
+<dd><p class="first">automx should use a mixture of general and individual
+settings. General settings are set like static settings.
+Individual settings should be retrieved from an SQL query:</p>
+<pre class="literal-block">
+backend = sql
+</pre>
+<p class="last">See also automx_sql(5) for a list of SQL related configuration options.</p>
+</dd>
+<dt>static</dt>
+<dd><p class="first">automx should use general settings provided within the
+current section:</p>
+<pre class="last literal-block">
+backend = static
+</pre>
+</dd>
+</dl>
+</dd>
+<dt>debug (default: no)</dt>
+<dd>Specifies if automx should note client request and server response to
+the (SSL) error log.</dd>
+<dt>display_name (no default, optional)</dt>
+<dd><p class="first">Specifies an “optional display name that indicates the name of the
+sender (...) that could be displayed to the user of a mail application”
+(see: 3.4. Address Specification in RFC 5322). The client can decide to
+accept or change the name.</p>
+<blockquote class="last">
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This option applies to Microsoft schema only.</p>
+</div>
+</blockquote>
+</dd>
+<dt>domains (no default)</dt>
+<dd><p class="first">Specifies a list of domains automx will output autoconfiguration
+information for.</p>
+<ul class="simple">
+<li>Specify <tt class="docutils literal">*</tt> to let automx reply for any domains listed in a
+section.</li>
+</ul>
+<dl class="last docutils">
+<dt>domain, domain, ...</dt>
+<dd>Specify a comma separated list of domains automx should
+provide autoconfiguration for.</dd>
+</dl>
+</dd>
+<dt>provider (no default, mandatory)</dt>
+<dd><p class="first">The FQDN domain name of the domain that provides the configuration
+service:</p>
+<pre class="last literal-block">
+provider = example.com
+</pre>
+</dd>
+<dt>section_filter (default: domainpart, optional)</dt>
+<dd><p class="first">Specifies a list of one or more filters whose result outputs a section
+name. The filters will be used in order specified. The first match ends
+execution of subsequent filters.</p>
+<p>These filters will be used instead of the hard coded, internal
+domainpart filter, which strictly uses the domainpart taken from the
+email address the client submitted in its configuration request:</p>
+<pre class="last literal-block">
+section_filters = server_1, server_2
+server_1 = /usr/sbin/postmap -q &quot;%u&quot; hash:/etc/postfix/virtual_alias_domains | \
+        sed -e 's/^.*&#64;\(\.*\)/\1/g' | grep internal.example.com
+server_2 = /usr/sbin/postmap -q &quot;%u&quot; hash:/etc/postfix/virtual_alias_domains | \
+        sed -e 's/^.*&#64;\(\.*\)/\1/g' | grep dmz.example.com
+</pre>
+</dd>
+<dt>service (default: no)</dt>
+<dd>Specifies the service type that should be provided in the configuration
+response. By default all services are disabled. See the section called
+<a class="reference internal" href="#services">Services</a> for a list of valid service names.</dd>
+<dt>service_auth_identity (no default)</dt>
+<dd>Specifies the login name the client should use when it identifies the
+user in order to gain access to the service. See the section called
+<a class="reference internal" href="#macros-and-variables">Macros and Variables</a> for available options.</dd>
+<dt>service_auth (no default)</dt>
+<dd><p class="first">Specifies the method the client should use when it identifies the user
+in order to gain access to the service. The following options are
+available:</p>
+<blockquote>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Thunderbird 3.0 accepts only <tt class="docutils literal">plain</tt> and <tt class="docutils literal">secure</tt>. It will ignore the whole XML file, if other values are given.</p>
+</div>
+</blockquote>
+<dl class="last docutils">
+<dt>plaintext</dt>
+<dd>The client should use the SASL mechanisms PLAIN or LOGIN
+to identify the user.</dd>
+<dt>encrypted</dt>
+<dd>The client should use the SASL mechanisms CRAM-MD5 or
+DIGEST-MD5 to identify the user.</dd>
+<dt>ntlm</dt>
+<dd>The client should use the SASL NTLM mechanism to identify
+the user.</dd>
+<dt>gssapi</dt>
+<dd>The client should use the SASL GSSAPI mechanism to
+identify the user.</dd>
+<dt>client-ip-address</dt>
+<dd>The client will not send identification data. Instead the
+server should recognize the user based on the clients IP
+address.</dd>
+<dt>tls-client-cert</dt>
+<dd>The client should send a TLS client certificate when the
+server requests one.</dd>
+<dt>smtp-after-pop</dt>
+<dd>The client should authenticate using POP first, and then
+start sending messages over SMTP later.</dd>
+<dt>none</dt>
+<dd>The client should not send any identification data.</dd>
+</dl>
+</dd>
+<dt>service_port (no default)</dt>
+<dd>Specifies port number on which the service is offered. Typical,
+standardized port numbers are:</dd>
+<dt>service_server (no default)</dt>
+<dd>Specifies the IP address or hostname on which the service is offered.</dd>
+<dt>service_encryption (no default)</dt>
+<dd><p class="first">Specifies whether the client should use a plaintext or an encrypted
+transport layer for client-server communication. The following options
+are available:</p>
+<dl class="last docutils">
+<dt>auto</dt>
+<dd><p class="first">The client should try to start with starttls, proceed with
+ssl and settle with none, if only that is available.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">This feature is not available in clients following the Mozilla schema. For these clients automx will always output none as encryption level.</p>
+</div>
+</dd>
+<dt>none</dt>
+<dd>The client should use an unencrypted transport layer.</dd>
+<dt>ssl</dt>
+<dd><p class="first">The client should use an SSL3 or TLS1 encrypted transport
+layer from the start.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is typical for smtps, pop3s and imaps services and usually requires a dedicated port on the server for SSL encryption only.</p>
+</div>
+</dd>
+<dt>starttls</dt>
+<dd><p class="first">The client should begin communication on an unencrypted
+port and then upgrade the communication to TLS via the
+STARTTLS command.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">This option is typical for smtp, pop3 and imap services.</p>
+</div>
+</dd>
+</dl>
+</dd>
+<dt>smtp_author (default: %s)</dt>
+<dd><p class="first">Specifies the envelope sender address used when the client sends a
+message. See the section called <a class="reference internal" href="#macros-and-variables">Macros and Variables</a> for available
+options.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">This parameter is experimental. The feature is available for
+Microsoft clients only. For a definition of “author” see also
+RFC 5598, Section 2.1 User Actors.</p>
+</div>
+</dd>
+<dt>smtp_default (no default)</dt>
+<dd><p class="first">Specifies if this service should be used globally for all outgoing
+messages from all accounts.</p>
+<div class="note last">
+<p class="first admonition-title">Note</p>
+<p class="last">This feature is available to clients following the Mozilla schema only.</p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="macros-and-variables">
+<h1>Macros and Variables</h1>
+<p>The following macros and variables can be used within automx to build service
+configuration.</p>
+<dl class="docutils">
+<dt>%%</dt>
+<dd>This is replaced by a literal <tt class="docutils literal">%</tt> character.</dd>
+<dt>%d</dt>
+<dd>When the input key is an address of the form <a class="reference external" href="mailto:localpart&#64;domainpart">localpart&#64;domainpart</a>, this
+macro will be replaced by the (RFC 2253) quoted domain part of the
+address.</dd>
+<dt>%s</dt>
+<dd>When the input key is an address of the form <a class="reference external" href="mailto:localpart&#64;domainpart">localpart&#64;domainpart</a>, this
+macro will be replaced by this (RFC 2253) quoted mail address.</dd>
+<dt>${varname}</dt>
+<dd>The value of ${varname}, retrieved from an LDAP or SQL query, will be
+used.</dd>
+<dt>%u</dt>
+<dd>When the input key is an address of the form <a class="reference external" href="mailto:localpart&#64;domainpart">localpart&#64;domainpart</a>, this
+macro will be replaced by the (RFC 2253) quoted local part of the
+address.</dd>
+</dl>
+</div>
+<div class="section" id="authors">
+<h1>Authors</h1>
+<dl class="docutils">
+<dt>Christian Roessner &lt;<a class="reference external" href="mailto:cr&#64;sys4.de">cr&#64;sys4.de</a>&gt;</dt>
+<dd>Wrote the program.</dd>
+<dt>Patrick Ben Koetter &lt;<a class="reference external" href="mailto:p&#64;sys4.de">p&#64;sys4.de</a>&gt;</dt>
+<dd>Wrote the documentation.</dd>
+</dl>
+</div>
+<div class="section" id="see-also">
+<h1>See also</h1>
+<p><a class="reference external" href="automx.8.html">automx(8)</a>, <a class="reference external" href="automx.conf.5.html">automx.conf(5)</a>, <a class="reference external" href="automx_ldap.5.html">automx_ldap(5)</a>, <a class="reference external" href="automx_script.5.html">automx_script(5)</a>, <a class="reference external" href="automx_sql.5.html">automx_sql(5)</a>, <a class="reference external" href="automx-test.1.html">automx-test(1)</a></p>
+</div>
+</div>
+</body>
+</html>
