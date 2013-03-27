@@ -1,6 +1,6 @@
 """
 automx - auto configuration service
-Copyright (c) 2012 [*] sys4 AG
+Copyright (c) 2011-2013 [*] sys4 AG
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 __version__ = '0.9.2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
-__copyright__ = "Copyright (c) 2012 [*] sys4 AG"
+__copyright__ = "Copyright (c) 2011-2012011-2013 [*] sys4 AG"
 
 import traceback
 import logging
