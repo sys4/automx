@@ -92,6 +92,8 @@ class Config(object, ConfigParser.RawConfigParser):
         try:
             if self.has_option("automx", "logfile"):
                 self.logfile = self.get("automx", "logfile")
+            else:
+                self.logfile = None
         except:
             self.logfile = None
 
@@ -100,6 +102,8 @@ class Config(object, ConfigParser.RawConfigParser):
         try:
             if self.has_option("automx", "debug"):
                 self.debug = self.getboolean("automx", "debug")
+            else:
+                self.debug = False
         except:
             self.debug = False
         
