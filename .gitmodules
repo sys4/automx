@@ -1,6 +1,0 @@
-[submodule "project"]
-	path = project
-	url = gitosis@pro.state-of-mind.de:automx-project.git
-[submodule "debian"]
-	path = debian
-	url = gitosis@pro.state-of-mind.de:automx-debian.git
