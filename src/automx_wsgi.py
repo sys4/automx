@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 __version__ = '0.9.2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
-__copyright__ = "Copyright (c) 2011-2012011-2013 [*] sys4 AG"
+__copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
 import traceback
 import logging
@@ -39,7 +39,9 @@ def application(environ, start_response):
     STAT_ERR = "500 Internal Server Error"
 
     response_body = ""
+    cn = None
     emailaddress = None
+    password = None
     
     # schema currently may be  'autoconfig' or 'autodiscover'
     schema = None
@@ -79,6 +81,9 @@ def application(environ, start_response):
             # in the file like wsgi.input environment variable.
             request_body = environ['wsgi.input'].read(request_body_size)
     
+            if data.debug:
+                logging.debug("Request POST (raw)\n" + request_body)
+
             fd = StringIO(request_body)
             try:
                 tree = etree.parse(fd)
@@ -127,9 +132,26 @@ def application(environ, start_response):
                 status = STAT_OK
     
             else:
-                process = False
-                status = STAT_ERR
-                data.memcache.set_client()
+                # We did not receive XML, so it might be a mobileconfig request
+                # TODO: We also might check the User-Agent here
+                d = parse_qs(request_body)
+
+                if d is not None:
+                    mobileconfig = d.get("_mobileconfig")[0]
+                    if mobileconfig == "true":
+                        if data.debug:
+                            logging.debug("Requesting iOS mobile "
+                                          "configuration")
+                        cn = d.get("cn")[0]
+                        emailaddress = d.get("emailaddress")[0]
+                        password = d.get("password")[0]
+                        schema = "ios"
+
+                    status = STAT_OK
+
+                else:
+                    process = False
+                    status = STAT_ERR
     
         elif request_method == "GET":
             # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
@@ -162,7 +184,7 @@ def application(environ, start_response):
     if process:
         try:
             if data.memcache.allow_client():
-                data.configure(emailaddress)
+                data.configure(emailaddress, cn, password)
             else:
                 process = False
                 status = STAT_ERR
@@ -201,8 +223,15 @@ def application(environ, start_response):
     if data.debug:
         logging.debug("Response:\n" + response_body)
 
-    response_headers = [('Content-Type', 'text/xml'),
-                        ('Content-Length', str(len(response_body)))]
+    if schema in ('autoconfig', "autodiscover"):
+        response_headers = [('Content-Type', 'text/xml'),
+                            ('Content-Length', str(len(response_body)))]
+    elif schema == "ios":
+        response_headers = [('Content-Type', 'application/x-apple-aspen-config'
+                            '; chatset=utf-8'),
+                            ('Content-Disposition', 'attachment; '
+                             'filename="company.mobileconfig'),
+                            ('Content-Length', str(len(response_body)))]
     start_response(status, response_headers)
 
     return [response_body]

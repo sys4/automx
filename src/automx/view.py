@@ -15,10 +15,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from plistlib import writePlistToString
 
 __version__ = '0.9.2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
+
+import plistlib
 
 from lxml import etree
 from lxml.etree import XMLSyntaxError
@@ -38,8 +41,9 @@ class View(object):
         self.__subschema = subschema
         
         self.__xml = None
+        self.__plist = None
         
-    def __build_xml_tree(self):
+    def __build_xml_plist_tree(self):
         root = None
         
         if self.__model.domain.has_key(self.__schema):
@@ -144,7 +148,9 @@ class View(object):
                 elif self.__model.domain.has_key("server_url"):
                     servername = etree.SubElement(server, "Name")
                     servername.text = self.__model.domain["server_url"]
-            
+
+                self.__xml = root
+        
             else:
                 return
 
@@ -172,7 +178,10 @@ class View(object):
                     if len(value) != 0:
                         self.__service(key, provider)
     
-        self.__xml = root
+            self.__xml = root
+            
+        elif self.__schema == "ios":
+            self.__plist = dict(sample = "DUMMY")
         
     def __service(self, service, root):
         l = self.__model.domain[service]
@@ -335,7 +344,7 @@ class View(object):
     def render(self):
         """Return the XML result of the view as a character string.
         """
-        self.__build_xml_tree()
+        self.__build_xml_plist_tree()
 
         if self.__xml is not None:
             return etree.tostring(self.__xml,
@@ -343,5 +352,7 @@ class View(object):
                                   method="xml",
                                   encoding="utf-8",
                                   pretty_print=True)
+        elif self.__plist is not None:
+            return writePlistToString(self.__plist)
         else:
             return ""
