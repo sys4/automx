@@ -420,9 +420,9 @@ class View(object):
 
             if elem.has_key(service + "_port"):
                 if service in ("imap", "pop"):
-                    proto["in_port"] = elem[service + "_port"]
+                    proto["in_port"] = int(elem[service + "_port"])
                 else:
-                    proto["out_port"] = elem[service + "_port"]
+                    proto["out_port"] = int(elem[service + "_port"])
                     
             if elem.has_key(service + "_auth_identity"):
                 if service in ("imap", "pop"):
