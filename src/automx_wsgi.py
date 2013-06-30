@@ -144,17 +144,10 @@ def application(environ, start_response):
                                 logging.debug("Requesting iOS mobile "
                                               "configuration")
                             if d.has_key("cn"):
-                                cn = d.get("cn")[0]
-                                # FIXME: only 7-bit ASCII
-                                try:
-                                    cn.decode("ascii")
-                                except:
-                                    logging.error("Known bug! Full name must "
-                                                  "be a 7 bit charset!")
-                                    process = False
-                                    status = STAT_ERR
+                                cn = unicode(d.get("cn")[0], "utf-8")
                             if d.has_key("password"):
-                                password = d.get("password")[0]
+                                password = unicode(d.get("password")[0],
+                                                   "utf-8")
                             if d.has_key("emailaddress"):
                                 emailaddress = d.get("emailaddress")[0]
                                 status = STAT_OK

@@ -206,9 +206,15 @@ class View(object):
                 org = self.__model.domain["account_name"]
             else:
                 org = self.__model.provider
-                                    
+            
+            if self.__model.domain.has_key("display_name"):
+                if self.__model.cn == "":
+                    email_account_name = self.__model.domain["display_name"]
+                else:
+                    email_account_name = self.__model.cn
+                    
             s = dict(EmailAccountDescription = org,
-                     EmailAccountName = self.__model.cn,
+                     EmailAccountName = email_account_name,
                      EmailAccountType = proto["type"],
                      EmailAddress = self.__model.emailaddress,
                      IncomingMailServerAuthentication = proto["in_auth"],

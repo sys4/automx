@@ -107,7 +107,7 @@ class Config(object, ConfigParser.RawConfigParser):
         except:
             self.debug = False
         
-    def configure(self, emailaddress, cn="", password=""):
+    def configure(self, emailaddress, cn=None, password=None):
         if emailaddress is None:
             return OrderedDict()
 
@@ -115,8 +115,14 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__emailaddress = emailaddress
         
         # Mobileconfig iOS
-        self.__cn = cn
-        self.__password = password
+        if cn is None:
+            self.__cn = ""
+        else:
+            self.__cn = cn
+        if password is None:
+            self.__password = ""
+        else:
+            self.__password = password
         
         domain = emailaddress.split("@")[1]
 
