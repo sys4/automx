@@ -415,8 +415,7 @@ class View(object):
             if service == "imap":
                 proto["type"] = "EmailTypeIMAP"
             if service == "pop":
-                # TODO: needs verification
-                proto["type"] = "EmailTypePOP3"
+                proto["type"] = "EmailTypePOP"
             
             if elem.has_key(service + "_server"):
                 if service in ("imap", "pop"):
@@ -436,7 +435,6 @@ class View(object):
                 else:
                     proto["out_username"] = elem[service + "_auth_identity"]
 
-            # FIXME: implement all other supported mechs            
             if elem.has_key(service + "_auth"):
                 value = elem[service + "_auth"]
                 result = ""
@@ -444,17 +442,21 @@ class View(object):
                 if value == "cleartext":
                     result = "EmailAuthPassword"
                 elif value == "encrypted":
-                    pass
+                    # We currently do not support EmailAuthHTTPMD5
+                    result = "EmailAuthCRAMMD5"
                 elif value == "ntlm":
-                    pass
+                    result = "EmailAuthNTLM"
                 elif value == "gssapi":
+                    # Not supported
                     pass
                 elif value == "client-ip-address":
+                    # Not supported
                     pass
                 elif value == "tls-client-cert":
+                    # Not supported
                     pass
                 elif value == "none":
-                    pass
+                    result = "EmailAuthNone"
                 
                 if service in ("imap", "pop"):
                     proto["in_auth"] = result
