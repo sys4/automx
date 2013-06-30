@@ -22,7 +22,8 @@ __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
 import plistlib
-
+import uuid
+    
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 
@@ -181,9 +182,69 @@ class View(object):
             self.__xml = root
             
         elif self.__schema == "ios":
-            self.__plist = dict(sample = "DUMMY")
+            proto = dict()
+
+            # We only support IMAP or POP3.
+            service_configured = False
+            
+            for key, value in self.__model.domain.iteritems():
+                if not service_configured and key == "imap":
+                    if len(value) != 0:
+                        self.__service(key, None, proto)
+                        service_configured = True
+
+                elif not service_configured and key == "pop":
+                    if len(value) != 0:
+                        self.__service(key, None, proto)
+                        service_configured = True
+
+                if key == "smtp":
+                    if len(value) != 0:
+                        self.__service(key, None, proto)
+                        
+            if self.__model.domain.has_key("account_name"):
+                org = self.__model.domain["account_name"]
+            else:
+                org = self.__model.provider
+                                    
+            s = dict(EmailAccountDescription = org,
+                     EmailAccountName = self.__model.cn,
+                     EmailAccountType = proto["type"],
+                     EmailAddress = self.__model.emailaddress,
+                     IncomingMailServerAuthentication = proto["in_auth"],
+                     IncomingMailServerHostName = proto["in_server"],
+                     IncomingMailServerPortNumber = proto["in_port"],
+                     IncomingMailServerUseSSL = proto["in_encryption"],
+                     IncomingMailServerUsername = proto["in_username"],
+                     IncomingPassword = self.__model.password,
+                     OutgoingMailServerAuthentication = proto["out_auth"],
+                     OutgoingMailServerHostName = proto["out_server"],
+                     OutgoingMailServerPortNumber = proto["out_port"],
+                     OutgoingMailServerUseSSL = proto["out_encryption"],
+                     OutgoingMailServerUsername = proto["out_username"],
+                     OutgoingPasswordSameAsIncomingPassword = True,
+                     PayloadDescription = "Configure email account.",
+                     PayloadDisplayName = "IMAP Account (%s)" % org,
+                     PayloadIdentifier = "org.automx",
+                     PayloadOrganization = self.__model.provider,
+                     PayloadType = "com.apple.mail.managed",
+                     PayloadUUID = str(uuid.uuid4()),
+                     PayloadVersion = 1,
+                     PreventAppSheet = False,
+                     PreventMove = False,
+                     SMIMEEnabled = False)
+                
+            self.__plist = dict(PayloadContent = [s],
+                                PayloadDescription = "Automx Email",
+                                PayloadDisplayName = org,
+                                PayloadIdentifier = "org.automx",
+                                PayloadOrganization = self.__model.provider,
+                                PayloadRemovalDisallowed = False,
+                                PayloadType = "Configuration",
+                                PayloadUUID = str(uuid.uuid4()),
+                                PayloadVersion = 1)
         
-    def __service(self, service, root):
+    def __service(self, service, root, proto=None):
         l = self.__model.domain[service]
 
         if self.__schema == "autodiscover":
@@ -340,6 +401,73 @@ class View(object):
                         c = etree.SubElement(sub_root,
                                              "useGlobalPreferredServer")
                         c.text = value.lower()
+        
+        elif self.__schema == "ios":
+            # see autodiscover comment above
+            elem = l[0]
+            
+            if service == "imap":
+                proto["type"] = "EmailTypeIMAP"
+            if service == "pop":
+                # TODO: needs verification
+                proto["type"] = "EmailTypePOP3"
+            
+            if elem.has_key(service + "_server"):
+                if service in ("imap", "pop"):
+                    proto["in_server"] = elem[service + "_server"]
+                else:
+                    proto["out_server"] = elem[service + "_server"]
+
+            if elem.has_key(service + "_port"):
+                if service in ("imap", "pop"):
+                    proto["in_port"] = elem[service + "_port"]
+                else:
+                    proto["out_port"] = elem[service + "_port"]
+                    
+            if elem.has_key(service + "_auth_identity"):
+                if service in ("imap", "pop"):
+                    proto["in_username"] = elem[service + "_auth_identity"]
+                else:
+                    proto["out_username"] = elem[service + "_auth_identity"]
+
+            # FIXME: implement all other supported mechs            
+            if elem.has_key(service + "_auth"):
+                value = elem[service + "_auth"]
+                result = ""
+
+                if value == "cleartext":
+                    result = "EmailAuthPassword"
+                elif value == "encrypted":
+                    pass
+                elif value == "ntlm":
+                    pass
+                elif value == "gssapi":
+                    pass
+                elif value == "client-ip-address":
+                    pass
+                elif value == "tls-client-cert":
+                    pass
+                elif value == "none":
+                    pass
+                
+                if service in ("imap", "pop"):
+                    proto["in_auth"] = result
+                else:
+                    proto["out_auth"] = result
+                
+            if elem.has_key(service + "_encryption"):
+                value = elem[service + "_encryption"]
+    
+                if value in ("ssl", "starttls"):
+                    if service in ("imap", "pop"):
+                        proto["in_encryption"] = True
+                    else:
+                        proto["out_encryption"] = True
+                else:
+                    if service in ("imap", "pop"):
+                        proto["in_encryption"] = False
+                    else:
+                        proto["out_encryption"] = False
                     
     def render(self):
         """Return the XML result of the view as a character string.

@@ -43,7 +43,7 @@ def application(environ, start_response):
     emailaddress = None
     password = None
     
-    # schema currently may be  'autoconfig' or 'autodiscover'
+    # schema currently may be  'autoconfig', 'autodiscover', 'ios'
     schema = None
 
     # subschema currently is either 'mobile' or 'outlook'
@@ -137,18 +137,37 @@ def application(environ, start_response):
                 d = parse_qs(request_body)
 
                 if d is not None:
-                    mobileconfig = d.get("_mobileconfig")[0]
-                    if mobileconfig == "true":
-                        if data.debug:
-                            logging.debug("Requesting iOS mobile "
-                                          "configuration")
-                        cn = d.get("cn")[0]
-                        emailaddress = d.get("emailaddress")[0]
-                        password = d.get("password")[0]
-                        schema = "ios"
-
-                    status = STAT_OK
-
+                    if d.has_key("_mobileconfig"):
+                        mobileconfig = d.get("_mobileconfig")[0]
+                        if mobileconfig == "true":
+                            if data.debug:
+                                logging.debug("Requesting iOS mobile "
+                                              "configuration")
+                            if d.has_key("cn"):
+                                cn = d.get("cn")[0]
+                                # FIXME: only 7-bit ASCII
+                                try:
+                                    cn.decode("ascii")
+                                except:
+                                    logging.error("Known bug! Full name must "
+                                                  "be a 7 bit charset!")
+                                    process = False
+                                    status = STAT_ERR
+                            if d.has_key("password"):
+                                password = d.get("password")[0]
+                            if d.has_key("emailaddress"):
+                                emailaddress = d.get("emailaddress")[0]
+                                status = STAT_OK
+                                schema = "ios"
+                            else:
+                                process = False
+                                status = STAT_ERR
+                        else:
+                            process = False
+                            status = STAT_ERR
+                    else:
+                        process = False
+                        status = STAT_ERR
                 else:
                     process = False
                     status = STAT_ERR
