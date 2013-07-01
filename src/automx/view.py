@@ -108,6 +108,8 @@ class View(object):
                             protocol = etree.SubElement(account, "Protocol")
                             self.__service(key, protocol)
 
+                self.__xml = root
+            
             elif self.__subschema == "mobile":
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/mobilesync/responseschema/2006")

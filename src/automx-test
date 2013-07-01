@@ -107,4 +107,33 @@ else
 	echo "Autodiscovery domain for Microsoft Outlook(tm) not found (autodiscover.$DOMAIN)"
 	echo
 fi
+
+# Test iOS schema
+AUTODISC="autodiscover.$DOMAIN"
+if [[ -z $(dig +short $AUTODISC) ]]; then
+	# default domain does not exist, try to discover non-default
+	AUTODISC="$(dig +short -t srv _autodiscover._tcp.$DOMAIN)"
+  	AUTODISC="${AUTODISC//* /}"
+  	AUTODISC="${AUTODISC%.*}"
+fi
+if [[ $AUTODISC ]]; then
+	# Test Microsoft Outlook schema
+	CON="https://$AUTODISC/mobileconfig"
+
+	# Test mobileconfig
+	cat <<-REQ >$MBREQUEST
+		_mobileconfig=true&cn=&emailaddress=$PROFILE&password=
+	REQ
+
+	echo
+	echo "Testing iOS (tm) (mobileconfig) ..."
+	echo "Connecting to $CON ..."
+	echo
+	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
+	rm $MBREQUEST
+else
+	echo
+	echo "Domain for iOS(tm) not found ($DOMAIN)"
+	echo
+fi
 # EOF
