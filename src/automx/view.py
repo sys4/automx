@@ -207,6 +207,7 @@ class View(object):
             else:
                 org = self.__model.provider
             
+            email_account_name = ""
             if self.__model.domain.has_key("display_name"):
                 if self.__model.cn == "":
                     email_account_name = self.__model.domain["display_name"]
