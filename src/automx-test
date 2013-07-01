@@ -121,9 +121,7 @@ if [[ $AUTODISC ]]; then
 	CON="https://$AUTODISC/mobileconfig"
 
 	# Test mobileconfig
-	cat <<-REQ >$MBREQUEST
-		_mobileconfig=true&cn=&emailaddress=$PROFILE&password=
-	REQ
+	echo -n "_mobileconfig=true&cn=&emailaddress=$PROFILE&password=" > $MBREQUEST
 
 	echo
 	echo "Testing iOS (tm) (mobileconfig) ..."
