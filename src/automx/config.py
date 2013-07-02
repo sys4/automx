@@ -73,6 +73,9 @@ class Config(object, ConfigParser.RawConfigParser):
                 later on in this backend section (is read as static backend)
                 do contain variables in the form ${attributename}, these are
                 expanded to the collected data.
+    -> sql    - TODO
+    -> script - TODO
+    -> file   - TODO
     
     Note: There may exist a DEFAULT section that is appended to _all_ sections
     in the configuration file. That said you can do really complex
@@ -114,7 +117,7 @@ class Config(object, ConfigParser.RawConfigParser):
         # Full email address containing local part _and_ domain
         self.__emailaddress = emailaddress
         
-        # Mobileconfig iOS
+        # Mobileconfig
         if cn is None:
             self.__cn = ""
         else:
@@ -445,7 +448,7 @@ class Config(object, ConfigParser.RawConfigParser):
 
             elif backend in ("file", "file_append"):
                 for opt in iter(self.options(section)):
-                    if opt in ("autoconfig", "autodiscover"):
+                    if opt in ("autoconfig", "autodiscover", "mobileconfig"):
                         tmp = self.get(section, opt)
                         result = self.__expand_vars(tmp)
                         

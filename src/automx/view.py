@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from plistlib import writePlistToString
+from plistlib import writePlistToString, readPlist
 
 __version__ = '0.9.2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
@@ -27,6 +27,7 @@ import logging
     
 from lxml import etree
 from lxml.etree import XMLSyntaxError
+from xml.parsers.expat import ExpatError
 
 
 class View(object):
@@ -34,7 +35,9 @@ class View(object):
     The view class uses the data structure built with the model class Config.
     It can convert data into different XML outputs. It currently supports
     AutoDiscover as found in the Microsoft world as well as Autoconfig, which
-    is used in Mozilla Thunderbird and several other open-source MUAs.
+    is used in Mozilla Thunderbird and several other open-source MUAs. It also
+    supports .mobileconfig profile support as found on iOS devices. These
+    profiles can also be used on Mac OS X Mail.app
         
     """
     def __init__(self, model, schema, subschema):
@@ -49,17 +52,22 @@ class View(object):
         root = None
         
         if self.__model.domain.has_key(self.__schema):
-            if self.__model.debug:
-                logging.debug("Entering file templates...")
+            if self.__schema in ("autodiscover", "autoconfig"):
+                path = self.__model.domain[self.__schema]
+                try:
+                    tree = etree.parse(path)
+                    root = tree.getroot()
+                    self.__xml = root
+                except XMLSyntaxError:
+                    logging.error("Syntax error in file %s" % path)
 
-            path = self.__model.domain[self.__schema]
-            tree = etree.parse(path)
-            root = tree.getroot()
-
-            self.__xml = root
-
-            if self.__model.debug:
-                logging.debug("Leaving file templates...")
+            elif self.__schema == "mobileconfig":
+                path = self.__model.domain[self.__schema]
+                try:
+                    plist = readPlist(path)
+                    self.__plist = plist
+                except ExpatError:
+                    logging.error("Syntax error in file %s" % path)
 
         elif self.__schema == "autodiscover":
             # define namespace constant
@@ -67,9 +75,6 @@ class View(object):
                                "autodiscover/responseschema/2006")
 
             if self.__subschema == "outlook":
-                if self.__model.debug:
-                    logging.debug("Entering autodiscover (outlook)...")
-
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/outlook/responseschema/2006a")
 
@@ -122,13 +127,7 @@ class View(object):
 
                 self.__xml = root
 
-                if self.__model.debug:
-                    logging.debug("Leaving autodiscover (outlook)...")
-            
             elif self.__subschema == "mobile":
-                if self.__model.debug:
-                    logging.debug("Entering autodiscover (mobile)...")
-
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/mobilesync/responseschema/2006")
 
@@ -172,16 +171,10 @@ class View(object):
 
                 self.__xml = root
 
-                if self.__model.debug:
-                    logging.debug("Leaving autodiscover (mobile)...")
-        
             else:
                 return
 
         elif self.__schema == "autoconfig":
-            if self.__model.debug:
-                logging.debug("Entering autoconfig...")
-
             root = etree.Element("clientConfig", version="1.1")
             
             provider = etree.SubElement(root,
@@ -207,13 +200,7 @@ class View(object):
     
             self.__xml = root
 
-            if self.__model.debug:
-                logging.debug("Leaving autoconfig...")
-
-        elif self.__schema == "ios":
-            if self.__model.debug:
-                logging.debug("Entering ios...")
-            
+        elif self.__schema == "mobileconfig":
             proto = dict()
 
             # We only support IMAP or POP3.
@@ -282,9 +269,6 @@ class View(object):
                                 PayloadType = "Configuration",
                                 PayloadUUID = str(uuid.uuid4()),
                                 PayloadVersion = 1)
-
-            if self.__model.debug:
-                logging.debug("Leaving ios...")
 
     def __service(self, service, root, proto=None):
         l = self.__model.domain[service]
@@ -444,7 +428,7 @@ class View(object):
                                              "useGlobalPreferredServer")
                         c.text = value.lower()
         
-        elif self.__schema == "ios":
+        elif self.__schema == "mobileconfig":
             # see autodiscover comment above
             elem = l[0]
             

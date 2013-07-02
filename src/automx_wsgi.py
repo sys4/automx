@@ -43,7 +43,7 @@ def application(environ, start_response):
     emailaddress = None
     password = None
     
-    # schema currently may be  'autoconfig', 'autodiscover', 'ios'
+    # schema currently may be  'autoconfig', 'autodiscover', 'mobileconfig'
     schema = None
 
     # subschema currently is either 'mobile' or 'outlook'
@@ -141,7 +141,7 @@ def application(environ, start_response):
                         mobileconfig = d.get("_mobileconfig")[0]
                         if mobileconfig == "true":
                             if data.debug:
-                                logging.debug("Requesting iOS mobile "
+                                logging.debug("Requesting mobileconfig "
                                               "configuration")
                             if d.has_key("cn"):
                                 cn = unicode(d.get("cn")[0], "utf-8")
@@ -151,7 +151,7 @@ def application(environ, start_response):
                             if d.has_key("emailaddress"):
                                 emailaddress = d.get("emailaddress")[0]
                                 status = STAT_OK
-                                schema = "ios"
+                                schema = "mobileconfig"
                             else:
                                 process = False
                                 status = STAT_ERR
@@ -242,7 +242,7 @@ def application(environ, start_response):
     if schema in ('autoconfig', "autodiscover"):
         response_headers = [('Content-Type', 'text/xml'),
                             ('Content-Length', str(len(response_body)))]
-    elif schema == "ios":
+    elif schema == "mobileconfig":
         response_headers = [('Content-Type', 'application/x-apple-aspen-config'
                             '; chatset=utf-8'),
                             ('Content-Disposition', 'attachment; '
