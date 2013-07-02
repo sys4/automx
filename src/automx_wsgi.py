@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.9.2'
+__version__ = '0.10.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
@@ -238,9 +238,9 @@ def application(environ, start_response):
 
     if data.debug:
         if (schema == "mobileconfig" and
-            data.domain.has_key("sign_mobileconfig")):
-            if data.domain["sign_mobileconfig"]:
-                logging.debug("No debugging output for signed mobileconfig!")
+            data.domain.has_key("sign_mobileconfig") and
+            data.domain["sign_mobileconfig"] is True):
+            logging.debug("No debugging output for signed mobileconfig!")
         else:
             logging.debug("Response:\n" + response_body)
 

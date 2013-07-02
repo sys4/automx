@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
-VERSION="0.9.2"
+VERSION="0.10.0"
 
 trap clean_exit EXIT
 function clean_exit() {

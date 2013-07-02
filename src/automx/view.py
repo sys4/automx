@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from plistlib import writePlistToString, readPlist
 
-__version__ = '0.9.2'
+__version__ = '0.10.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
@@ -554,8 +554,8 @@ class View(object):
                     
                     return plist_signed
                 else:
-                    logging.error("Signing not possible. Check your config!")
+                    logging.info("Not signing!")
                     
-            return writePlistToString(plist_unsigned)
+            return plist_unsigned
         else:
             return ""
