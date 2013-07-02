@@ -24,6 +24,8 @@ __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 import plistlib
 import uuid
 import logging
+import M2Crypto
+import re
     
 from lxml import etree
 from lxml.etree import XMLSyntaxError
@@ -65,6 +67,7 @@ class View(object):
                 path = self.__model.domain[self.__schema]
                 try:
                     plist = readPlist(path)
+                    # FIXME: Something is wrong here!
                     self.__plist = plist
                 except ExpatError:
                     logging.error("Syntax error in file %s" % path)
@@ -508,7 +511,51 @@ class View(object):
                                   method="xml",
                                   encoding="utf-8",
                                   pretty_print=True)
+            
         elif self.__plist is not None:
-            return writePlistToString(self.__plist)
+            plist_unsigned = writePlistToString(self.__plist)
+            
+            if self.__model.domain.has_key("sign_mobileconfig"):
+                if (self.__model.domain["sign_mobileconfig"] is True and
+                    self.__model.domain.has_key("sign_cert") and
+                    self.__model.domain.has_key("sign_key")):
+
+                    sign_cert = self.__model.domain["sign_cert"]
+                    sign_key = self.__model.domain["sign_key"]
+                
+                    buffer = M2Crypto.BIO.MemoryBuffer(plist_unsigned)
+                    signer = M2Crypto.SMIME.SMIME()
+                    s = M2Crypto.X509.X509_Stack()
+                
+                    cert_handle = open(sign_cert).read()
+                    certificates = re.finditer(r"-----BEGIN CERTIFICATE-----"
+                                                ".*?-----END CERTIFICATE-----",
+                                                cert_handle, re.S)
+                
+                    # First certificate is for signing!
+                    # Rest is intermediate cert chain!
+                    certificates.next()
+                    for match in certificates:
+                        s.push(M2Crypto.X509.load_cert_string(match.group(0)))
+                    signer.set_x509_stack(s)
+                    
+                    # Load key and _first_ certificate
+                    try:
+                        signer.load_key(sign_key, sign_cert)
+                    except M2Crypto.BIO.BIOError:
+                        logging.error("Cannot access %s or %s. Not signing!"
+                                      % (sign_cert, sign_key))
+                        return plist_unsigned
+                    
+                    p7 = signer.sign(buffer)
+                    output = M2Crypto.BIO.MemoryBuffer()
+                    p7.write_der(output)
+                    plist_signed = output.getvalue()
+                    
+                    return plist_signed
+                else:
+                    logging.error("Signing not possible. Check your config!")
+                    
+            return writePlistToString(plist_unsigned)
         else:
             return ""

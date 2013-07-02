@@ -194,6 +194,18 @@ class Config(object, ConfigParser.RawConfigParser):
                         service = self.__service(section, "imap")
                     elif opt == "pop":
                         service = self.__service(section, "pop")
+                    elif opt == "sign_mobileconfig":
+                        try:
+                            settings[opt] = self.getboolean(section, opt)
+                        except:
+                            logging.error("%s is not boolean!" % opt)
+                            settings[opt] = False
+                    elif opt in ("sign_cert", "sign_key"):
+                        result = self.get(section, opt)
+                        if os.path.exists(result):
+                            settings[opt] = result
+                        else:
+                            logging.error("%s cannot read %s" % (opt, result))
                     else:
                         pass
                     

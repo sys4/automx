@@ -237,7 +237,12 @@ def application(environ, start_response):
             status = STAT_ERR
 
     if data.debug:
-        logging.debug("Response:\n" + response_body)
+        if (schema == "mobileconfig" and
+            data.domain.has_key("sign_mobileconfig")):
+            if data.domain["sign_mobileconfig"]:
+                logging.debug("No debugging output for signed mobileconfig!")
+        else:
+            logging.debug("Response:\n" + response_body)
 
     if schema in ('autoconfig', "autodiscover"):
         response_headers = [('Content-Type', 'text/xml'),

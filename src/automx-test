@@ -49,7 +49,13 @@ if [[ $(dig +short $AUTOCONF) ]]; then
 	echo "Testing Autoconfig ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --no-check-certificate $CON
+	wget -S -O - -q --no-check-certificate $CON -O/dev/null
+	echo
+	if [[ $? -eq 0 ]]; then
+		echo "Success!"
+	else
+		echo "Failed!"
+	fi
 else
 	echo
 	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
@@ -82,7 +88,13 @@ if [[ $AUTODISC ]]; then
 	echo "Testing Autodiscover (Microsoft Outlook(tm)) ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON
+	wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON -O/dev/null
+	echo
+	if [[ $? -eq 0 ]]; then
+		echo "Success!"
+	else
+		echo "Failed!"
+	fi
 	rm $OLREQUEST
 	
 	# Test Microsoft Mobile schema
@@ -100,7 +112,13 @@ if [[ $AUTODISC ]]; then
 	echo "Testing Autodiscover (mobilesync) ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
+	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON -O/dev/null
+	echo
+	if [[ $? -eq 0 ]]; then
+		echo "Success!"
+	else
+		echo "Failed!"
+	fi
 	rm $MBREQUEST
 else
 	echo
@@ -108,7 +126,7 @@ else
 	echo
 fi
 
-# Test iOS schema
+# Test mobileconfig schema
 AUTODISC="autodiscover.$DOMAIN"
 if [[ -z $(dig +short $AUTODISC) ]]; then
 	# default domain does not exist, try to discover non-default
@@ -117,17 +135,22 @@ if [[ -z $(dig +short $AUTODISC) ]]; then
   	AUTODISC="${AUTODISC%.*}"
 fi
 if [[ $AUTODISC ]]; then
-	# Test Microsoft Outlook schema
+	# Test Apple mobileconfig schema
 	CON="https://$AUTODISC/mobileconfig"
 
-	# Test mobileconfig
 	echo -n "_mobileconfig=true&cn=&emailaddress=$PROFILE&password=" > $MBREQUEST
 
 	echo
-	echo "Testing iOS (tm) (mobileconfig) ..."
+	echo "Testing mobileconfig..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
+	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON -O/dev/null
+	echo
+	if [[ $? -eq 0 ]]; then
+		echo "Success!"
+	else
+		echo "Failed!"
+	fi
 	rm $MBREQUEST
 else
 	echo
