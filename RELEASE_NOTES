@@ -1,3 +1,12 @@
+Version 0.9.x to 0.10:
+
+Automx does support mobileconfig profiles for Apple iOS devices as well as
+Mac OS X Mail. The profiles are optionally signed.
+
+The backend "file" was expanded and does support the new option mobileconfig,
+which may point to a mobileconfig file (it is the equivalent to the
+autoconfig/autodiscover option of that specific backend).
+
 Version 0.8 to 0.9:
 
 Failure Counter (Denial-of-Service-Attack protection)
