@@ -66,8 +66,8 @@ class View(object):
             elif self.__schema == "mobileconfig":
                 path = self.__model.domain[self.__schema]
                 try:
-                    plist = readPlist(path)
-                    # FIXME: Something is wrong here!
+                    plist_tmp = readPlist(path)
+                    plist = plist_tmp.copy()
                     self.__plist = plist
                 except ExpatError:
                     logging.error("Syntax error in file %s" % path)
