@@ -23,6 +23,7 @@ __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
 import plistlib
 import uuid
+import logging
     
 from lxml import etree
 from lxml.etree import XMLSyntaxError
@@ -48,16 +49,27 @@ class View(object):
         root = None
         
         if self.__model.domain.has_key(self.__schema):
+            if self.__model.debug:
+                logging.debug("Entering file templates...")
+
             path = self.__model.domain[self.__schema]
             tree = etree.parse(path)
             root = tree.getroot()
-            
+
+            self.__xml = root
+
+            if self.__model.debug:
+                logging.debug("Leaving file templates...")
+
         elif self.__schema == "autodiscover":
             # define namespace constant
             NS_AutoDiscover = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/responseschema/2006")
 
             if self.__subschema == "outlook":
+                if self.__model.debug:
+                    logging.debug("Entering autodiscover (outlook)...")
+
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/outlook/responseschema/2006a")
 
@@ -109,8 +121,14 @@ class View(object):
                             self.__service(key, protocol)
 
                 self.__xml = root
+
+                if self.__model.debug:
+                    logging.debug("Leaving autodiscover (outlook)...")
             
             elif self.__subschema == "mobile":
+                if self.__model.debug:
+                    logging.debug("Entering autodiscover (mobile)...")
+
                 NS_Response = ("http://schemas.microsoft.com/exchange/"
                                "autodiscover/mobilesync/responseschema/2006")
 
@@ -153,11 +171,17 @@ class View(object):
                     servername.text = self.__model.domain["server_url"]
 
                 self.__xml = root
+
+                if self.__model.debug:
+                    logging.debug("Leaving autodiscover (mobile)...")
         
             else:
                 return
 
         elif self.__schema == "autoconfig":
+            if self.__model.debug:
+                logging.debug("Entering autoconfig...")
+
             root = etree.Element("clientConfig", version="1.1")
             
             provider = etree.SubElement(root,
@@ -182,8 +206,14 @@ class View(object):
                         self.__service(key, provider)
     
             self.__xml = root
-            
+
+            if self.__model.debug:
+                logging.debug("Leaving autoconfig...")
+
         elif self.__schema == "ios":
+            if self.__model.debug:
+                logging.debug("Entering ios...")
+            
             proto = dict()
 
             # We only support IMAP or POP3.
@@ -252,7 +282,10 @@ class View(object):
                                 PayloadType = "Configuration",
                                 PayloadUUID = str(uuid.uuid4()),
                                 PayloadVersion = 1)
-        
+
+            if self.__model.debug:
+                logging.debug("Leaving ios...")
+
     def __service(self, service, root, proto=None):
         l = self.__model.domain[service]
 

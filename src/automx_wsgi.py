@@ -193,6 +193,8 @@ def application(environ, start_response):
                     logging.debug("Request GET: QUERY_STRING failed!")
                     status = STAT_ERR
 
+    if data.debug:
+        logging.debug("Entering data.configure()")
     if process:
         try:
             if data.memcache.allow_client():
@@ -218,6 +220,8 @@ def application(environ, start_response):
             process = False
             status = STAT_ERR
     
+    if data.debug:
+        logging.debug("Entering view()")
     if process:
         try:
             view = View(data, schema, subschema)
