@@ -235,7 +235,9 @@ class View(object):
                     email_account_name = self.__model.domain["display_name"]
                 else:
                     email_account_name = self.__model.cn
-                    
+
+            # Important! The identifier must be unique
+            payload_identifier = "org.automx.%s" % str(uuid.uuid4())
             s = dict(EmailAccountDescription = org,
                      EmailAccountName = email_account_name,
                      EmailAccountType = proto["type"],
@@ -254,7 +256,7 @@ class View(object):
                      OutgoingPasswordSameAsIncomingPassword = True,
                      PayloadDescription = "Configure email account.",
                      PayloadDisplayName = "IMAP Account (%s)" % org,
-                     PayloadIdentifier = "org.automx",
+                     PayloadIdentifier = payload_identifier,
                      PayloadOrganization = self.__model.provider,
                      PayloadType = "com.apple.mail.managed",
                      PayloadUUID = str(uuid.uuid4()),
@@ -263,10 +265,11 @@ class View(object):
                      PreventMove = False,
                      SMIMEEnabled = False)
                 
+            payload_identifier = "org.automx.%s" % str(uuid.uuid4())
             self.__plist = dict(PayloadContent = [s],
                                 PayloadDescription = "Automx Email",
                                 PayloadDisplayName = org,
-                                PayloadIdentifier = "org.automx",
+                                PayloadIdentifier = payload_identifier,
                                 PayloadOrganization = self.__model.provider,
                                 PayloadRemovalDisallowed = False,
                                 PayloadType = "Configuration",
