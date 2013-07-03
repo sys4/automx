@@ -415,7 +415,7 @@ class View(object):
                     elif value == "tls-client-cert":
                         result = "TLS-client-cert"
                     elif value == "none":
-                        result = "none"
+                        result = "plain"
                     elif value == "smtp-after-pop":
                         if service == "smtp":
                             result = "SMTP-after-POP"
