@@ -145,11 +145,14 @@ def application(environ, start_response):
                                               "configuration")
                             if d.has_key("cn"):
                                 cn = unicode(d.get("cn")[0], "utf-8")
+                                cn.strip()
                             if d.has_key("password"):
                                 password = unicode(d.get("password")[0],
                                                    "utf-8")
+                                password.strip()
                             if d.has_key("emailaddress"):
                                 emailaddress = d.get("emailaddress")[0]
+                                emailaddress.strip()
                                 status = STAT_OK
                                 schema = "mobileconfig"
                             else:
@@ -193,9 +196,9 @@ def application(environ, start_response):
                     logging.debug("Request GET: QUERY_STRING failed!")
                     status = STAT_ERR
 
-    if data.debug:
-        logging.debug("Entering data.configure()")
     if process:
+        if data.debug:
+            logging.debug("Entering data.configure()")
         try:
             if data.memcache.allow_client():
                 data.configure(emailaddress, cn, password)
@@ -220,9 +223,9 @@ def application(environ, start_response):
             process = False
             status = STAT_ERR
     
-    if data.debug:
-        logging.debug("Entering view()")
     if process:
+        if data.debug:
+            logging.debug("Entering view()")
         try:
             view = View(data, schema, subschema)
             response_body = view.render()
@@ -253,6 +256,11 @@ def application(environ, start_response):
                             ('Content-Disposition', 'attachment; '
                              'filename="company.mobileconfig'),
                             ('Content-Length', str(len(response_body)))]
+    else:
+        # Failure?
+        response_headers = [('Content-Type', 'text/html'),
+                            ('Content-Length', str(len(response_body)))]
+
     start_response(status, response_headers)
 
     return [response_body]
