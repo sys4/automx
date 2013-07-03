@@ -13,9 +13,9 @@
 
 <form action="/mobileconfig" method="post">
 	<p><input type="hidden" name="_mobileconfig" value="true" /></p>
-	<p>Full name:<br /><input type="text" name="cn" value="" size="40" /></p>
-	<p>Email address:<br /><input type="email" name="emailaddress" value="" size="40" /></p>
-	<p>Password:<br /><input type="password" name="password" value="" size="40" /></p>
+	<p>Full name:<br /><input type="text" placeholder="optional" name="cn" value="" size="40" /></p>
+	<p>Email address:<br /><input type="email" placeholder="required" required="required" name="emailaddress" value="" size="40" /></p>
+	<p>Password:<br /><input type="password" placeholder="optional" name="password" value="" size="40" /></p>
 	<p><input type="submit" value="Download" /></p>
 </form>
 
