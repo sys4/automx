@@ -144,7 +144,18 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__vars = dict()
         
         try:
-            self.__automx["provider"] = self.get("automx", "provider")
+            provider = self.get("automx", "provider")
+            
+            # provider must be a domainname
+            pattern = "^[0-9a-zA-Z.-]+[a-zA-Z]{2,9}$"
+            prog = re.compile(pattern)
+            result = prog.match(provider)
+            if result is not None:
+                self.__automx["provider"] = result.group(0)
+            else:
+                logging.error("<provider> setting broken!")
+                self.__automx["provider"] = "provider.broken"
+            
             tmp = self.create_list(self.get("automx", "domains"))
             self.__automx["domains"] = tmp 
         except TypeError:
