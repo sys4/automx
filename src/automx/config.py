@@ -137,6 +137,8 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__defaults = OrderedDict()
         # domain individual settings (overwrites some or all defaults)
         self.__domain = OrderedDict()
+        # Collect settings for each backend
+        self.__settings = OrderedDict()
         
         # if we use dynamic backends, we might earn variables
         self.__vars = dict()
@@ -152,18 +154,18 @@ class Config(object, ConfigParser.RawConfigParser):
         if (domain in iter(self.__automx["domains"]) or
             self.__automx["domains"][0] == "*"):
             if self.has_section(domain):
-                self.__domain = self.__eval_options(domain)
+                self.__eval_options(domain)
+                self.__domain = self.__settings
             else:
                 if self.has_section("global"):
-                    self.__defaults = self.__eval_options("global")
-                    self.__defaults = self.__replace_makro(self.__defaults)
+                    self.__eval_options("global")
                 else:
                     raise Exception("Missing section 'global'")
                 # we need to use default values from config file
-                self.__domain = self.__defaults
+                self.__domain = self.__replace_makro(self.__settings)
 
-    def __eval_options(self, section, backend=None, upper_level=None):
-        settings = OrderedDict()
+    def __eval_options(self, section, backend=None):
+        settings = self.__settings
 
         settings["domain"] = self.__search_domain
         settings["emailaddress"] = self.__emailaddress
@@ -211,11 +213,10 @@ class Config(object, ConfigParser.RawConfigParser):
                     
                     if opt in ("smtp", "imap", "pop"):
                         if backend == "static_append":
-                            if (upper_level is not None and
-                                upper_level.has_key(opt)):
+                            if settings.has_key(opt):
                                 if self.debug:
                                     logging.debug("APPEND %s" % service)
-                                upper_level[opt].append(service)
+                                settings[opt].append(service)
                             else:
                                 if self.debug:
                                     logging.debug("APPEND NEW %s"
@@ -235,8 +236,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     tmp = self.get(section, "follow")
                     result = self.__expand_vars(tmp)
                     result = self.__replace_makro(result)
-                    settings.update(self.__eval_options(result,
-                                                        upper_level=settings))
+                    self.__eval_options(result)
 
             elif backend in ("ldap", "ldap_append"):
                 try:
@@ -398,13 +398,10 @@ class Config(object, ConfigParser.RawConfigParser):
                     except ldap.LDAPError, e:
                         pass
 
-                # then we call ourself again for static addons
                 if backend == "ldap":
-                    extra = self.__eval_options(section, backend="static")
+                    self.__eval_options(section, backend="static")
                 else:
-                    extra = self.__eval_options(section,
-                                                backend="static_append")
-                settings.update(extra)
+                    self.__eval_options(section, backend="static_append")
             
             elif backend in ("sql", "sql_append"):
                 try:
@@ -450,13 +447,10 @@ class Config(object, ConfigParser.RawConfigParser):
                     
                     break
 
-                # then we call ourself again for static addons
                 if backend == "sql":
-                    extra = self.__eval_options(section, backend="static")
+                    self.__eval_options(section, backend="static")
                 else:
-                    extra = self.__eval_options(section,
-                                                backend="static_append")
-                settings.update(extra)
+                    self.__eval_options(section, backend="static_append")
 
             elif backend in ("file", "file_append"):
                 for opt in iter(self.options(section)):
@@ -468,12 +462,69 @@ class Config(object, ConfigParser.RawConfigParser):
                             settings[opt] = result
 
                 if backend == "file":
-                    extra = self.__eval_options(section, backend="static")
+                    self.__eval_options(section, backend="static")
                 else:
-                    extra = self.__eval_options(section,
-                                                backend="static_append")
-                settings.update(extra)
+                    self.__eval_options(section, backend="static_append")
 
+            elif backend in ("script", "script_append"):
+                if self.has_option(section, "script"):
+                    script_args = self.get(section, "script")
+                else:
+                    raise Exception("Missing option <script>")
+
+                if self.has_option(section, "result_attrs"):
+                    result_attrs = self.create_list(self.get(section,
+                                                             "result_attrs"))
+                else:
+                    raise Exception("Missing option <result_attrs>")
+
+                seperator = None
+                if self.has_option(section, "seperator"):
+                    seperator = self.get(section, "seperator")
+
+                cmd = shlex.split(self.get(section, "script"))
+                for i, item in enumerate(cmd):
+                    cmd[i] = self.__replace_makro(item)
+
+                stdout_fd = sys.__stdout__.fileno()
+                pipe_in, pipe_out = os.pipe()
+                pid = os.fork()
+
+                if pid == 0:
+                    # child
+                    os.close(pipe_in)
+                    os.dup2(pipe_out, stdout_fd)
+
+                    os.execvp(cmd[0], cmd)
+
+                    raise Exception("ERROR in execvp()" )
+                elif pid > 0:
+                    # parent
+                    os.close(pipe_out)
+                    recv = os.read(pipe_in, 1024)
+
+                    result = os.waitpid(pid, 0)
+
+                # check return code
+                if result[1] != 0:
+                    raise Exception("ERROR while calling script",
+                                    result,
+                                    recv.strip())
+
+                if len(recv) == 0:
+                     logging.warning("No result from script!")
+                     raise DataNotFoundException
+
+                result = recv.strip().split(seperator, len(result_attrs))
+
+                for i in range(min(len(result_attrs), len(result))):
+                    self.__vars[result_attrs[i]] = result[i].strip()
+
+                if backend == "script":
+                    self.__eval_options(section, backend="static")
+                else:
+                    self.__eval_options(section, backend="static_append")
+                            
             ### backends beyond this line do not have a follow option ###
 
             elif backend == "filter":
@@ -535,7 +586,7 @@ class Config(object, ConfigParser.RawConfigParser):
 
                             # recurse again, because we now have a new section
                             # that we need to scan
-                            settings.update(self.__eval_options(special_opt))
+                            self.__eval_options(special_opt)
                             
                             # we already got a result. Do not continue!
                             break
@@ -543,74 +594,9 @@ class Config(object, ConfigParser.RawConfigParser):
                     if not got_data:
                         raise DataNotFoundException
             
-            elif backend in ("script", "script_append"):
-                if self.has_option(section, "script"):
-                    script_args = self.get(section, "script")
-                else:
-                    raise Exception("Missing option <script>")
-
-                if self.has_option(section, "result_attrs"):
-                    result_attrs = self.create_list(self.get(section,
-                                                             "result_attrs"))
-                else:
-                    raise Exception("Missing option <result_attrs>")
-
-                seperator = None
-                if self.has_option(section, "seperator"):
-                    seperator = self.get(section, "seperator")
-
-                cmd = shlex.split(self.get(section, "script"))
-                for i, item in enumerate(cmd):
-                    cmd[i] = self.__replace_makro(item)
-
-                stdout_fd = sys.__stdout__.fileno()
-                pipe_in, pipe_out = os.pipe()
-                pid = os.fork()
-
-                if pid == 0:
-                    # child
-                    os.close(pipe_in)
-                    os.dup2(pipe_out, stdout_fd)
-
-                    os.execvp(cmd[0], cmd)
-
-                    raise Exception("ERROR in execvp()" )
-                elif pid > 0:
-                    # parent
-                    os.close(pipe_out)
-                    recv = os.read(pipe_in, 1024)
-
-                    result = os.waitpid(pid, 0)
-
-                # check return code
-                if result[1] != 0:
-                    raise Exception("ERROR while calling script",
-                                    result,
-                                    recv.strip())
-
-                if len(recv) == 0:
-                     logging.warning("No result from script!")
-                     raise DataNotFoundException
-
-                result = recv.strip().split(seperator, len(result_attrs))
-
-                for i in range(min(len(result_attrs), len(result))):
-                    self.__vars[result_attrs[i]] = result[i].strip()
-
-                # then we call ourself again for static addons
-                settings.update(self.__eval_options(section,
-                                                  backend="static"))
-
-                if backend == "script":
-                    extra = self.__eval_options(section, backend="static")
-                else:
-                    extra = self.__eval_options(section,
-                                                backend="static_append")
-                settings.update(extra)
-                            
             elif backend == "global":
                 if self.has_section("global"):
-                    settings = self.__eval_options("global")
+                    self.__eval_options("global")
                     settings = self.__replace_makro(settings)
                 else:
                     raise Exception("Missing section 'global'")
@@ -618,26 +604,24 @@ class Config(object, ConfigParser.RawConfigParser):
             else:
                 raise Exception("Unknown backend specified")
 
-        return settings
-
     def __service(self, section, service):
         # This method only stores meta information. The results depend on
         # the MUA xml schema specification and is defined in the Viewer-class
 
-        settings = OrderedDict()
+        proto_settings = OrderedDict()
 
         if self.getboolean(section, service) == True:
             if self.has_option(section, service + "_server"):
                 opt = service + "_server"
                 result = self.__expand_vars(self.get(section, opt))
 
-                settings[opt] = result
+                proto_settings[opt] = result
                 
             if self.has_option(section, service + "_port"):
                 opt = service + "_port"
                 result = self.__expand_vars(self.get(section, opt))
                 
-                settings[opt] = result
+                proto_settings[opt] = result
                 
             if self.has_option(section, service + "_encryption"):
                 opt = service + "_encryption"
@@ -652,7 +636,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 elif result.lower() == "auto":
                     result = "auto"
                     
-                settings[opt] = result
+                proto_settings[opt] = result
                 
             if self.has_option(section, service + "_auth"):
                 opt = service + "_auth"
@@ -677,26 +661,26 @@ class Config(object, ConfigParser.RawConfigParser):
                         result = "smtp-after-pop"
                 # TODO: we allow bogus keys/values.
                 
-                settings[opt] = result
+                proto_settings[opt] = result
 
             if self.has_option(section, service + "_auth_identity"):
                 opt = service + "_auth_identity"
                 result = self.__expand_vars(self.get(section, opt))
-                settings[opt] = self.__replace_makro(result)
+                proto_settings[opt] = self.__replace_makro(result)
             else:
                 emaillocalpart = self.__replace_makro("%u")
-                settings[service + "_auth_identity"] = emaillocalpart
+                proto_settings[service + "_auth_identity"] = emaillocalpart
             
             if self.has_option(section, service + "_expiration_date"):
                 opt = service + "_expiration_date"
                 result = self.__expand_vars(self.get(section, opt))
                 dt = parser.parse(result, fuzzy=True)
-                settings[opt] = dt.strftime("%Y%m%d")
+                proto_settings[opt] = dt.strftime("%Y%m%d")
                 
             if self.has_option(section, service + "_refresh_ttl"):
                 opt = service + "_refresh_ttl"
                 result = self.get(section, opt)
-                settings[opt] = result
+                proto_settings[opt] = result
 
             if service == "smtp":
                 if self.has_option(section, service + "_author"):
@@ -704,7 +688,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     author = self.__expand_vars(self.get(section, opt))
 
                     if author == "%s":
-                        settings[opt] = self.__emailaddress
+                        proto_settings[opt] = self.__emailaddress
                     
                 if self.has_option(section, service + "_default"):
                     try:
@@ -714,11 +698,11 @@ class Config(object, ConfigParser.RawConfigParser):
                             result = "Yes"
                         else:
                             result = "No"
-                        settings[opt] = result
+                        proto_settings[opt] = result
                     except ValueError:
                         pass
 
-        return settings
+        return proto_settings
     
     def create_list(self, value):
         result = value.split()
