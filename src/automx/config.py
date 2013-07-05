@@ -61,21 +61,32 @@ class Config(object, ConfigParser.RawConfigParser):
     The class currently support smtp, pop and imap services.
     
     The class currently supports the following backends:
+    
     -> global - This backend tells automx to use the global section
+    
     -> static - all kind of service information that can be sent directly to
                 the MUA
+                
     -> filter - This backend can execute commands and collects results from
                 stdout. The result may be "", which means we skip further
                 searching. It may return data, which should point to a section
                 that we try to follow.
+                
     -> ldap   - Read all kind of information from LDAP servers. The result
                 attributes are stored in an internal dictionary and if options
                 later on in this backend section (is read as static backend)
                 do contain variables in the form ${attributename}, these are
                 expanded to the collected data.
-    -> sql    - TODO
-    -> script - TODO
-    -> file   - TODO
+                
+    -> sql    - Read all kind of information from SQL servers. The result
+                attributes are stored in an internal dictionary. See ldpa
+                
+    -> script - Execute a script and split a result into attributes, which are
+                stored in an internal dictionary, See ldap
+                
+    -> file   - Provide static files. If present, all collected data are
+                discarded and only the static file is sent to the remote
+                client. This may change in future releases.
     
     Note: There may exist a DEFAULT section that is appended to _all_ sections
     in the configuration file. That said you can do really complex
@@ -133,12 +144,9 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__search_domain = domain
         
         self.__automx = dict()
-        # global section parameter
-        self.__defaults = OrderedDict()
+
         # domain individual settings (overwrites some or all defaults)
         self.__domain = OrderedDict()
-        # Collect settings for each backend
-        self.__settings = OrderedDict()
         
         # if we use dynamic backends, we might earn variables
         self.__vars = dict()
@@ -166,17 +174,16 @@ class Config(object, ConfigParser.RawConfigParser):
             self.__automx["domains"][0] == "*"):
             if self.has_section(domain):
                 self.__eval_options(domain)
-                self.__domain = self.__settings
             else:
                 if self.has_section("global"):
                     self.__eval_options("global")
                 else:
                     raise Exception("Missing section 'global'")
                 # we need to use default values from config file
-                self.__domain = self.__replace_makro(self.__settings)
+                self.__domain = self.__replace_makro(self.__domain)
 
     def __eval_options(self, section, backend=None):
-        settings = self.__settings
+        settings = self.__domain
 
         settings["domain"] = self.__search_domain
         settings["emailaddress"] = self.__emailaddress
@@ -365,7 +372,8 @@ class Config(object, ConfigParser.RawConfigParser):
                         else:
                             con.simple_bind_s(ldap_cfg["binddn"],
                                               ldap_cfg["bindpw"])
-                    except:
+                    except Exception, e:
+                        logging.error("LDAP: %s" % e)
                         continue
                     break
 
@@ -437,10 +445,11 @@ class Config(object, ConfigParser.RawConfigParser):
                     try:
                         engine = create_engine(con)
                         connection = engine.connect()
-                    except:
+                    except Exception, e:
+                        logging.error("SQL: %s" % e)
                         continue
-                    result = connection.execute(sql_cfg["query"])
                     
+                    result = connection.execute(sql_cfg["query"])
                     for row in result:
                         keys = row.keys()
                         for key in iter(keys):
@@ -749,6 +758,9 @@ class Config(object, ConfigParser.RawConfigParser):
                 if mobj.group(2) is not None:
                     macro = mobj.group(2)[1:]
                     
+                    if self.debug:
+                        logging.debug("__expand_vars()->macro=%s" % macro)
+                        
                     if "@" in result:
                         if macro == "%u":
                             return result.split("@")[0]
@@ -781,6 +793,9 @@ class Config(object, ConfigParser.RawConfigParser):
                         unicode(expression, "utf-8"),
                         re.UNICODE)
      
+        if self.debug:
+            logging.debug("__expand_vars()->result=%s" % result)
+            
         return result
         
     def get_provider(self):
