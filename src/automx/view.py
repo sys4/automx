@@ -394,7 +394,7 @@ class View(object):
                         c.text = value.upper()
                     elif value in ("none", "auto"):
                         # autoconfig does not know anything about auto
-                        c.text = value
+                        c.text = "plain"
     
                 if elem.has_key(service + "_auth"):
                     c = etree.SubElement(sub_root, "authentication")
@@ -415,7 +415,7 @@ class View(object):
                     elif value == "tls-client-cert":
                         result = "TLS-client-cert"
                     elif value == "none":
-                        result = "plain"
+                        result = "none"
                     elif value == "smtp-after-pop":
                         if service == "smtp":
                             result = "SMTP-after-POP"
