@@ -803,7 +803,7 @@ class Config(object, ConfigParser.RawConfigParser):
             if section.lower() == domain.lower():
                 return section
 
-        raise NoSectionError(section)
+        raise NoSectionError(domain)
         
     def get_provider(self):
         return self.__automx["provider"]
