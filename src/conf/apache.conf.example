@@ -23,6 +23,7 @@
   <IfModule mod_wsgi.c>
     WSGIScriptAlias /Autodiscover/Autodiscover.xml /usr/lib/automx/automx_wsgi.py
     WSGIScriptAlias /autodiscover/autodiscover.xml /usr/lib/automx/automx_wsgi.py
+    WSGIScript /mobileconfig /usr/lib/automx/automx_wsgi.py
     <Directory "/usr/lib/automx">
       Order allow,deny
       Allow from all

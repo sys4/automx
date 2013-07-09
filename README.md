@@ -166,7 +166,8 @@ Web Server Configuration
    website. After entering the form data, you will receive a mobileconfig
    file and the device switches to the settings assistent. On Mac OS X, you
    also can call this document and save it to disk. After opening it, the
-   profile manager opens and the steps are similar to iOS.
+   profile manager opens and the steps are similar to iOS. For signed
+   profiles see the man page automx.conf(5).
 
    Here is a simple example that configures an autoconfig and an
    autodiscover service (both use the same automx script). You need
