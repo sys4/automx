@@ -30,7 +30,7 @@ import re
 import memcache
 import logging
 
-from ConfigParser import NoOptionError
+from ConfigParser import NoOptionError, NoSectionError
 from ipaddr import IPAddress, IPNetwork
 from dateutil import parser
 
@@ -103,23 +103,18 @@ class Config(object, ConfigParser.RawConfigParser):
         if not self.has_section("automx"):
             raise Exception("Missing section 'automx'")
 
-        try:
-            if self.has_option("automx", "logfile"):
-                self.logfile = self.get("automx", "logfile")
-            else:
-                self.logfile = None
-        except:
+
+        if self.has_option("automx", "logfile"):
+            self.logfile = self.get("automx", "logfile")
+        else:
             self.logfile = None
 
-        self.memcache = Memcache(self, environ)
-        
-        try:
-            if self.has_option("automx", "debug"):
-                self.debug = self.getboolean("automx", "debug")
-            else:
-                self.debug = False
-        except:
+        if self.has_option("automx", "debug"):
+            self.debug = self.getboolean("automx", "debug")
+        else:
             self.debug = False
+            
+        self.memcache = Memcache(self, environ)
         
     def configure(self, emailaddress, cn=None, password=None):
         if emailaddress is None:
@@ -189,6 +184,8 @@ class Config(object, ConfigParser.RawConfigParser):
 
         settings["domain"] = self.__search_domain
         settings["emailaddress"] = self.__emailaddress
+        
+        section = self.__find_section(section)
         
         if self.has_option(section, "backend"):
             if backend is None:
@@ -799,6 +796,14 @@ class Config(object, ConfigParser.RawConfigParser):
             logging.debug("__expand_vars()->result=%s" % result)
             
         return result
+        
+    def __find_section(self, domain):
+        l = self.sections()
+        for section in iter(l):
+            if section.lower() == domain.lower():
+                return section
+
+        raise NoSectionError(section)
         
     def get_provider(self):
         return self.__automx["provider"]
