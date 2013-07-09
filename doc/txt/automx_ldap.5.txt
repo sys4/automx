@@ -52,7 +52,7 @@ Parameters
 
           Note
 
-          See the section “Macros and Variables” in automx.conf(5) for a
+          See the section "Macros and Variables" in automx.conf(5) for a
           list of available query macros.
 
    host (default: ldap://127.0.0.1/)

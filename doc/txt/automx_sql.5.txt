@@ -37,7 +37,7 @@ host = driver://username:password@hostname/database
 
           Note
 
-          See the section called “Macros and Variables” in automx.conf(5)
+          See the section called "Macros and Variables" in automx.conf(5)
           for a list of available query macros.
 
    result_attrs (default: none)

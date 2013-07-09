@@ -167,9 +167,9 @@ backend = static
           response to the (SSL) error log.
 
    display_name (no default, optional)
-          Specifies an “optional display name that indicates the name of
+          Specifies an "optional display name that indicates the name of
           the sender (...) that could be displayed to the user of a mail
-          application” (see: 3.4. Address Specification in RFC 5322). The
+          application" (see: 3.4. Address Specification in RFC 5322). The
           client can decide to accept or change the name.
 
      Note
@@ -313,7 +313,7 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
           Note
 
           This parameter is experimental. The feature is available for
-          Microsoft clients only. For a definition of “author” see also
+          Microsoft clients only. For a definition of "author" see also
           RFC 5598, Section 2.1 User Actors.
 
    smtp_default (no default)
@@ -324,6 +324,19 @@ server_2 = /usr/sbin/postmap -q "%u" hash:/etc/postfix/virtual_alias_domains | \
 
           This feature is available to clients following the Mozilla
           schema only.
+
+   sign_mobileconfig (default: no)
+          Specifies whether configuration files for iOS and MacOS should
+          be sent signed or not. By default signing is disabled.
+
+   sign_cert (no default)
+          Specifies the path to the cert used to sign configuration files
+          for iOS and MacOS. The file must contain all certificates -
+          certificate and all intermediate certificates concatenated.
+
+   sign_key (no default)
+          Specifies the path to the key used to sign configuration files
+          for iOS and MacOS.
 
 Macros and Variables
 

@@ -11,16 +11,16 @@ Format
 
    The general format of the automx.conf file is as follows:
      * The basic element contained in an INI file is the property. Every
-       property has a name and a value, delimited by an equals sign (“=”).
+       property has a name and a value, delimited by an equals sign ("=").
        The name appears to the left of the equals sign.
      * Properties are grouped into sections. The section name appears on a
-       line by itself, in square brackets (“[” and “]”). All properties
+       line by itself, in square brackets ("[" and "]"). All properties
        after the section declaration are associated with that section.
-       There is no explicit “end of section” delimiter; sections end at
+       There is no explicit "end of section" delimiter; sections end at
        the next section declaration, or the end of the file. Sections may
        not be nested.
      * Section and property names are case sensitive.
-     * A line with a number sign (“#”) begins a comment. Anything
+     * A line with a number sign ("#") begins a comment. Anything
        following a number sign will be ignored by automx.
 
 Sections
@@ -189,7 +189,7 @@ cacert = /etc/ssl/certs/ca-certificates.crt
 
 Authors
 
-   Christian Rößner <cr@ys4.de>
+   Christian R��ner <cr@ys4.de>
           Wrote the program.
 
    Patrick Ben Koetter <p@sys4.de>

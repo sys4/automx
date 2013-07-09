@@ -1,4 +1,4 @@
-.\" Man page generated from reStructeredText.
+.\" Man page generated from reStructuredText.
 .
 .TH AUTOMX.CONF 5 "02/08/2013" "" "automx"
 .SH NAME
@@ -70,12 +70,16 @@ parameter it should configure.
 .sp
 The following concatenation of service name smtp and service option _server
 creates the smtp_server parameter:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 smtp_server = mail.example.com
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Service names available in automx are shown in the following list. The service
 options to create parameters are specified in the section called \fI\%Parameters\fP:
@@ -104,9 +108,13 @@ Specifies a path to a file that contains static autoconfiguration
 options following to the Mozilla schema.
 .INDENT 7.0
 .INDENT 3.5
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
 This parameter is valid only if backend = file has been specified.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .UNINDENT
 .TP
@@ -115,9 +123,13 @@ Specifies a path to a file that contains static autoconfiguration
 options following to the Microsoft schema.
 .INDENT 7.0
 .INDENT 3.5
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
 This parameter is valid only if backend = file has been specified.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .UNINDENT
 .TP
@@ -133,9 +145,13 @@ Specifies the account type that should be configured:
 .TP
 .B email
 Setting this option will create an email configuration.
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 The Microsoft schema specifies additional account_types. Currently automx only supports email.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .TP
 .B action (default: settings, mandatory)
@@ -144,9 +160,13 @@ settings or if it should visit a different server or use a different
 address.
 .INDENT 7.0
 .INDENT 3.5
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
 This option applies to Microsoft schema only.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -163,45 +183,61 @@ following options are available:
 automx should use logic provided within this section to
 identify a different section which holds configuration
 settings:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 backend = file
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .TP
 .B filter
 automx should use logic provided within this section to
 identify a different section which holds configuration
 settings:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 backend = filter
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .TP
 .B global
 automx should use general settings defined in the global
 section:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 backend = global
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .TP
 .B ldap
 automx should use a mixture of general and individual
 settings. General settings are set like static settings.
 Individual settings should be retrieved from an LDAP
 query:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 backend = ldap
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 See also automx_ldap(5) for a list of LDAP related configuration options.
 .TP
@@ -209,24 +245,32 @@ See also automx_ldap(5) for a list of LDAP related configuration options.
 automx should use a mixture of general and individual
 settings. General settings are set like static settings.
 Individual settings should be retrieved from an SQL query:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 backend = sql
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 See also automx_sql(5) for a list of SQL related configuration options.
 .TP
 .B static
 automx should use general settings provided within the
 current section:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 backend = static
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .TP
 .B debug (default: no)
@@ -240,9 +284,13 @@ sender (...) that could be displayed to the user of a mail application”
 accept or change the name.
 .INDENT 7.0
 .INDENT 3.5
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
 This option applies to Microsoft schema only.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .UNINDENT
 .TP
@@ -264,12 +312,16 @@ provide autoconfiguration for.
 .B provider (no default, mandatory)
 The FQDN domain name of the domain that provides the configuration
 service:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 provider = example.com
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .TP
 .B section_filter (default: domainpart, optional)
 Specifies a list of one or more filters whose result outputs a section
@@ -279,6 +331,8 @@ execution of subsequent filters.
 These filters will be used instead of the hard coded, internal
 domainpart filter, which strictly uses the domainpart taken from the
 email address the client submitted in its configuration request:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -289,6 +343,8 @@ server_2 = /usr/sbin/postmap \-q "%u" hash:/etc/postfix/virtual_alias_domains | 
         sed \-e \(aqs/^.*@\e(\e.*\e)/\e1/g\(aq | grep dmz.example.com
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .TP
 .B service (default: no)
 Specifies the service type that should be provided in the configuration
@@ -306,9 +362,13 @@ in order to gain access to the service. The following options are
 available:
 .INDENT 7.0
 .INDENT 3.5
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
 Thunderbird 3.0 accepts only \fBplain\fP and \fBsecure\fP. It will ignore the whole XML file, if other values are given.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -362,9 +422,13 @@ are available:
 .B auto
 The client should try to start with starttls, proceed with
 ssl and settle with none, if only that is available.
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 This feature is not available in clients following the Mozilla schema. For these clients automx will always output none as encryption level.
-.RE
+.UNINDENT
+.UNINDENT
 .TP
 .B none
 The client should use an unencrypted transport layer.
@@ -372,35 +436,64 @@ The client should use an unencrypted transport layer.
 .B ssl
 The client should use an SSL3 or TLS1 encrypted transport
 layer from the start.
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 This option is typical for smtps, pop3s and imaps services and usually requires a dedicated port on the server for SSL encryption only.
-.RE
+.UNINDENT
+.UNINDENT
 .TP
 .B starttls
 The client should begin communication on an unencrypted
 port and then upgrade the communication to TLS via the
 STARTTLS command.
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 This option is typical for smtp, pop3 and imap services.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .TP
 .B smtp_author (default: %s)
 Specifies the envelope sender address used when the client sends a
 message. See the section called \fI\%Macros and Variables\fP for available
 options.
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 This parameter is experimental. The feature is available for
 Microsoft clients only. For a definition of “author” see also
 RFC 5598, Section 2.1 User Actors.
-.RE
+.UNINDENT
+.UNINDENT
 .TP
 .B smtp_default (no default)
 Specifies if this service should be used globally for all outgoing
 messages from all accounts.
-.IP Note
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 This feature is available to clients following the Mozilla schema only.
-.RE
+.UNINDENT
+.UNINDENT
+.TP
+.B sign_mobileconfig (default: no)
+Specifies whether configuration files for iOS and MacOS should be sent
+signed or not. By default signing is disabled.
+.TP
+.B sign_cert (no default)
+Specifies the path to the cert used to sign configuration files for iOS
+and MacOS. The file must contain all certificates \- certificate and all
+intermediate certificates concatenated.
+.TP
+.B sign_key (no default)
+Specifies the path to the key used to sign configuration files for iOS
+and MacOS.
 .UNINDENT
 .SH MACROS AND VARIABLES
 .sp
@@ -444,5 +537,4 @@ Wrote the documentation.
 .SH COPYRIGHT
 This document has been placed in the public domain.
 .\" Generated by docutils manpage writer.
-.\" 
 .

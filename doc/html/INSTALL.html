@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
-<title>Install</title>
+<meta name="generator" content="Docutils 0.10: http://docutils.sourceforge.net/" />
+<title>INSTALL</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
+:Id: $Id: html4css1.css 7514 2012-09-14 14:27:12Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -77,7 +77,7 @@ div.tip p.admonition-title {
 
 div.attention p.admonition-title, div.caution p.admonition-title,
 div.danger p.admonition-title, div.error p.admonition-title,
-div.warning p.admonition-title {
+div.warning p.admonition-title, .code .error {
   color: red ;
   font-weight: bold ;
   font-family: sans-serif }
@@ -249,9 +249,18 @@ pre.address {
   margin-top: 0 ;
   font: inherit }
 
-pre.literal-block, pre.doctest-block, pre.math {
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
   margin-left: 2em ;
   margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
 
 span.classifier {
   font-family: sans-serif ;
@@ -315,7 +324,7 @@ ul.auto-toc {
 </head>
 <body>
 <div class="document" id="install">
-<h1 class="title">Install</h1>
+<h1 class="title">INSTALL</h1>
 
 <p>This document contains step by step instructions to install automx.</p>
 <div class="section" id="automx-download">
@@ -332,152 +341,186 @@ $ cd automx-VERSION
 </div>
 <div class="section" id="software-requirements">
 <h1>Software Requirements</h1>
-<p>automx is a Python application. You must install a few extra modules to handle
-frontend and backend communication as well to deal with XML data.</p>
+<p>automx is a Python application. You must install a few extra modules to
+handle frontend and backend communication as well to deal with XML
+data.</p>
 <dl class="docutils">
 <dt>frontend</dt>
-<dd>Install mod_wsgi for the Apache web server and the python-wsgi module.</dd>
+<dd>Install mod_wsgi for the Apache web server and the python-wsgi
+module.</dd>
 <dt>backend (optional)</dt>
 <dd>If you plan to use either LDAP or SQL as backends to retrieve
-configuration options from install ldap for LDAP and python-sqlalchemy
-for SQL. Further you also need to install the SQL backend driver that
-communicates with your database. For MySQL this might be mysqldb.</dd>
+configuration options from install ldap for LDAP and
+python-sqlalchemy for SQL. Further you also need to install the
+SQL backend driver that communicates with your database. For
+MySQL this might be mysqldb.</dd>
 <dt>XML handling</dt>
-<dd>Install python lxml or automx will not be able to handle the XML data
-it needs to deal with.</dd>
+<dd>Install the python-packages dateutil, ipaddr, lxml and memcache.
+Otherwise automx will not be able to handle the XML data it needs
+to deal with.</dd>
+<dt>plist (mobileconfig) handling</dt>
+<dd>Mobileconfig profiles may be signed with your webservers cert and
+key. You need to install M2Crypto, which does the S/MIME-signing.</dd>
 </dl>
 <p>Once you've satisfied the requirements, you can start to install automx.</p>
 </div>
 <div class="section" id="installing-automx">
 <h1>Installing automx</h1>
-<p>automx is a wsgi script depending on some automx-specific libraries. It reads
-its configuration from a single configuration file. The program, the libraries
-and the configuration file need to be installed at different locations.</p>
+<p>automx is a wsgi script depending on some automx-specific libraries. It
+reads its configuration from a single configuration file. The program,
+the libraries and the configuration file need to be installed at
+different locations.</p>
 <div class="section" id="installing-the-program">
 <h2>Installing the program</h2>
 <p>Create a directory for the automx program and copy it to that location:</p>
 <pre class="literal-block">
-% mkdir -p /usr/local/lib/automx
-% cp automx-VERSION/automx.wsgi /usr/local/lib/automx/
+$ mkdir -p /usr/local/lib/automx
+$ cp automx-VERSION/src/automx_wsgi.py /usr/local/lib/automx/
 </pre>
 </div>
 <div class="section" id="installing-the-test-program">
 <h2>Installing the test program</h2>
 <p>Copy the automx-test program to a location that is in your $PATH:</p>
 <pre class="literal-block">
-% cp automx-VERSION/automx-test /usr/local/bin/automx-test
+$ cp automx-VERSION/src/automx-test /usr/local/bin/automx-test
 </pre>
 </div>
 <div class="section" id="installing-automx-specific-libraries">
 <h2>Installing automx-specific libraries</h2>
-<p>Python provides a directory with site specific packages, called site-packages.
-Copy the automx directory including all its files to site-packages:</p>
+<p>Python loads packages from various locations depending on your
+distribution and python version. To correctly determine the used
+paths please type the following commands:</p>
 <pre class="literal-block">
-% cp automx-VERSION/automx /usr/local/lib/python2.6/site-packages/
-
-.. NOTE:: site-packages
-
-        The location of that directory depends on the Python version
-        and the distribution you use.
+$ python
+&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.path
+&gt;&gt;&gt; (CTRL+D)
+</pre>
+<p>You'll get a list of used paths. Please remember the first shown path
+entry (for example '/usr/lib/python2.7') -  this is the best location for
+placing the automx-directory:</p>
+<pre class="literal-block">
+$ cp -r automx-VERSION/src/automx /usr/lib/pythonVERSION
+</pre>
+</div>
+<div class="section" id="installing-man-pages">
+<h2>Installing man Pages</h2>
+<p>Try using the manpath command to find out where man pages are stored on
+your computer:</p>
+<pre class="literal-block">
+$ manpath /usr/local/man:/usr/local/share/man:/usr/share/man
+</pre>
+<p>Copy the man pages to that location:</p>
+<pre class="literal-block">
+$ cp -a automx-VERSION/doc/man/ /usr/local/share/man
 </pre>
 </div>
 <div class="section" id="installing-the-configuration-file">
 <h2>Installing the configuration file</h2>
 <p>Place the sample automx.conf file into /etc:</p>
 <pre class="literal-block">
-% cp automx-VERSION/src/conf/automx.conf /etc/
+$ cp automx-VERSION/src/conf/automx.conf /etc/
 </pre>
-<p>Follow automx.conf(5) Adopt this configuration file to your needs. You may find
-detailed information in the man page automx.conf(5).</p>
-<blockquote>
-<div class="tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">Set debug=yes in the section automx while you setup, configure
-and test automx. It will help you detect problems more easily.
-This will log the request GET/POST and the response to the
-error.log file(s).</p>
-</div>
-</blockquote>
-</div>
-<div class="section" id="installing-man-pages">
-<h2>Installing man Pages</h2>
-<p>Try using the manpath command to find out where man pages are stored on your
-computer:</p>
-<pre class="literal-block">
-$ manpath
-/usr/local/man:/usr/local/share/man:/usr/share/man
-</pre>
-<p>Copy the man pages to that location:</p>
-<pre class="literal-block">
-% cp -a automx-VERSION/doc/man/ /usr/local/share/man
-</pre>
+<p>Follow automx.conf(5) Adopt this configuration file to your needs. You
+may find detailed information in the man page automx.conf(5).</p>
+<p>Tip</p>
+<p>Set debug=yes in the section automx while you setup, configure and test
+automx. It will help you detect problems more easily. This will log the
+request GET/POST and the response to the error.log file(s).</p>
 </div>
 </div>
 <div class="section" id="dns-configuration">
 <h1>DNS Configuration</h1>
-<p>Mail clients seeking mail account autoconfiguration will either request an IP
-address for autoconfig.example.com (Mozilla schema) or autodiscover.example.com
-(Microsoft schema). Provide settings in your DNS that directs them to the
-server running the automx service:</p>
+<p>Mail clients seeking mail account autoconfiguration will either request
+an IP address for autoconfig.example.com (Mozilla schema) or
+autodiscover.example.com (Microsoft schema). Provide settings in your
+DNS that directs them to the server running the automx service:</p>
 <pre class="literal-block">
-autoconfig.example.com.       IN    A     192.168.2.1
-autodiscover.example.com.     IN    A     192.168.2.1
+     autoconfig.example.com.              IN    A     192.168.2.1
+     autodiscover.example.com.            IN    A     192.168.2.1
+
+.. NOTE::
+
+If you install automx on an existing host , which has it's own domain-name,
+then it is also possible to use above entries as nicknames:
+
+ somehost.example.com.       IN      A       192.168.2.1
+     autoconfig              IN      CNAME   somehost
+     autodiscover            IN      CNAME   somehost
 </pre>
 </div>
 <div class="section" id="web-server-configuration">
 <h1>Web Server Configuration</h1>
-<p>Finally configure the web server. It will accept configuration requests from
-mail clients, pass the information to automx and in turn will respond with
-account profiles once automx has figured out the details.</p>
-<p>First enable the wsgi module. Follow your OS documentation to find out how it
-needs to be done.</p>
-<p>automx is able to provision mail clients following the Mozilla autoconfig
-schema as well as mail clients following the Microsoft autodiscover schema.
-Both schemas have different requirements regarding hostname, port and level of
-security when a request is sent to the configuration server:</p>
+<p>Finally configure the web server. It will accept configuration requests
+from mail clients, pass the information to automx and in turn will
+respond with account profiles once automx has figured out the details.</p>
+<p>First enable the wsgi module. Follow your OS documentation to find out
+how it needs to be done. (e.g. 'a2enmod wsgi' for Apache on Debian)</p>
+<p>automx is able to provision mail clients following the Mozilla
+autoconfig schema as well as mail clients following the Microsoft
+autodiscover schema. Both schemas have different requirements regarding
+hostname, port and level of security when a request is sent to the
+configuration server:</p>
 <dl class="docutils">
 <dt>Microsoft</dt>
-<dd>Mail clients following the Microsoft autodiscover schema require a
-https connection. The web server must identify itself as
-autodiscover.example.com on port 443 and it must use a valid server
-certificate that is trusted by the mail client requesting
+<dd>Mail clients following the Microsoft autodiscover schema require
+a https connection. The web server must identify itself as
+autodiscover.example.com on port 443 and it must use a valid
+server certificate that is trusted by the mail client requesting
 configuration.</dd>
 <dt>Mozilla</dt>
-<dd>Mail clients following the Mozilla autoconfig schema can use either a
-http or a https connection. The web server must identify itself as
-autoconfig.example.com on port 80 or 443. If it connects on 443 a valid
-server certificate that is trusted by the mail client requesting
-configuration has to be used.</dd>
+<dd>Mail clients following the Mozilla autoconfig schema can use
+either a http or a https connection. The web server must
+identify itself as autoconfig.example.com on port 80 or 443. If
+it connects on 443 a valid server certificate that is trusted by
+the mail client requesting configuration has to be used.</dd>
 </dl>
-<p>Here is a simple example that configures an autoconfig and an autodiscover
-service - both use the same automx script:</p>
+<p>To provision Apple iOS devices or Mac OS X Mail, you need to place the file
+automx.html somewhere in your document root of your webserver. After that
+you can use your iOS device and open the Safari browser calling this
+website. After entering the form data, you will receive a mobileconfig
+file and the device switches to the settings assistent. On Mac OS X, you
+also can call this document and save it to disk. After opening it, the
+profile manager opens and the steps are similar to iOS. For signed
+profiles see the man page automx.conf(5).</p>
+<p>Here is a simple example that configures an autoconfig and an
+autodiscover service (both use the same automx script). You need
+to copy &amp; paste this lines into your existing website configuration
+files (for Debian take a look in /etc/apache2/sites-enabled/...):</p>
 <pre class="literal-block">
 &lt;VirtualHost *:80&gt;
-  ServerName example.com
-  ServerAlias autoconfig.example.com
-  ServerAdmin webmaster&#64;example.com
-  &lt;IfModule mod_wsgi.c&gt;
-    WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)&gt;xml /usr/lib/automx/automx.wsgi
-    &lt;Directory &quot;/usr/local/lib/automx&quot;&gt;
-      Order allow,deny
-      Allow from all
-    &lt;/Directory&gt;
-  &lt;/IfModule&gt;
+        ServerName example.com
+        ServerAlias autoconfig.example.com
+        ServerAdmin webmaster&#64;example.com
+        &lt;IfModule mod_wsgi.c&gt;
+                WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)&gt;xml /usr/lib/automx/automx_wsgi.py
+                &lt;Directory &quot;/usr/lib/automx&quot;&gt;
+                        Order allow,deny
+                        Allow from all
+                &lt;/Directory&gt;
+        &lt;/IfModule&gt;
 &lt;/VirtualHost&gt;
 
 &lt;VirtualHost *:443&gt;
-  ServerName example.com:443
-  ServerAlias autodiscover.example.com:443
-  ServerAdmin webmaster&#64;example.com
-  &lt;IfModule mod_wsgi.c&gt;
-    WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)&gt;xml /usr/lib/automx/automx.wsgi
-    &lt;Directory &quot;/usr/local/lib/automx&quot;&gt;
-      Order allow,deny
-      Allow from all
-    &lt;/Directory&gt;
-  &lt;/IfModule&gt;
+        ServerName example.com:443
+        ServerAlias autodiscover.example.com:443
+        ServerAdmin webmaster&#64;example.com
+        &lt;IfModule mod_wsgi.c&gt;
+                WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)&gt;xml /usr/lib/automx/automx_wsgi.py
+                WSGIScriptAlias /mobileconfig /usr/lib/automx/automx_wsgi.py
+                &lt;Directory &quot;/usr/lib/automx&quot;&gt;
+                        Order allow,deny
+                        Allow from all
+                &lt;/Directory&gt;
+        &lt;/IfModule&gt;
 &lt;/VirtualHost&gt;
 
+.. NOTE::
+
+If you haven't done so, you also need to configure and enable SSL in your apache-configuration.
+At least that means enabling the default SSL-site, install (self signed) certificates and activating
+the ssl-support (e.g. 'a2enmod ssl' for Apache on debian). Don't forget to restart your web-server
+afterwards!
 
 
 .. NOTE:: ISPs
@@ -485,44 +528,56 @@ service - both use the same automx script:</p>
 In an advanced environment with thousands of domains, you can redirect
 mail clients via DNS entries to your ISP automx provisioning server for
 Microsoft clients and a web server instance with a wild card ServerName
-autoconfig.* to serve the Mozilla schema::
+to serve the Mozilla schema.
 
-        autoconfig.example.com.       IN    A     192.168.2.1
-        autodiscover.example.com.     IN    A     192.168.2.1
+Add this to your DNS-configuation:
+
+*.example.com.        A     192.168.2.1
 </pre>
-<p>automx comes with a little utility that helps testing proper operation. The
-next section explains how to use it.</p>
+<p>and this to your virtualhost-definition in your webserver-configuration:</p>
+<pre class="literal-block">
+ServerAlias *.example.com
+</pre>
+<p>automx comes with a little utility that helps testing proper operation.
+The next section explains how to use it.</p>
 </div>
 <div class="section" id="testing-and-debugging-automx">
 <h1>Testing And Debugging automx</h1>
-<p>The automx-test utility sends configuration requests for Microsoft and Mozilla
-clients to the web server:</p>
+<p>The automx-test utility sends configuration requests for Microsoft and
+Mozilla clients to the web server:</p>
 <pre class="literal-block">
 $ automx-test user&#64;example.com
 </pre>
-<p>The domainpart in the address determines the list of hostnames that will be
-queried. In this example autoconfig.example.com and autodiscover.example.com
-will be contacted.</p>
-<p>You should see the web server header and get XML results from the server.</p>
+<p>The domainpart in the address determines the list of hostnames that
+will be queried. In this example autoconfig.example.com and
+autodiscover.example.com will be contacted.</p>
+<p>You should see the web server header. The script will say Success or
+Failed.</p>
 <p>If things go wrong, the error.log is your friend. It will indicate
-configuration issues, if python modules are missing, if your database can not
-be queried or anything else that might go wrong.</p>
+configuration issues, if python modules are missing, if your database
+can not be queried or anything else that might go wrong. If you also
+enabled debug in /etc/automx.conf, you will find further information
+in your automx.log file. Please turn on debug, if you want to send us
+a bug report. PLEASE NOTICE! Mobileconfig will display a users password
+in cleartext! So please remove that from bug reports first!</p>
 <blockquote>
 <div class="note">
 <p class="first admonition-title">Note</p>
-<p class="last">If you split error logs by port, e.g. port 80 and 443, you need
-to check both. Autoconfig requests will mostly show up in the
-port 80 error.log, whereas autodiscover will only show up in
-your 443 error.log.</p>
+<p class="last">If you split error logs by port, e.g. port 80 and 443, you need to
+check both. Autoconfig requests will mostly show up in the port 80
+error.log, whereas autodiscover will only show up in your 443
+error.log.</p>
 </div>
 </blockquote>
 <div class="section" id="authors">
 <h2>Authors</h2>
 <dl class="docutils">
-<dt>Christian Rößner &lt;<a class="reference external" href="mailto:cr&#64;ys4.de">cr&#64;ys4.de</a>&gt;</dt>
+<dt>Christian Roessner &lt;<a class="reference external" href="mailto:cr&#64;ys4.de">cr&#64;ys4.de</a>&gt;</dt>
 <dd>Wrote the program.</dd>
 <dt>Patrick Ben Koetter &lt;<a class="reference external" href="mailto:p&#64;sys4.de">p&#64;sys4.de</a>&gt;</dt>
 <dd>Wrote the documentation.</dd>
+<dt>Christian Sudec &lt;<a class="reference external" href="mailto:c.sudec&#64;htlwrn.ac.at">c.sudec&#64;htlwrn.ac.at</a>&gt;</dt>
+<dd>04-22-2013: Updated the documentation to support automx 0.9.2</dd>
 </dl>
 </div>
 </div>
