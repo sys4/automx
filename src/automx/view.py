@@ -229,12 +229,10 @@ class View(object):
             else:
                 org = self.__model.provider
             
-            email_account_name = ""
+            email_account_name = self.__model.cn
             if self.__model.domain.has_key("display_name"):
                 if self.__model.cn == "":
                     email_account_name = self.__model.domain["display_name"]
-                else:
-                    email_account_name = self.__model.cn
 
             # Important! The identifier must be unique
             payload_identifier = "org.automx.%s" % str(uuid.uuid4())
@@ -562,3 +560,5 @@ class View(object):
             return plist_unsigned
         else:
             return ""
+
+# vim: expandtab ts=4 sw=4

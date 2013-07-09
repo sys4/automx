@@ -913,3 +913,5 @@ class Memcache(object):
                 return True
         
         return False
+
+# vim: expandtab ts=4 sw=4

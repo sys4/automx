@@ -264,3 +264,5 @@ def application(environ, start_response):
     start_response(status, response_headers)
 
     return [response_body]
+
+# vim: expandtab ts=4 sw=4
