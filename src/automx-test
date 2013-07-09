@@ -25,6 +25,7 @@ trap clean_exit EXIT
 function clean_exit() {
 	[[ -f "$OLREQUEST" ]] && rm "$OLREQUEST"
 	[[ -f "$MBREQUEST" ]] && rm "$MBREQUEST"
+	[[ -f "$MBCRESPONSE" ]] && rm "$MBCRESPONSE"
 }
 
 # We need a mail address
@@ -39,7 +40,7 @@ DOMAIN="${PROFILE#*@}"
 PROGRAM_NAME=$(basename $0)
 OLREQUEST="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
 MBREQUEST="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
-
+MBCRESPONSE="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
 
 # Test Mozilla schema
 AUTOCONF="autoconfig.$DOMAIN"
@@ -49,13 +50,7 @@ if [[ $(dig +short $AUTOCONF) ]]; then
 	echo "Testing Autoconfig ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --no-check-certificate $CON -O/dev/null
-	echo
-	if [[ $? -eq 0 ]]; then
-		echo "Success!"
-	else
-		echo "Failed!"
-	fi
+	wget -S -O - -q --no-check-certificate $CON
 else
 	echo
 	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
@@ -88,13 +83,7 @@ if [[ $AUTODISC ]]; then
 	echo "Testing Autodiscover (Microsoft Outlook(tm)) ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON -O/dev/null
-	echo
-	if [[ $? -eq 0 ]]; then
-		echo "Success!"
-	else
-		echo "Failed!"
-	fi
+	wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON
 	rm $OLREQUEST
 	
 	# Test Microsoft Mobile schema
@@ -112,13 +101,7 @@ if [[ $AUTODISC ]]; then
 	echo "Testing Autodiscover (mobilesync) ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON -O/dev/null
-	echo
-	if [[ $? -eq 0 ]]; then
-		echo "Success!"
-	else
-		echo "Failed!"
-	fi
+	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON
 	rm $MBREQUEST
 else
 	echo
@@ -144,14 +127,7 @@ if [[ $AUTODISC ]]; then
 	echo "Testing mobileconfig..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON -O/dev/null
-	echo
-	if [[ $? -eq 0 ]]; then
-		echo "Success!"
-	else
-		echo "Failed!"
-	fi
-	rm $MBREQUEST
+	wget -S -O - -q --post-file=$MBREQUEST --no-check-certificate $CON | hexdump -C
 else
 	echo
 	echo "Domain for iOS(tm) not found ($DOMAIN)"
