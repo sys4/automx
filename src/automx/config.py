@@ -170,9 +170,11 @@ class Config(object, ConfigParser.RawConfigParser):
             raise Exception("Missing options in section automx")
 
         # if a domain has its own section, use settings from it
-        if (domain in iter(self.__automx["domains"]) or
+        cmp_domains = [dom.lower() for dom in self.__automx["domains"]]
+        if (domain.lower() in iter(cmp_domains) or
             self.__automx["domains"][0] == "*"):
-            if self.has_section(domain):
+            cmp_sections = [dom.lower() for dom in self.sections()]
+            if domain.lower() in iter(cmp_sections):
                 self.__eval_options(domain)
             else:
                 if self.has_section("global"):
