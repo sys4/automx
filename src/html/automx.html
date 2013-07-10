@@ -1,25 +1,61 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="de-DE">
-<head profile="http://gmpg.org/xfn/11">
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="viewport" content="width=340px" />
-	<title>Automx - generate mobileconfig</title>
+<!DOCTYPE html>
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>automx - Mobile Clients</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <script src="js/vendor/custom.modernizr.js"></script>
 </head>
-
 <body>
-<p>
-<img src="/automx/315x75xautomx-logo.png.pagespeed.ic.XaLjjzN31q.png" width="315" height="75"/>
-</p>
 
-<form action="/mobileconfig" method="post">
-	<p><input type="hidden" name="_mobileconfig" value="true" /></p>
-	<p>Full name:<br /><input type="text" placeholder="optional" name="cn" value="" size="40" /></p>
-	<p>Email address:<br /><input type="email" placeholder="required" required="required" name="emailaddress" value="" size="40" /></p>
-	<p>Password:<br /><input type="password" placeholder="optional" name="password" value="" size="40" /></p>
-	<p><input type="submit" value="Download" /></p>
-</form>
+  <div class="row">
+    <div id="company-banner" class="small-12 large-6 large-centered columns">
+      <img src="img/company-banner.png" />
+    </div>
+  </div>
 
+  <div class="row">
+    <div class="small-12 large-6 large-centered columns">
+
+      <label for="email-address">Email address</label>
+      <span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="If you leave this empty only your mail address will be displayed in messages from you.">
+        <input id="email-address" type="text" placeholder="john.doe@example.com (mandatory)">
+      </span>
+
+      <label for="full-name">Full name</label>
+      <input id="full-name" type="text" placeholder="John Doe (optional)">
+
+      <label for="password">Password</label>
+      <span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Leave empty to be asked on first login.">
+        <input id="password" type="password" placeholder="Password (optional)">
+      </span>
+
+      <input type="submit" class="button small-12 large-6 right" value="Create configuration!" />
+    </div>
+  </div>
+
+  <div id="footer-desktop" class="hide-for-small">
+      <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
+  </div>
+  <div id="footer-mobile" class="show-for-small row">
+    <div class="small-12 columns">
+      <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
+    </div>
+  </div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  <script src="js/foundation.min.js"></script>
+  <script src="js/foundation/foundation.forms.js"></script>
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  <script>
+    $(document).foundation();
+  </script>
 </body>
-
 </html>
-
