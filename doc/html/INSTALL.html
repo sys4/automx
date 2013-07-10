@@ -436,18 +436,20 @@ an IP address for autoconfig.example.com (Mozilla schema) or
 autodiscover.example.com (Microsoft schema). Provide settings in your
 DNS that directs them to the server running the automx service:</p>
 <pre class="literal-block">
-     autoconfig.example.com.              IN    A     192.168.2.1
-     autodiscover.example.com.            IN    A     192.168.2.1
-
-.. NOTE::
-
-If you install automx on an existing host , which has it's own domain-name,
-then it is also possible to use above entries as nicknames:
-
- somehost.example.com.       IN      A       192.168.2.1
-     autoconfig              IN      CNAME   somehost
-     autodiscover            IN      CNAME   somehost
+autoconfig.example.com.              IN    A     192.168.2.1
+autodiscover.example.com.            IN    A     192.168.2.1
 </pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>If you install automx on an existing host, which has it's own
+domain-name, then it is also possible to use above entries as
+nicknames:</p>
+<dl class="last docutils">
+<dt>somehost.example.com.       IN      A       192.168.2.1</dt>
+<dd>autoconfig              IN      CNAME   somehost
+autodiscover            IN      CNAME   somehost</dd>
+</dl>
+</div>
 </div>
 <div class="section" id="web-server-configuration">
 <h1>Web Server Configuration</h1>
@@ -493,7 +495,9 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...):</p>
         ServerAlias autoconfig.example.com
         ServerAdmin webmaster&#64;example.com
         &lt;IfModule mod_wsgi.c&gt;
-                WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)&gt;xml /usr/lib/automx/automx_wsgi.py
+                WSGIScriptAliasMatch \
+                        (?i)^/.+/(autodiscover|config-v1.1)&gt;xml \
+                        /usr/lib/automx/automx_wsgi.py
                 &lt;Directory &quot;/usr/lib/automx&quot;&gt;
                         Order allow,deny
                         Allow from all
@@ -506,34 +510,38 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...):</p>
         ServerAlias autodiscover.example.com:443
         ServerAdmin webmaster&#64;example.com
         &lt;IfModule mod_wsgi.c&gt;
-                WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)&gt;xml /usr/lib/automx/automx_wsgi.py
-                WSGIScriptAlias /mobileconfig /usr/lib/automx/automx_wsgi.py
+                WSGIScriptAliasMatch \
+                        (?i)^/.+/(autodiscover|config-v1.1)&gt;xml \
+                        /usr/lib/automx/automx_wsgi.py
+                WSGIScriptAlias \
+                        /mobileconfig \
+                        /usr/lib/automx/automx_wsgi.py
                 &lt;Directory &quot;/usr/lib/automx&quot;&gt;
                         Order allow,deny
                         Allow from all
                 &lt;/Directory&gt;
         &lt;/IfModule&gt;
 &lt;/VirtualHost&gt;
-
-.. NOTE::
-
-If you haven't done so, you also need to configure and enable SSL in your apache-configuration.
-At least that means enabling the default SSL-site, install (self signed) certificates and activating
-the ssl-support (e.g. 'a2enmod ssl' for Apache on debian). Don't forget to restart your web-server
-afterwards!
-
-
-.. NOTE:: ISPs
-
-In an advanced environment with thousands of domains, you can redirect
+</pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you haven't done so, you also need to configure and enable SSL in
+your apache-configuration. At least that means enabling the default
+SSL-site, install (self signed) certificates and activating the
+ssl-support (e.g. 'a2enmod ssl' for Apache on debian). Don't forget to
+restart your web-server afterwards! You need also to ajust the paths
+to automx_wsgi.py in the example above.</p>
+</div>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>ISPs</p>
+<p>In an advanced environment with thousands of domains, you can redirect
 mail clients via DNS entries to your ISP automx provisioning server for
 Microsoft clients and a web server instance with a wild card ServerName
-to serve the Mozilla schema.
-
-Add this to your DNS-configuation:
-
-*.example.com.        A     192.168.2.1
-</pre>
+to serve the Mozilla schema.</p>
+<p>Add this to your DNS-configuation:</p>
+<p class="last">*.example.com.        A     192.168.2.1</p>
+</div>
 <p>and this to your virtualhost-definition in your webserver-configuration:</p>
 <pre class="literal-block">
 ServerAlias *.example.com
@@ -560,7 +568,6 @@ enabled debug in /etc/automx.conf, you will find further information
 in your automx.log file. Please turn on debug, if you want to send us
 a bug report. PLEASE NOTICE! Mobileconfig will display a users password
 in cleartext! So please remove that from bug reports first!</p>
-<blockquote>
 <div class="note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you split error logs by port, e.g. port 80 and 443, you need to
@@ -568,7 +575,6 @@ check both. Autoconfig requests will mostly show up in the port 80
 error.log, whereas autodiscover will only show up in your 443
 error.log.</p>
 </div>
-</blockquote>
 <div class="section" id="authors">
 <h2>Authors</h2>
 <dl class="docutils">

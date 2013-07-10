@@ -132,14 +132,15 @@ DNS that directs them to the server running the automx service::
         autoconfig.example.com.              IN    A     192.168.2.1
         autodiscover.example.com.            IN    A     192.168.2.1
 
-   .. NOTE::
-   
-   If you install automx on an existing host , which has it's own domain-name,
-   then it is also possible to use above entries as nicknames:
-   
-    somehost.example.com.       IN      A       192.168.2.1
-        autoconfig              IN      CNAME   somehost
-        autodiscover            IN      CNAME   somehost
+.. NOTE::
+
+        If you install automx on an existing host, which has it's own
+        domain-name, then it is also possible to use above entries as
+        nicknames:
+
+        somehost.example.com.       IN      A       192.168.2.1
+            autoconfig              IN      CNAME   somehost
+            autodiscover            IN      CNAME   somehost
    
    
 Web Server Configuration
@@ -191,7 +192,9 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
                 ServerAlias autoconfig.example.com
                 ServerAdmin webmaster@example.com
                 <IfModule mod_wsgi.c>
-                        WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx/automx_wsgi.py
+                        WSGIScriptAliasMatch \
+                                (?i)^/.+/(autodiscover|config-v1.1)>xml \
+                                /usr/lib/automx/automx_wsgi.py
                         <Directory "/usr/lib/automx">
                                 Order allow,deny
                                 Allow from all
@@ -204,8 +207,12 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
                 ServerAlias autodiscover.example.com:443
                 ServerAdmin webmaster@example.com
                 <IfModule mod_wsgi.c>
-                        WSGIScriptAliasMatch (?i)^/.+/(autodiscover|config-v1.1)>xml /usr/lib/automx/automx_wsgi.py
-                        WSGIScriptAlias /mobileconfig /usr/lib/automx/automx_wsgi.py
+                        WSGIScriptAliasMatch \
+                                (?i)^/.+/(autodiscover|config-v1.1)>xml \
+                                /usr/lib/automx/automx_wsgi.py
+                        WSGIScriptAlias \
+                                /mobileconfig \
+                                /usr/lib/automx/automx_wsgi.py
                         <Directory "/usr/lib/automx">
                                 Order allow,deny
                                 Allow from all
@@ -213,15 +220,16 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
                 </IfModule>
         </VirtualHost>
 
-        .. NOTE::
+.. NOTE::
         
-        If you haven't done so, you also need to configure and enable SSL in your apache-configuration.
-        At least that means enabling the default SSL-site, install (self signed) certificates and activating
-        the ssl-support (e.g. 'a2enmod ssl' for Apache on debian). Don't forget to restart your web-server
-        afterwards!
+        If you haven't done so, you also need to configure and enable SSL in
+        your apache-configuration. At least that means enabling the default
+        SSL-site, install (self signed) certificates and activating the
+        ssl-support (e.g. 'a2enmod ssl' for Apache on debian). Don't forget to
+        restart your web-server afterwards! You need also to ajust the paths
+        to automx_wsgi.py in the example above.
 
-        
-        .. NOTE:: ISPs
+.. NOTE:: ISPs
 
         In an advanced environment with thousands of domains, you can redirect
         mail clients via DNS entries to your ISP automx provisioning server for
@@ -230,7 +238,7 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
         
         Add this to your DNS-configuation:
 
-        *.example.com.        A     192.168.2.1
+        \*.example.com.        A     192.168.2.1
 
 and this to your virtualhost-definition in your webserver-configuration::
         
@@ -264,22 +272,22 @@ a bug report. PLEASE NOTICE! Mobileconfig will display a users password
 in cleartext! So please remove that from bug reports first!
 
    
-        .. NOTE::
+.. NOTE::
 
-                If you split error logs by port, e.g. port 80 and 443, you need to
-                check both. Autoconfig requests will mostly show up in the port 80
-                error.log, whereas autodiscover will only show up in your 443
-                error.log.
+        If you split error logs by port, e.g. port 80 and 443, you need to
+        check both. Autoconfig requests will mostly show up in the port 80
+        error.log, whereas autodiscover will only show up in your 443
+        error.log.
 
    
 Authors
 '''''''
 
 Christian Roessner <cr@ys4.de>
-          Wrote the program.
+        Wrote the program.
 
 Patrick Ben Koetter <p@sys4.de>
-          Wrote the documentation.
+        Wrote the documentation.
 
 Christian Sudec <c.sudec@htlwrn.ac.at>
-                  04-22-2013: Updated the documentation to support automx 0.9.2
+        04-22-2013: Updated the documentation to support automx 0.9.2

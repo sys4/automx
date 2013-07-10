@@ -21,7 +21,7 @@ html:	$(HTMLS)
 	rst2html $< $@
 
 %.txt:	%.html
-	lynx -dump -nolist $< > $@
+	w3m -cols 80 -dump $< > $@
 
 %:	%.rst
 	rst2man $< $@
@@ -35,6 +35,7 @@ install:
 	cp -p *.html ../../doc/html/
 	cp -p automx*.txt ../../doc/txt/
 	cp -p INSTALL.txt ../../INSTALL
+	cp -p INSTALL.txt ../../README.md
 	cp -p BASIC_CONFIGURATION_README.txt ../../BASIC_CONFIGURATION_README
 
 .PHONY:	clean

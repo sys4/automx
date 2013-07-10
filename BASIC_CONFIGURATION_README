@@ -1,47 +1,47 @@
 Basic Configuration
 
-   This document contains information for initial and/or basic
-   configuration of automx.
+This document contains information for initial and/or basic configuration of
+automx.
 
-   automx reads runtime behaviour and all settings controlling a domains
-   account provisioning from a single configuration file. By default
-   automx expects to find this file at /etc/automx.conf.
+automx reads runtime behaviour and all settings controlling a domains account
+provisioning from a single configuration file. By default automx expects to
+find this file at /etc/automx.conf.
 
 Format
 
-   The general format of the automx.conf file is as follows:
-     * The basic element contained in an INI file is the property. Every
-       property has a name and a value, delimited by an equals sign ("=").
-       The name appears to the left of the equals sign.
-     * Properties are grouped into sections. The section name appears on a
-       line by itself, in square brackets ("[" and "]"). All properties
-       after the section declaration are associated with that section.
-       There is no explicit "end of section" delimiter; sections end at
-       the next section declaration, or the end of the file. Sections may
-       not be nested.
-     * Section and property names are case sensitive.
-     * A line with a number sign ("#") begins a comment. Anything
-       following a number sign will be ignored by automx.
+The general format of the automx.conf file is as follows:
+
+  • The basic element contained in an INI file is the property. Every property
+    has a name and a value, delimited by an equals sign (“=”). The name appears
+    to the left of the equals sign.
+  • Properties are grouped into sections. The section name appears on a line by
+    itself, in square brackets (“[” and “]”). All properties after the section
+    declaration are associated with that section. There is no explicit “end of
+    section” delimiter; sections end at the next section declaration, or the
+    end of the file. Sections may not be nested.
+  • Section and property names are case sensitive.
+  • A line with a number sign (“#”) begins a comment. Anything following a
+    number sign will be ignored by automx.
 
 Sections
 
-   Sections create a namespace in which properties specific to a domain
-   are defined. The section name identifies the domain. The three section
-   names [automx], [DEFAULT] and [global] are reserved for special
-   purposes within automx.
+Sections create a namespace in which properties specific to a domain are
+defined. The section name identifies the domain. The three section names
+[automx], [DEFAULT] and [global] are reserved for special purposes within
+automx.
 
 [automx]
 
-   Controlling automx Runtime Behaviour
+Controlling automx Runtime Behaviour
 
-   This section is mandatory - it lists all options controlling automx
-   runtime behaviour. The properties provider and domains are also
-   mandatory. Usage of memcache and all of its associated properties is
-   highly recommended.
+This section is mandatory - it lists all options controlling automx runtime
+behaviour. The properties provider and domains are also mandatory. Usage of
+memcache and all of its associated properties is highly recommended.
 
-   [automx]
+[automx]
 
-   The following example shows a typical [automx] section setup:
+The following example shows a typical [automx] section setup:
+
 [automx]
 provider = example.com  1
 domains = *  2
@@ -52,93 +52,82 @@ memcache_ttl = 86400
 client_error_limit = 5  6
 rate_limit_exception_networks = 127.0.0.0/8, ::1/128  7
 
-   1
-          The provider property configures automx to identify the
-          webservice as example.com.
-
-   2
-          The wildcard option * used in domains instructs automx to answer
-          any configuration request regardless of the domain sent by the
-          mail client.
-
-   3
-          All log information should go to /var/log/automx/automx.log.
-
-   4
-          Debugging is enabled and infos will be sent to logfile.
-
-   5
-          Statistical data controlling errors caused by clients accessing
-          database backends will be sent to the specified memcache
-          service.
-
-   6
-          In this example a client may not cause more than 5 errors before
-          automx will refuse to answer further queries.
-
-   7
-          Clients listed in rate_limit_exception_networks are excluded
-          from rate limiting.
+1
+    The provider property configures automx to identify the webservice as
+    example.com.
+2
+    The wildcard option * used in domains instructs automx to answer any
+    configuration request regardless of the domain sent by the mail client.
+3
+    All log information should go to /var/log/automx/automx.log.
+4
+    Debugging is enabled and infos will be sent to logfile.
+5
+    Statistical data controlling errors caused by clients accessing database
+    backends will be sent to the specified memcache service.
+6
+    In this example a client may not cause more than 5 errors before automx
+    will refuse to answer further queries.
+7
+    Clients listed in rate_limit_exception_networks are excluded from rate
+    limiting.
 
 [DEFAULT]
 
-   Properties present in all other sections
+Properties present in all other sections
 
-   This section is optional. Settings in this section define properties
-   which will be present in all other sections. It is useful to avoid
-   redundancy.
+This section is optional. Settings in this section define properties which will
+be present in all other sections. It is useful to avoid redundancy.
 
-   [DEFAULT]
+[DEFAULT]
 
-   The following example shows a typical [DEFAULT] section setup:
+The following example shows a typical [DEFAULT] section setup:
+
 [DEFAULT]
 action = settings  1
 account_type = email  2
 account_name = Example Inc.  3
 account_name_short = Example  4
 
-   1
-          The default action for automx is to provide account settings.
+1
 
-          Note
+    The default action for automx is to provide account settings.
 
-          The Microsoft schema forsees other actions that account
-          provisioning.
+    Note
 
-   2
-          The account_type should be an email account.
+    The Microsoft schema forsees other actions that account provisioning.
 
-   3
-          The account should show up as Example Inc. in the clients
-          account list.
-
-   4
-          The accounts short name should be Example.
+2
+    The account_type should be an email account.
+3
+    The account should show up as Example Inc. in the clients account list.
+4
+    The accounts short name should be Example.
 
 [global]
 
-   A global backend
+A global backend
 
-   Setting this section is mandatory, but it may remain empty. It provides
-   a backend, which will be used whenever automx should serve a domain,
-   but no section with domain-specific settings has been specified.
+Setting this section is mandatory, but it may remain empty. It provides a
+backend, which will be used whenever automx should serve a domain, but no
+section with domain-specific settings has been specified.
 
-   Other sections may either explicitly or implicitly refer to the
-   [global] section as a whole. An explicit reference specifies global as
-   backend property. Implicit references simply announce the domain in
-   automx' domains list and omit an explicit section definition for that
-   domain.
+Other sections may either explicitly or implicitly refer to the [global]
+section as a whole. An explicit reference specifies global as backend property.
+Implicit references simply announce the domain in automx' domains list and omit
+an explicit section definition for that domain.
 
-   Note
+    Note
 
-   This is useful when many domains should use the same backend or when
-   automx domain property configures it to run as wildcard service.
+    This is useful when many domains should use the same backend or when automx
+    domain property configures it to run as wildcard service.
 
-   [global]
+[global]
 
-   The following example configures automx to query a LDAP directory
-   service. Refer to automx_ldap(5) for a detailed discussion of
-   parameters and their meaning:
+The following example configures automx to query a LDAP directory service.
+Refer to automx_ldap(5) for a detailed discussion of parameters and their
+meaning:
+
 [global]
 backend = ldap
 
@@ -189,8 +178,8 @@ cacert = /etc/ssl/certs/ca-certificates.crt
 
 Authors
 
-   Christian R��ner <cr@ys4.de>
-          Wrote the program.
+Christian Rößner <cr@ys4.de>
+    Wrote the program.
+Patrick Ben Koetter <p@sys4.de>
+    Wrote the documentation.
 
-   Patrick Ben Koetter <p@sys4.de>
-          Wrote the documentation.

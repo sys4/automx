@@ -34,7 +34,7 @@ The configuration file is split into sections.
 - A section begins with the section name surrounded by square brackets, e.g. ``[example.com]``.
 - A section name identifies a domain or subdomain automx should respond with autoconfiguration instructions upon client request.
 - A section defines services which will be sent as autoconfiguration instructions to a client.
-- Section names ``automx``, ``default`` and ``GLOBAL`` are reserved - they have special meaning.
+- Section names ``automx``, ``DEFAULT`` and ``global`` are reserved - they have special meaning.
 
 Services
 ''''''''
@@ -189,6 +189,14 @@ domains (no default)
         domain, domain, ...
                 Specify a comma separated list of domains automx should
                 provide autoconfiguration for.
+
+mobileconfig (no default)
+	Specifies a path to a file that contains static mobileconfiguration
+	options following to the Mozilla schema.
+
+		.. NOTE:: 
+
+			This parameter is valid only if backend = file has been specified.
 
 provider (no default, mandatory)
 	The FQDN domain name of the domain that provides the configuration

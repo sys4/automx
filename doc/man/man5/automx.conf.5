@@ -59,7 +59,7 @@ A section name identifies a domain or subdomain automx should respond with autoc
 .IP \(bu 2
 A section defines services which will be sent as autoconfiguration instructions to a client.
 .IP \(bu 2
-Section names \fBautomx\fP, \fBdefault\fP and \fBGLOBAL\fP are reserved \- they have special meaning.
+Section names \fBautomx\fP, \fBDEFAULT\fP and \fBglobal\fP are reserved \- they have special meaning.
 .UNINDENT
 .SH SERVICES
 .sp
@@ -307,6 +307,21 @@ section.
 .B domain, domain, ...
 Specify a comma separated list of domains automx should
 provide autoconfiguration for.
+.UNINDENT
+.TP
+.B mobileconfig (no default)
+Specifies a path to a file that contains static mobileconfiguration
+options following to the Mozilla schema.
+.INDENT 7.0
+.INDENT 3.5
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This parameter is valid only if backend = file has been specified.
+.UNINDENT
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .TP
 .B provider (no default, mandatory)
