@@ -18,21 +18,23 @@
   </div>
 
   <div class="row">
-	  <div class="small-12 large-6 large-centered columns">
-		<form action="/mobileconfig" method="post">
-		<input type="hidden" name="_mobileconfig" value="true" />
+    <div class="small-12 large-6 large-centered columns">
 
-		<label for="emailaddress">Email address</label>
-		<input name="emailaddress" id="emailaddress" type="email" placeholder="john.doe@example.com (mandatory)">
+      <form action="/mobileconfig" method="post">
+
+	<input type="hidden" name="_mobileconfig" value="true" />
+	
+	<label for="emailaddress">Email address</label>
+	<input name="emailaddress" id="emailaddress" type="email" placeholder="john.doe@example.com (mandatory)">
 
 	<label for="cn">Full name</label>
 	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Mails from you will only display your email address if you leave this field empty.">
-		<input name="cn" id="cn" type="text" placeholder="John Doe (optional)">
+	  <input name="cn" id="cn" type="text" placeholder="John Doe (optional)">
 	</span>
 
 	<label for="password">Password</label>
 	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="You will be asked for the password on first login if you leave this field empty.">
-		<input name="password" id="password" type="password" placeholder="Password (optional)">
+	  <input name="password" id="password" type="password" placeholder="Password (optional)">
 	</span>
 
 	<input type="submit" class="button small-12 large-6 right" value="Request configuration!" />
@@ -41,7 +43,7 @@
   </div>
 
   <div id="footer-desktop" class="hide-for-small">
-      <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
+    <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
   </div>
   <div id="footer-mobile" class="show-for-small row">
     <div class="small-12 columns">

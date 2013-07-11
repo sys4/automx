@@ -19,26 +19,30 @@
 
   <div class="row">
     <div class="small-12 large-6 large-centered columns">
+      <form action="/mobileconfig" method="post">
 
-      <label for="email-address">E-Mail Adresse</label>
-        <input id="email-address" type="text" placeholder="max.mustermann@beispiel.de (erforderlich)">
-      </span>
+	<input type="hidden" name="_mobileconfig" value="true" />
 
-      <label for="full-name">Name</label>
-      <span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="In E-Mails von Ihnen wird nur Ihre Mailadresse angezeigt, wenn sie dieses Feld leer lassen.">
-      <input id="full-name" type="text" placeholder="Max Mustermann (optional)">
+	<label for="emailaddress">E-Mail Adresse</label>
+	<input name="emailaddress" id="emailaddress" type="email" placeholder="max.mustermann@beispiel.de (erforderlich)">
 
-      <label for="password">Passwort</label>
-      <span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Beim ersten Zugriff auf Ihr Mailkonto werden sie nach dem Passwort gefragt, wenn Sie dieses Feld leer lassen.">
-        <input id="password" type="password" placeholder="Passwort (optional)">
-      </span>
+	<label for="cn">Name</label>
+	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="In E-Mails von Ihnen wird nur Ihre Mailadresse angezeigt, wenn sie dieses Feld leer lassen.">
+	  <input name="cn" id="cn" type="text" placeholder="Max Mustermann (optional)">
+	</span>
 
-      <input type="submit" class="button small-12 large-6 right" value="Konfiguration anfordern" />
+	<label for="password">Passwort</label>
+	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Beim ersten Zugriff auf Ihr Mailkonto werden sie nach dem Passwort gefragt, wenn Sie dieses Feld leer lassen.">
+	  <input name="password" id="password" type="password" placeholder="Passwort (optional)">
+	</span>
+
+	<input type="submit" class="button small-12 large-6 right" value="Konfiguration anfordern" />
+      </form>
     </div>
   </div>
 
   <div id="footer-desktop" class="hide-for-small">
-      <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
+    <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
   </div>
   <div id="footer-mobile" class="show-for-small row">
     <div class="small-12 columns">
