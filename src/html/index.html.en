@@ -18,22 +18,25 @@
   </div>
 
   <div class="row">
-    <div class="small-12 large-6 large-centered columns">
+	  <div class="small-12 large-6 large-centered columns">
+		<form action="/mobileconfig" method="post">
+		<input type="hidden" name="_mobileconfig" value="true" />
 
-      <label for="email-address">Email address</label>
-        <input id="email-address" type="text" placeholder="john.doe@example.com (mandatory)">
-      </span>
+		<label for="emailaddress">Email address</label>
+		<input name="emailaddress" id="emailaddress" type="email" placeholder="john.doe@example.com (mandatory)">
 
-      <label for="full-name">Full name</label>
-      <span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Mails from you will only display your email address if you leave this field empty.">
-      <input id="full-name" type="text" placeholder="John Doe (optional)">
+	<label for="cn">Full name</label>
+	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Mails from you will only display your email address if you leave this field empty.">
+		<input name="cn" id="cn" type="text" placeholder="John Doe (optional)">
+	</span>
 
-      <label for="password">Password</label>
-      <span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="You will be asked for the password on first login if you leave this field empty.">
-        <input id="password" type="password" placeholder="Password (optional)">
-      </span>
+	<label for="password">Password</label>
+	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="You will be asked for the password on first login if you leave this field empty.">
+		<input name="password" id="password" type="password" placeholder="Password (optional)">
+	</span>
 
-      <input type="submit" class="button small-12 large-6 right" value="Request configuration!" />
+	<input type="submit" class="button small-12 large-6 right" value="Request configuration!" />
+      </form>
     </div>
   </div>
 
