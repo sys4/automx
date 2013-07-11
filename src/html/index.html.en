@@ -37,7 +37,7 @@
 	  <input name="password" id="password" type="password" placeholder="Password (optional)">
 	</span>
 
-	<input type="submit" class="button small-12 large-6 right" value="Request configuration!" />
+	<input type="submit" class="button small-12 right" value="Request configuration!" />
       </form>
     </div>
   </div>
