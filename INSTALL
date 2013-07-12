@@ -198,6 +198,12 @@ above.
 
 Note
 
+For Nginx see the example configuration file nginx-automx.conf. You can place
+this file into /etc/nginx/conf.d (this depends on your distribution) and adopt
+it to your needs.
+
+Note
+
 ISPs
 
 In an advanced environment with thousands of domains, you can redirect mail

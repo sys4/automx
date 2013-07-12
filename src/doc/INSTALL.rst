@@ -229,6 +229,11 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
         restart your web-server afterwards! You need also to ajust the paths
         to automx_wsgi.py in the example above.
 
+.. NOTE::
+        For Nginx see the example configuration file nginx-automx.conf. You
+        can place this file into /etc/nginx/conf.d (this depends on your
+        distribution) and adopt it to your needs.
+
 .. NOTE:: ISPs
 
         In an advanced environment with thousands of domains, you can redirect
