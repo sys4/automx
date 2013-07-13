@@ -234,8 +234,15 @@ class View(object):
                 if self.__model.cn == "":
                     email_account_name = self.__model.domain["display_name"]
 
-            # Important! The identifier must be unique
-            payload_identifier = "org.automx.%s" % str(uuid.uuid4())
+            rev_provider = self.__model.provider.split(".")
+            rev_provider = ".".join(rev_provider[::-1])
+            rev_email = self.__model.emailaddress.split("@")
+            rev_email = ".".join(rev_email[::-1])
+            payload_identifier = ("org.automx.mail."
+                                  + rev_provider 
+                                  + "."
+                                  + rev_email)
+             
             s = dict(EmailAccountDescription = org,
                      EmailAccountName = email_account_name,
                      EmailAccountType = proto["type"],
@@ -263,7 +270,6 @@ class View(object):
                      PreventMove = False,
                      SMIMEEnabled = False)
                 
-            payload_identifier = "org.automx.%s" % str(uuid.uuid4())
             self.__plist = dict(PayloadContent = [s],
                                 PayloadDescription = "Automx Email",
                                 PayloadDisplayName = org,
