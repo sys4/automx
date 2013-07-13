@@ -68,6 +68,13 @@ def application(environ, start_response):
         request_method = environ['REQUEST_METHOD']
         request_method = escape(request_method)
     
+        # Adding some more useful debugging information
+        if data.debug:
+            logging.debug("-" * 15 + " BEGIN environ " + "-" * 15)
+            for k, v in environ.iteritems():
+                logging.debug("%s: %s" % (k, v))
+            logging.debug("-" * 15 + " END environ " + "-" * 15)
+                
         if request_method == "POST":
             valid_xml = True
     
@@ -92,14 +99,6 @@ def application(environ, start_response):
             
             if valid_xml:
                 root = tree.getroot()
-        
-                if data.debug:
-                    debug_msg = etree.tostring(root,
-                                               xml_declaration=True,
-                                               method="xml",
-                                               encoding="utf-8",
-                                               pretty_print=True)
-                    logging.debug("Request POST\n" + debug_msg) 
         
                 # We need to strip the namespace for XPath
                 expr = "//*[local-name() = $name]"
