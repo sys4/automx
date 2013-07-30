@@ -117,18 +117,20 @@ def application(environ, start_response):
                         subschema = "mobile"
                     elif "/outlook/" in response_schema[0].text:
                         subschema = "outlook"
+                    else:
+                        process = False
+                        status = STAT_ERR
         
                     emailaddresses = root.xpath(expr, name="EMailAddress")
                     if len(emailaddresses) == 0:
-                        logging.warning("Error in XML request")
+                        logging.warning("Error in autodiscover request!")
                         process = False
                         status = STAT_ERR
                         data.memcache.set_client()
                     else:
                         emailaddress = emailaddresses[0].text
                         schema = "autodiscover"
-                
-                status = STAT_OK
+                        status = STAT_OK
     
             else:
                 # We did not receive XML, so it might be a mobileconfig request
@@ -155,6 +157,8 @@ def application(environ, start_response):
                                 status = STAT_OK
                                 schema = "mobileconfig"
                             else:
+                                logging.warning("Error in mobileconfig "
+                                                "request!")
                                 process = False
                                 status = STAT_ERR
                         else:
@@ -179,20 +183,22 @@ def application(environ, start_response):
                 qs = environ['QUERY_STRING']
                 d = parse_qs(qs)
             
+                if data.debug:
+                    logging.debug("Request GET: QUERY_STRING: %s" % qs)
+
                 if d is not None:
-                    emailaddress = d.get("emailaddress")[0]
-                    if emailaddress is None:
+                    if d.has_key("emailaddress"):
+                        emailaddress = d.get("emailaddress")[0]
+                        emailaddress.strip()
+                        status = STAT_OK
+                        schema = "autoconfig"
+                    else:
+                        logging.warning("Error in autoconfig request!")
                         process = False
                         status = STAT_ERR
-                    else:
-                        schema = "autoconfig"
-                        
-                    if data.debug:
-                        logging.debug("Request GET: QUERY_STRING: %s" % qs)
-            
-                    status = STAT_OK
                 else:
-                    logging.debug("Request GET: QUERY_STRING failed!")
+                    logging.error("Request GET: QUERY_STRING failed!")
+                    process = False
                     status = STAT_ERR
 
     if process:
