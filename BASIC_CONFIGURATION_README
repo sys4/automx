@@ -178,7 +178,7 @@ cacert = /etc/ssl/certs/ca-certificates.crt
 
 Authors
 
-Christian Rößner <cr@ys4.de>
+Christian Rößner <cr@sys4.de>
     Wrote the program.
 Patrick Ben Koetter <p@sys4.de>
     Wrote the documentation.
