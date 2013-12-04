@@ -11,5 +11,6 @@ setup(name='automx',
       packages=['automx'],
       package_dir={'': 'src'},
       data_files=[('/etc', ['src/conf/automx.conf'])],
+      scripts=['src/automx-test'],
       )
 
