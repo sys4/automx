@@ -27,8 +27,13 @@ import subprocess
 import shlex
 import StringIO
 import re
-import memcache
 import logging
+
+try:
+    import memcache
+    use_memcache = True
+except ImportError:
+    use_memcache = False
 
 from ConfigParser import NoOptionError, NoSectionError
 from ipaddr import IPAddress, IPNetwork
@@ -849,7 +854,7 @@ class Memcache(object):
         return self.__current
 
     def set_client(self):
-        if not self.__has_memcache:
+        if not self.__has_memcache or use_memcache is False:
             return
 
         if self.__is_trusted_network():
@@ -870,7 +875,7 @@ class Memcache(object):
         self.__mc.set(self.__client, self.__current, time=ttl)
                                                             
     def allow_client(self):
-        if not self.__has_memcache:
+        if not self.__has_memcache or use_memcache is False:
             return True
 
         self.__client = self.__environ["REMOTE_ADDR"]
