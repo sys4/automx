@@ -168,7 +168,7 @@ The following example configures automx to query a LDAP directory service. Refer
 Authors
 '''''''
 
-Christian Rößner <cr@ys4.de>
+Christian Rößner <cr@sys4.de>
         Wrote the program.
 
 Patrick Ben Koetter <p@sys4.de>

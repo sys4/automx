@@ -193,7 +193,7 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
                 ServerAdmin webmaster@example.com
                 <IfModule mod_wsgi.c>
                         WSGIScriptAliasMatch \
-                                (?i)^/.+/(autodiscover|config-v1.1)>xml \
+                                (?i)^/.+/(autodiscover|config-v1.1).xml \
                                 /usr/lib/automx/automx_wsgi.py
                         <Directory "/usr/lib/automx">
                                 Order allow,deny
@@ -208,7 +208,7 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
                 ServerAdmin webmaster@example.com
                 <IfModule mod_wsgi.c>
                         WSGIScriptAliasMatch \
-                                (?i)^/.+/(autodiscover|config-v1.1)>xml \
+                                (?i)^/.+/(autodiscover|config-v1.1).xml \
                                 /usr/lib/automx/automx_wsgi.py
                         WSGIScriptAlias \
                                 /mobileconfig \
@@ -288,7 +288,7 @@ in cleartext! So please remove that from bug reports first!
 Authors
 '''''''
 
-Christian Roessner <cr@ys4.de>
+Christian Roessner <cr@sys4.de>
         Wrote the program.
 
 Patrick Ben Koetter <p@sys4.de>
