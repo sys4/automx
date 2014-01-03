@@ -849,6 +849,9 @@ class Memcache(object):
         except ValueError, e:
             logging.warning("Memcache misconfigured: ", e)
             self.__has_memcache = False
+        except NoOptionError:
+            logging.warning("Not using Memcache")
+            self.__has_memcache = False
 
     def counter(self):
         return self.__current
