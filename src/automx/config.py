@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.10.1'
+__version__ = '0.10.2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
@@ -28,6 +28,7 @@ import shlex
 import StringIO
 import re
 import logging
+import ipaddr
 
 try:
     import memcache
@@ -36,7 +37,6 @@ except ImportError:
     use_memcache = False
 
 from ConfigParser import NoOptionError, NoSectionError
-from ipaddr import IPAddress, IPNetwork
 from dateutil import parser
 
 try:
@@ -121,6 +121,19 @@ class Config(object, ConfigParser.RawConfigParser):
             
         self.memcache = Memcache(self, environ)
         
+        # defaults
+        self.__emailaddress = ""
+        self.__cn = ""
+        self.__password = ""
+        self.__search_domain = ""
+        self.__automx = dict()
+
+        # domain individual settings (overwrites some or all defaults)
+        self.__domain = OrderedDict()
+
+        # if we use dynamic backends, we might earn variables
+        self.__vars = dict()
+        
     def configure(self, emailaddress, cn=None, password=None):
         if emailaddress is None:
             return OrderedDict()
@@ -129,27 +142,14 @@ class Config(object, ConfigParser.RawConfigParser):
         self.__emailaddress = emailaddress
         
         # Mobileconfig
-        if cn is None:
-            self.__cn = ""
-        else:
+        if cn is not None:
             self.__cn = cn
-        if password is None:
-            self.__password = ""
-        else:
+        if password is not None:
             self.__password = password
         
-        domain = emailaddress.split("@")[1]
-
         # The domain that is searched in the config file
+        domain = emailaddress.split("@")[1]
         self.__search_domain = domain
-        
-        self.__automx = dict()
-
-        # domain individual settings (overwrites some or all defaults)
-        self.__domain = OrderedDict()
-        
-        # if we use dynamic backends, we might earn variables
-        self.__vars = dict()
         
         try:
             provider = self.get("automx", "provider")
@@ -884,7 +884,12 @@ class Memcache(object):
         self.__client = self.__environ["REMOTE_ADDR"]
 
         if self.__is_trusted_network():
+            if self.__config.debug:
+                logging.debug("TRUSTED %s" % self.__client)
             return True
+        else:
+            if self.__config.debug:
+                logging.debug("NOT TRUSTED %s" % self.__client)
         
         if self.__config.has_option("automx", "client_error_limit"):
             try:
@@ -917,9 +922,16 @@ class Memcache(object):
             networks = ("127.0.0.1", "::1/128")
         
         for network in iter(networks):
-            if IPAddress(self.__client) in IPNetwork(network):
+            a = ipaddr.IPAddress(self.__client)
+            n = ipaddr.IPNetwork(network)
+            if n.Contains(a):
+                if self.__config.debug:
+                    logging.debug("FOUND %s, %s" % (a, n))
                 return True
-        
+            else:
+                if self.__config.debug:
+                    logging.debug("NOT FOUND %s, %s" % (a, n))
+
         return False
 
 # vim: expandtab ts=4 sw=4
