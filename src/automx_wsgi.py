@@ -29,7 +29,8 @@ from cStringIO import StringIO
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 
-from automx.config import Config, DataNotFoundException
+from automx.config import Config
+from automx.config import DataNotFoundException, ConfigNotFoundException
 from automx.view import View
 
 
@@ -53,18 +54,19 @@ def application(environ, start_response):
 
     try:
         data = Config(environ)
-    except:
+    except Exception, e:
         process = False
         status = STAT_ERR
-    
-    try:
-        logging.basicConfig(filename=data.logfile,
-                            format='%(asctime)s %(levelname)s: %(message)s',
-                            level=logging.DEBUG)
-    except IOError, e:
         print >> environ["wsgi.errors"], e
-  
+    
     if process:
+        try:
+            logging.basicConfig(filename=data.logfile,
+                                format='%(asctime)s %(levelname)s: %(message)s',
+                                level=logging.DEBUG)
+        except IOError, e:
+            print >> environ["wsgi.errors"], e
+  
         request_method = environ['REQUEST_METHOD']
         request_method = escape(request_method)
     
@@ -244,13 +246,14 @@ def application(environ, start_response):
                 logging.error("view.render(): %s" % e)
             status = STAT_ERR
 
-    if data.debug:
-        if (schema == "mobileconfig" and
-            data.domain.has_key("sign_mobileconfig") and
-            data.domain["sign_mobileconfig"] is True):
-            logging.debug("No debugging output for signed mobileconfig!")
-        else:
-            logging.debug("Response:\n" + response_body)
+    if process:
+        if data.debug:
+            if (schema == "mobileconfig" and
+                data.domain.has_key("sign_mobileconfig") and
+                data.domain["sign_mobileconfig"] is True):
+                logging.debug("No debugging output for signed mobileconfig!")
+            else:
+                logging.debug("Response:\n" + response_body)
 
     if schema in ('autoconfig', "autodiscover"):
         response_headers = [('Content-Type', 'text/xml'),

@@ -50,6 +50,9 @@ except:
 class DataNotFoundException(Exception):
     pass
 
+class ConfigNotFoundException(Exception):
+    pass
+
 
 class Config(object, ConfigParser.RawConfigParser):
     """
@@ -103,7 +106,20 @@ class Config(object, ConfigParser.RawConfigParser):
         ConfigParser.RawConfigParser.__init__(self,
                                             defaults=None,
                                             dict_type=OrderedDict)
-        self.read("/etc/automx.conf")
+
+        found_conf = False
+        conf_files = list(["/usr/local/etc/automx.conf", "/etc/automx.conf"])
+
+        for conf in iter(conf_files):
+            if os.path.exists(conf):
+                found_conf = True
+                break
+
+        if not found_conf:
+            raise ConfigNotFoundException("No configuration files found:"
+                                          "%s, %s" %
+                                          (conf_files[0], conf_files[1]))
+        self.read(conf)
 
         if not self.has_section("automx"):
             raise Exception("Missing section 'automx'")
