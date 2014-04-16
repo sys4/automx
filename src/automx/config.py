@@ -854,14 +854,15 @@ class Memcache(object):
         self.__environ = environ
                 
         # Memcache usage is optional
-        self.__has_memcache = True
+        self.__has_memcache = use_memcache
 
         self.__found = False
         self.__client = None
         self.__current = 0
         
         try:
-            self.__mc = memcache.Client([config.get("automx", "memcache")])
+            if use_memcache:
+                self.__mc = memcache.Client([config.get("automx", "memcache")])
         except ValueError, e:
             logging.warning("Memcache misconfigured: ", e)
             self.__has_memcache = False
@@ -873,7 +874,7 @@ class Memcache(object):
         return self.__current
 
     def set_client(self):
-        if not self.__has_memcache or use_memcache is False:
+        if not self.__has_memcache:
             return
 
         if self.__is_trusted_network():
@@ -894,7 +895,7 @@ class Memcache(object):
         self.__mc.set(self.__client, self.__current, time=ttl)
                                                             
     def allow_client(self):
-        if not self.__has_memcache or use_memcache is False:
+        if not self.__has_memcache:
             return True
 
         self.__client = self.__environ["REMOTE_ADDR"]
