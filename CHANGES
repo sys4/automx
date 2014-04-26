@@ -1,3 +1,8 @@
+* Version 0.10.2
+---------------------------------
+- Several minor bug fixes
+- Drop memcache dependencies
+
 * Version 0.10.0
 ---------------------------------
 - Several minor bug fixes
