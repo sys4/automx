@@ -1,8 +1,11 @@
 # Example for autoconfig
-<VirtualHost example.com:80>
+<VirtualHost *:80>
 
   ServerName autoconfig.example.com
   ServerAdmin webmaster@example.com
+  DocumentRoot /usr/lib/automx
+
+  # Redirect permanent / https://autoconfig.example.com
 
   <IfModule mod_wsgi.c>
     WSGIScriptAlias /mail/config-v1.1.xml /usr/lib/automx/automx_wsgi.py
@@ -15,15 +18,17 @@
 </VirtualHost>
 
 # SSL example for autodiscover
-<VirtualHost example.com:443>
+<VirtualHost *:443>
 
-  ServerName autodiscover.example.com:443
+  ServerName autodiscover.example.com
+  ServerAlias autoconfig.example.com
   ServerAdmin webmaster@example.com
+  DocumentRoot /usr/lib/automx
 
   <IfModule mod_wsgi.c>
     WSGIScriptAlias /Autodiscover/Autodiscover.xml /usr/lib/automx/automx_wsgi.py
     WSGIScriptAlias /autodiscover/autodiscover.xml /usr/lib/automx/automx_wsgi.py
-    WSGIScript /mobileconfig /usr/lib/automx/automx_wsgi.py
+    WSGIScriptAlias /mobileconfig /usr/lib/automx/automx_wsgi.py
     <Directory "/usr/lib/automx">
       Order allow,deny
       Allow from all

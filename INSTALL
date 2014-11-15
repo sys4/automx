@@ -4,13 +4,14 @@ This document contains step by step instructions to install automx.
 
 automx Download
 
-If you haven't done so yet download automx from its website:
+If you haven't done so yet get automx from its website:
 
-$ wget http://automx.org/download/latest.tar.gz
+    https://github.com/sys4/automx/releases/latest
 
-Unpack the tar archive and change into the newly created directory:
+Download the latest release, Unpack the tar archive and change into the newly
+created directory:
 
-$ tar xzf latest.tar.gz
+$ tar xzf vVERSION.tar.gz
 $ cd automx-VERSION
 
 Software Requirements
@@ -18,17 +19,19 @@ Software Requirements
 automx is a Python application. You must install a few extra modules to handle
 frontend and backend communication as well to deal with XML data.
 
-frontend
+mod_wsgi
     Install mod_wsgi for the Apache web server and the python-wsgi module.
-backend (optional)
+ldap, python-sqlalchemy (optional)
     If you plan to use either LDAP or SQL as backends to retrieve configuration
     options from install ldap for LDAP and python-sqlalchemy for SQL. Further
     you also need to install the SQL backend driver that communicates with your
     database. For MySQL this might be mysqldb.
-XML handling
+dateutil, ipaddr, lxml
     Install the python-packages dateutil, ipaddr, lxml and memcache. Otherwise
     automx will not be able to handle the XML data it needs to deal with.
-plist (mobileconfig) handling
+memcached
+    If you want to rate limit connections to automx, install a memcached server.
+M2Crypto (mobileconfig only)
     Mobileconfig profiles may be signed with your webservers cert and key. You
     need to install M2Crypto, which does the S/MIME-signing.
 
@@ -44,14 +47,14 @@ Installing the program
 
 Create a directory for the automx program and copy it to that location:
 
-$ mkdir -p /usr/local/lib/automx
-$ cp automx-VERSION/src/automx_wsgi.py /usr/local/lib/automx/
+$ mkdir -p /usr/lib/automx
+$ cp automx-VERSION/src/automx_wsgi.py /usr/lib/automx/
 
 Installing the test program
 
 Copy the automx-test program to a location that is in your $PATH:
 
-$ cp automx-VERSION/src/automx-test /usr/local/bin/automx-test
+$ cp automx-VERSION/src/automx-test /usr/bin/automx-test
 
 Installing automx-specific libraries
 
@@ -79,7 +82,7 @@ $ manpath /usr/local/man:/usr/local/share/man:/usr/share/man
 
 Copy the man pages to that location:
 
-$ cp -a automx-VERSION/doc/man/ /usr/local/share/man
+$ cp -a automx-VERSION/doc/man/ /usr/share/man
 
 Installing the configuration file
 
