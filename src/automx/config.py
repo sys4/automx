@@ -47,6 +47,10 @@ except:
     from automx.ordereddict import OrderedDict
 
 
+# List of boolean words that have the meaning "true"
+TRUE = ('1', 'y', 'yes', 't', 'true', 'on')
+
+
 class DataNotFoundException(Exception):
     pass
 
@@ -328,7 +332,7 @@ class Config(object, ConfigParser.RawConfigParser):
                         ldap_cfg[opt] = result
                 
                 # Do we connect with TLS?
-                if ldap_cfg["usetls"].lower() in ("yes", "true", "1"):
+                if ldap_cfg["usetls"].strip().lower() in TRUE:
                     if ldap_cfg["reqcert"] in ("never",
                                                "allow",
                                                "try",
@@ -650,7 +654,8 @@ class Config(object, ConfigParser.RawConfigParser):
 
         proto_settings = OrderedDict()
 
-        if self.getboolean(section, service) == True:
+        if (self.__expand_vars(self.get(section, service)).strip().lower() in 
+            TRUE:
             if self.has_option(section, service + "_server"):
                 opt = service + "_server"
                 result = self.__expand_vars(self.get(section, opt))
@@ -734,7 +739,7 @@ class Config(object, ConfigParser.RawConfigParser):
                     try:
                         opt = service + "_default"
                         tmp = self.__expand_vars(self.get(section, opt))
-                        if tmp.lower() in ("yes", "true", "1"):
+                        if tmp.strip().lower() in TRUE:
                             result = "Yes"
                         else:
                             result = "No"
