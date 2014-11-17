@@ -1,3 +1,9 @@
+* Version 0.10.3
+---------------------------------
+- Replace macros in *_server varaibles
+- Making service sections dynamic
+- Documentation improvements
+
 * Version 0.10.2
 ---------------------------------
 - Several minor bug fixes
