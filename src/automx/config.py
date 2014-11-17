@@ -655,7 +655,7 @@ class Config(object, ConfigParser.RawConfigParser):
         proto_settings = OrderedDict()
 
         if (self.__expand_vars(self.get(section, service)).strip().lower() in 
-            TRUE:
+            TRUE):
             if self.has_option(section, service + "_server"):
                 opt = service + "_server"
                 result = self.__expand_vars(self.get(section, opt))
