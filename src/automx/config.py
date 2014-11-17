@@ -655,7 +655,7 @@ class Config(object, ConfigParser.RawConfigParser):
                 opt = service + "_server"
                 result = self.__expand_vars(self.get(section, opt))
 
-                proto_settings[opt] = result
+                proto_settings[opt] = self.__replace_makro(result)
                 
             if self.has_option(section, service + "_port"):
                 opt = service + "_port"
