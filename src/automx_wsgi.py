@@ -22,6 +22,7 @@ __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
 import traceback
 import logging
+import urllib
 
 from cgi import escape
 from urlparse import parse_qs
@@ -192,6 +193,8 @@ def application(environ, start_response):
                     if d.has_key("emailaddress"):
                         emailaddress = d.get("emailaddress")[0]
                         emailaddress.strip()
+			if not '@' in emailaddress:
+			  emailaddress = urllib.unquote(emailaddress)
                         status = STAT_OK
                         schema = "autoconfig"
                     else:
