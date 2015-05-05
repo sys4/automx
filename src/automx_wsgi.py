@@ -176,8 +176,7 @@ def application(environ, start_response):
     
         elif request_method == "GET":
             # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
-            if "autodiscover" in (environ["HTTP_HOST"],
-                                  environ["REQUEST_URI"].lower()):
+            if any("autodiscover" in s for s in (environ["HTTP_HOST"], environ["REQUEST_URI"].lower())):
                 process = False
                 status = STAT_ERR
             
