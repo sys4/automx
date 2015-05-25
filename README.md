@@ -16,7 +16,7 @@ from LDAP, SQL and SCRIPT.
 
 - Visit https://automx.org to learn more about automx.
 
-- Join the mailing list at https://mail.automx.org/cgi-bin/mailman/listinfo/automx-users
+- Join the mailing list at https://mail.sys4.de/cgi-bin/mailman/listinfo/automx-users
 
 - Download the lastest release from https://github.com/sys4/automx/releases/latest
 
