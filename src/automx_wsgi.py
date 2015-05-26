@@ -252,7 +252,7 @@ def application(environ, start_response):
         if data.debug:
             if (schema == "mobileconfig" and
                 data.domain.has_key("sign_mobileconfig") and
-                data.domain["sign_mobileconfig"] is True):
+                    data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
                 logging.debug("Response:\n" + response_body)
