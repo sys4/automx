@@ -192,8 +192,8 @@ def application(environ, start_response):
                     if d.has_key("emailaddress"):
                         emailaddress = d.get("emailaddress")[0]
                         emailaddress.strip()
-			if not '@' in emailaddress:
-			  emailaddress = urllib.unquote(emailaddress)
+                        if '@' not in emailaddress:
+                            emailaddress = urllib.unquote(emailaddress)
                         status = STAT_OK
                         schema = "autoconfig"
                     else:
