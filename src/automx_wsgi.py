@@ -44,13 +44,13 @@ def application(environ, start_response):
     cn = None
     emailaddress = None
     password = None
-    
+
     # schema currently may be  'autoconfig', 'autodiscover', 'mobileconfig'
     schema = None
 
     # subschema currently is either 'mobile' or 'outlook'
     subschema = None
-    
+
     process = True
 
     try:
@@ -59,7 +59,7 @@ def application(environ, start_response):
         process = False
         status = STAT_ERR
         print >> environ["wsgi.errors"], e
-    
+
     if process:
         try:
             logging.basicConfig(filename=data.logfile,
@@ -67,30 +67,30 @@ def application(environ, start_response):
                                 level=logging.DEBUG)
         except IOError, e:
             print >> environ["wsgi.errors"], e
-  
+
         request_method = environ['REQUEST_METHOD']
         request_method = escape(request_method)
-    
+
         # Adding some more useful debugging information
         if data.debug:
             logging.debug("-" * 15 + " BEGIN environ " + "-" * 15)
             for k, v in environ.iteritems():
                 logging.debug("%s: %s" % (k, v))
             logging.debug("-" * 15 + " END environ " + "-" * 15)
-                
+
         if request_method == "POST":
             valid_xml = True
-    
+
             try:
                 request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             except ValueError:
                 request_body_size = 0
-        
+
             # When the method is POST the query string will be sent
             # in the HTTP request body which is passed by the WSGI server
             # in the file like wsgi.input environment variable.
             request_body = environ['wsgi.input'].read(request_body_size)
-    
+
             if data.debug:
                 logging.debug("Request POST (raw)\n" + request_body)
 
@@ -99,13 +99,13 @@ def application(environ, start_response):
                 tree = etree.parse(fd)
             except XMLSyntaxError:
                 valid_xml = False
-            
+
             if valid_xml:
                 root = tree.getroot()
-        
+
                 # We need to strip the namespace for XPath
                 expr = "//*[local-name() = $name]"
-        
+
                 response_schema = root.xpath(expr,
                                              name="AcceptableResponseSchema")
                 if len(response_schema) == 0:
@@ -123,7 +123,7 @@ def application(environ, start_response):
                     else:
                         process = False
                         status = STAT_ERR
-        
+
                     emailaddresses = root.xpath(expr, name="EMailAddress")
                     if len(emailaddresses) == 0:
                         logging.warning("Error in autodiscover request!")
@@ -134,7 +134,7 @@ def application(environ, start_response):
                         emailaddress = emailaddresses[0].text
                         schema = "autodiscover"
                         status = STAT_OK
-    
+
             else:
                 # We did not receive XML, so it might be a mobileconfig request
                 # TODO: We also might check the User-Agent here
@@ -173,18 +173,18 @@ def application(environ, start_response):
                 else:
                     process = False
                     status = STAT_ERR
-    
+
         elif request_method == "GET":
             # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
             if any("autodiscover" in s for s in (environ["HTTP_HOST"], environ["REQUEST_URI"].lower())):
                 process = False
                 status = STAT_ERR
-            
+
             # autoconfig
             else:
                 qs = environ['QUERY_STRING']
                 d = parse_qs(qs)
-            
+
                 if data.debug:
                     logging.debug("Request GET: QUERY_STRING: %s" % qs)
 
@@ -231,7 +231,7 @@ def application(environ, start_response):
                 logging.error("data.configure(): %s" % e)
             process = False
             status = STAT_ERR
-    
+
     if process:
         if data.debug:
             logging.debug("Entering view()")
@@ -252,7 +252,7 @@ def application(environ, start_response):
         if data.debug:
             if (schema == "mobileconfig" and
                 data.domain.has_key("sign_mobileconfig") and
-                data.domain["sign_mobileconfig"] is True):
+                    data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
                 logging.debug("Response:\n" + response_body)
