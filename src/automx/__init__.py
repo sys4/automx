@@ -20,5 +20,4 @@ __version__ = '0.10.2'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
-__all__ = [ 'config', 'view' ]
-
+__all__ = ['config', 'view']

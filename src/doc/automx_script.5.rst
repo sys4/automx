@@ -23,7 +23,7 @@ result_attrs (default: none)
                 result_attrs = server, email, auth, socket
 
 .. IMPORTANT::
-        
+
         automx_script(5) does not check if the number of values returned matches the ones expected. Too many return values will be discarded. If the script returns too few automx_script(5) will use the corresponding result attribute name.
 
 script (default: none)
@@ -57,5 +57,5 @@ See also
 .. _automx.conf(5): automx.conf.5.html
 .. _automx_ldap(5): automx_ldap.5.html
 .. _automx_sql(5): automx_sql.5.html
-.. _automx_script(5): automx_script.5.html                                                                                                             
+.. _automx_script(5): automx_script.5.html
 .. _automx-test(1): automx-test.1.html

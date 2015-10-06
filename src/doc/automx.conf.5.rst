@@ -147,7 +147,7 @@ action (default: settings, mandatory)
 
 			backend = ldap
 
-		See also automx_ldap(5) for a list of LDAP related configuration options.
+        See also automx_ldap(5) for a list of LDAP related configuration options.
 
         sql
                 automx should use a mixture of general and individual
@@ -156,7 +156,7 @@ action (default: settings, mandatory)
 
 			backend = sql
 
-		See also automx_sql(5) for a list of SQL related configuration options.
+        See also automx_sql(5) for a list of SQL related configuration options.
 
         static
                 automx should use general settings provided within the
@@ -373,7 +373,7 @@ ${varname}
 Authors
 '''''''
 
-Christian Roessner <cr@sys4.de>                                                                                                                        
+Christian Roessner <cr@sys4.de>
         Wrote the program.
 
 Patrick Ben Koetter <p@sys4.de>

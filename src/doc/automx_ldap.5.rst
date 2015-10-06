@@ -106,7 +106,7 @@ usetls (default: false)
 Authors
 '''''''
 
-Christian Roessner <cr@sys4.de>                                                                                                                        
+Christian Roessner <cr@sys4.de>
         Wrote the program.
 
 Patrick Ben Koetter <p@sys4.de>
@@ -121,5 +121,5 @@ See also
 .. _automx.conf(5): automx.conf.5.html
 .. _automx_ldap(5): automx_ldap.5.html
 .. _automx_sql(5): automx_sql.5.html
-.. _automx_script(5): automx_script.5.html                                                                                                             
+.. _automx_script(5): automx_script.5.html
 .. _automx-test(1): automx-test.1.html

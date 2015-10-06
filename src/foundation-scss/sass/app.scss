@@ -1,9 +1,7 @@
 // Global Foundation Settings
 @import "settings";
-
 // Comment out this import if you don't want to use normalize
 @import "normalize";
-
 // Comment out this import if you are customizing you imports below
 @import "foundation";
 
@@ -48,17 +46,17 @@
 
 // automx footer
 #footer-desktop {
-	position: fixed;
-	bottom: 1em;
-	height: 2em;
-	width: 100%;
+  position: fixed;
+  bottom: 1em;
+  height: 2em;
+  width: 100%;
 }
 
 .automx-powered {
-	padding-right: 1em;
+  padding-right: 1em;
 }
 
 // company banner
 #company-banner img {
-	margin: 2em 0;
+  margin: 2em 0;
 }

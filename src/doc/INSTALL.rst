@@ -221,7 +221,7 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
         </VirtualHost>
 
 .. NOTE::
-        
+
         If you haven't done so, you also need to configure and enable SSL in
         your apache-configuration. At least that means enabling the default
         SSL-site, install (self signed) certificates and activating the
@@ -230,7 +230,7 @@ files (for Debian take a look in /etc/apache2/sites-enabled/...)::
         to automx_wsgi.py in the example above.
 
 .. NOTE::
-        For Nginx see the example configuration file nginx-automx.conf. You
+For Nginx see the example configuration file nginx-automx.conf. You
         can place this file into /etc/nginx/conf.d (this depends on your
         distribution) and adopt it to your needs.
 

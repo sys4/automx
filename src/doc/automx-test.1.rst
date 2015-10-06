@@ -36,5 +36,5 @@ See also
 .. _automx.conf(5): automx.conf.5.html
 .. _automx_ldap(5): automx_ldap.5.html
 .. _automx_sql(5): automx_sql.5.html
-.. _automx_script(5): automx_script.5.html                                                                                                             
+.. _automx_script(5): automx_script.5.html
 .. _automx-test(1): automx-test.1.html

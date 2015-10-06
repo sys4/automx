@@ -16,9 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__version__ = '0.10.2'
-__author__ = "Christian Roessner, Patrick Ben Koetter"
-__copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
+from __future__ import print_function, unicode_literals
 
 import traceback
 import logging
@@ -31,8 +29,12 @@ from lxml import etree
 from lxml.etree import XMLSyntaxError
 
 from automx.config import Config
-from automx.config import DataNotFoundException, ConfigNotFoundException
+from automx.config import DataNotFoundException
 from automx.view import View
+
+__version__ = '0.11.0'
+__author__ = "Christian Roessner, Patrick Ben Koetter"
+__copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
 
 
 def application(environ, start_response):
@@ -58,7 +60,7 @@ def application(environ, start_response):
     except Exception, e:
         process = False
         status = STAT_ERR
-        print >> environ["wsgi.errors"], e
+        print(e, file=environ["wsgi.errors"])
 
     if process:
         try:
@@ -66,7 +68,7 @@ def application(environ, start_response):
                                 format='%(asctime)s %(levelname)s: %(message)s',
                                 level=logging.DEBUG)
         except IOError, e:
-            print >> environ["wsgi.errors"], e
+            print(e, file=environ["wsgi.errors"])
 
         request_method = environ['REQUEST_METHOD']
         request_method = escape(request_method)
@@ -141,20 +143,20 @@ def application(environ, start_response):
                 d = parse_qs(request_body)
 
                 if d is not None:
-                    if d.has_key("_mobileconfig"):
+                    if "_mobileconfig" in d:
                         mobileconfig = d.get("_mobileconfig")[0]
                         if mobileconfig == "true":
                             if data.debug:
                                 logging.debug("Requesting mobileconfig "
                                               "configuration")
-                            if d.has_key("cn"):
+                            if "cn" in d:
                                 cn = unicode(d.get("cn")[0], "utf-8")
                                 cn.strip()
-                            if d.has_key("password"):
+                            if "password" in d:
                                 password = unicode(d.get("password")[0],
                                                    "utf-8")
                                 password.strip()
-                            if d.has_key("emailaddress"):
+                            if "emailaddress" in d:
                                 emailaddress = d.get("emailaddress")[0]
                                 emailaddress.strip()
                                 status = STAT_OK
@@ -176,7 +178,8 @@ def application(environ, start_response):
 
         elif request_method == "GET":
             # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
-            if any("autodiscover" in s for s in (environ["HTTP_HOST"], environ["REQUEST_URI"].lower())):
+            if any("autodiscover" in s for s in (
+                    environ["HTTP_HOST"], environ["REQUEST_URI"].lower())):
                 process = False
                 status = STAT_ERR
 
@@ -189,7 +192,7 @@ def application(environ, start_response):
                     logging.debug("Request GET: QUERY_STRING: %s" % qs)
 
                 if d is not None:
-                    if d.has_key("emailaddress"):
+                    if "emailaddress" in d:
                         emailaddress = d.get("emailaddress")[0]
                         emailaddress.strip()
                         if not '@' in emailaddress:
@@ -251,8 +254,8 @@ def application(environ, start_response):
     if process:
         if data.debug:
             if (schema == "mobileconfig" and
-                data.domain.has_key("sign_mobileconfig") and
-                    data.domain["sign_mobileconfig"] is True):
+                    "sign_mobileconfig" in data.domain and
+                        data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
                 logging.debug("Response:\n" + response_body)
@@ -261,9 +264,11 @@ def application(environ, start_response):
         response_headers = [('Content-Type', 'text/xml'),
                             ('Content-Length', str(len(response_body)))]
     elif schema == "mobileconfig":
-        response_headers = [('Content-Type', 'application/x-apple-aspen-config'
-                            '; chatset=utf-8'),
-                            ('Content-Disposition', 'attachment; '
+        response_headers = [('Content-Type',
+                             'application/x-apple-aspen-config'
+                             '; chatset=utf-8'),
+                            ('Content-Disposition',
+                             'attachment; '
                              'filename="company.mobileconfig'),
                             ('Content-Length', str(len(response_body)))]
     else:
