@@ -220,6 +220,7 @@ class Config(object, ConfigParser.RawConfigParser):
                                "account_name",
                                "account_name_short",
                                "display_name",
+                               "activesync_email",
                                "server_url",
                                "server_name"):
                         tmp = self.get(section, opt)

@@ -151,7 +151,10 @@ class View(object):
                     displayname.text = self.__model.domain["display_name"]
 
                 emailaddress = etree.SubElement(user, "EmailAddress")
-                emailaddress.text = self.__model.domain["emailaddress"]
+                if "activesync_email" in self.__model.domain:
+                    emailaddress.text = self.__model.domain["activesync_email"]
+                else:
+                    emailaddress.text = self.__model.domain["emailaddress"]
 
                 action = etree.SubElement(response, "Action")
 
