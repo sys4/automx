@@ -15,15 +15,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import print_function
+
 
 import os
 import sys
-import ConfigParser
+import configparser
 import shlex
 import re
 import logging
-import ipaddr
+import ipaddress
 
 try:
     import memcache
@@ -32,13 +32,13 @@ try:
 except ImportError:
     use_memcache = False
 
-from ConfigParser import NoOptionError, NoSectionError
+from configparser import NoOptionError, NoSectionError
 from dateutil import parser
 from collections import OrderedDict
 
-__version__ = '0.11.0'
+__version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
-__copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
+__copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
 # List of boolean words that have the meaning "true"
 TRUE = ('1', 'y', 'yes', 't', 'true', 'on')
@@ -52,7 +52,7 @@ class ConfigNotFoundException(Exception):
     pass
 
 
-class Config(object, ConfigParser.RawConfigParser):
+class Config(configparser.RawConfigParser):
     """
     This class creates the internal data structure that is completely
     independend from the view. It may query different backends to gather all
@@ -102,7 +102,7 @@ class Config(object, ConfigParser.RawConfigParser):
     """
 
     def __init__(self, environ):
-        ConfigParser.RawConfigParser.__init__(self,
+        configparser.RawConfigParser.__init__(self,
                                               defaults=None,
                                               dict_type=OrderedDict)
 
@@ -391,7 +391,7 @@ class Config(object, ConfigParser.RawConfigParser):
                         else:
                             con.simple_bind_s(ldap_cfg["binddn"],
                                               ldap_cfg["bindpw"])
-                    except Exception, e:
+                    except Exception as e:
                         logging.error("LDAP: %s" % e)
                         continue
                     break
@@ -423,17 +423,17 @@ class Config(object, ConfigParser.RawConfigParser):
                     # we did not receive data from LDAP
                     if raw_res[1] != []:
                         for entry in raw_res[1]:
-                            for key, value in entry[1].items():
+                            for key, value in list(entry[1].items()):
                                 # result attributes might be multi values, but
                                 # we only accept the first value.
-                                self.__vars[key] = unicode(value[0], "utf-8")
+                                self.__vars[key] = str(value[0], "utf-8")
                     else:
                         logging.warning("No LDAP result from server!")
                         raise DataNotFoundException
 
                     try:
                         con.unbind()
-                    except ldap.LDAPError, e:
+                    except ldap.LDAPError as e:
                         pass
 
                 if backend == "ldap":
@@ -464,13 +464,13 @@ class Config(object, ConfigParser.RawConfigParser):
                     try:
                         engine = create_engine(con)
                         connection = engine.connect()
-                    except Exception, e:
+                    except Exception as e:
                         logging.error("SQL: %s" % e)
                         continue
 
                     result = connection.execute(sql_cfg["query"])
                     for row in result:
-                        keys = row.keys()
+                        keys = list(row.keys())
                         for key in iter(keys):
                             if key in iter(sql_cfg["result_attrs"]):
                                 self.__vars[key] = row[key]
@@ -810,7 +810,7 @@ class Config(object, ConfigParser.RawConfigParser):
 
         result = re.sub(r"\$\{(\w+)(:%[sud1-9])?\}",
                         repl,
-                        unicode(expression, "utf-8"),
+                        str(expression, "utf-8"),
                         re.UNICODE)
 
         if self.debug:
@@ -867,7 +867,7 @@ class Memcache(object):
         try:
             if use_memcache:
                 self.__mc = memcache.Client([config.get("automx", "memcache")])
-        except ValueError, e:
+        except ValueError as e:
             logging.warning("Memcache misconfigured: ", e)
             self.__has_memcache = False
         except NoOptionError:
@@ -887,7 +887,7 @@ class Memcache(object):
         if self.__config.has_option("automx", "memcache_ttl"):
             try:
                 ttl = self.__config.getint("automx", "memcache_ttl")
-            except ValueError, e:
+            except ValueError as e:
                 logging.warning("Memcache <memcache_ttl>, using default: ", e)
                 ttl = 600
         else:
@@ -915,7 +915,7 @@ class Memcache(object):
         if self.__config.has_option("automx", "client_error_limit"):
             try:
                 limit = self.__config.getint("automx", "client_error_limit")
-            except ValueError, e:
+            except ValueError as e:
                 logging.warning("Memcache <client_error_limit>, "
                                 "using default: ", e)
                 limit = 20
@@ -943,8 +943,8 @@ class Memcache(object):
             networks = ("127.0.0.1", "::1/128")
 
         for network in iter(networks):
-            a = ipaddr.IPAddress(self.__client)
-            n = ipaddr.IPNetwork(network)
+            a = ipaddress.IPAddress(self.__client)
+            n = ipaddress.IPNetwork(network)
             if n.Contains(a):
                 if self.__config.debug:
                     logging.debug("FOUND %s, %s" % (a, n))

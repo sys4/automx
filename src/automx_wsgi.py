@@ -16,15 +16,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import print_function, unicode_literals
 
 import traceback
 import logging
-import urllib
+import urllib.request
+import urllib.parse
+import urllib.error
 
-from cgi import escape
-from urlparse import parse_qs
-from cStringIO import StringIO
+from html import escape
+from urllib.parse import parse_qs
+from io import BytesIO
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 
@@ -32,9 +33,9 @@ from automx.config import Config
 from automx.config import DataNotFoundException
 from automx.view import View
 
-__version__ = '0.11.0'
+__version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
-__copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
+__copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
 
 def application(environ, start_response):
@@ -57,7 +58,7 @@ def application(environ, start_response):
 
     try:
         data = Config(environ)
-    except Exception, e:
+    except Exception as e:
         process = False
         status = STAT_ERR
         print(e, file=environ["wsgi.errors"])
@@ -67,7 +68,7 @@ def application(environ, start_response):
             logging.basicConfig(filename=data.logfile,
                                 format='%(asctime)s %(levelname)s: %(message)s',
                                 level=logging.DEBUG)
-        except IOError, e:
+        except IOError as e:
             print(e, file=environ["wsgi.errors"])
 
         request_method = environ['REQUEST_METHOD']
@@ -76,7 +77,7 @@ def application(environ, start_response):
         # Adding some more useful debugging information
         if data.debug:
             logging.debug("-" * 15 + " BEGIN environ " + "-" * 15)
-            for k, v in environ.iteritems():
+            for k, v in environ.items():
                 logging.debug("%s: %s" % (k, v))
             logging.debug("-" * 15 + " END environ " + "-" * 15)
 
@@ -94,9 +95,10 @@ def application(environ, start_response):
             request_body = environ['wsgi.input'].read(request_body_size)
 
             if data.debug:
-                logging.debug("Request POST (raw)\n" + request_body)
+                logging.debug("Request POST (raw)\n" +
+                              request_body.decode('utf-8'))
 
-            fd = StringIO(request_body)
+            fd = BytesIO(request_body)
             try:
                 tree = etree.parse(fd)
             except XMLSyntaxError:
@@ -143,21 +145,23 @@ def application(environ, start_response):
                 d = parse_qs(request_body)
 
                 if d is not None:
-                    if "_mobileconfig" in d:
-                        mobileconfig = d.get("_mobileconfig")[0]
-                        if mobileconfig == "true":
+                    logging.debug(str(d))
+                    if b"_mobileconfig" in d:
+                        mobileconfig = d[b"_mobileconfig"][0]
+                        if mobileconfig == b"true":
                             if data.debug:
                                 logging.debug("Requesting mobileconfig "
                                               "configuration")
-                            if "cn" in d:
-                                cn = unicode(d.get("cn")[0], "utf-8")
+                            if b"cn" in d:
+                                cn = str(d[b"cn"][0], encoding='utf-8')
                                 cn.strip()
-                            if "password" in d:
-                                password = unicode(d.get("password")[0],
-                                                   "utf-8")
+                            if b"password" in d:
+                                password = str(d[b"password"][0],
+                                               encoding='utf-8')
                                 password.strip()
-                            if "emailaddress" in d:
-                                emailaddress = d.get("emailaddress")[0]
+                            if b"emailaddress" in d:
+                                emailaddress = str(d[b"emailaddress"][0],
+                                                   encoding='utf-8')
                                 emailaddress.strip()
                                 status = STAT_OK
                                 schema = "mobileconfig"
@@ -196,7 +200,7 @@ def application(environ, start_response):
                         emailaddress = d.get("emailaddress")[0]
                         emailaddress.strip()
                         if not '@' in emailaddress:
-                            emailaddress = urllib.unquote(emailaddress)
+                            emailaddress = urllib.parse.unquote(emailaddress)
                         status = STAT_OK
                         schema = "autoconfig"
                     else:
@@ -226,7 +230,7 @@ def application(environ, start_response):
             data.memcache.set_client()
             logging.warning("Request %d [%s]" % (data.memcache.counter(),
                                                  environ["REMOTE_ADDR"]))
-        except Exception, e:
+        except Exception as e:
             if data.debug:
                 tb = traceback.format_exc()
                 logging.error(tb)
@@ -243,7 +247,7 @@ def application(environ, start_response):
             response_body = view.render()
             if response_body == "":
                 status = STAT_ERR
-        except Exception, e:
+        except Exception as e:
             if data.debug:
                 tb = traceback.format_exc()
                 logging.error(tb)
@@ -258,7 +262,7 @@ def application(environ, start_response):
                         data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
-                logging.debug("Response:\n" + response_body)
+                logging.debug("Response:\n" + response_body.decode('utf-8'))
 
     if schema in ('autoconfig', "autodiscover"):
         response_headers = [('Content-Type', 'text/xml'),

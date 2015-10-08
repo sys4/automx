@@ -15,21 +15,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import print_function, unicode_literals
+
 
 import uuid
 import logging
-import M2Crypto
+# The following module does not exist for Python3
+# import M2Crypto
 import re
 
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from xml.parsers.expat import ExpatError
-from plistlib import writePlistToString, readPlist
+from plistlib import load, dumps, FMT_XML
 
-__version__ = '0.11.0'
+__version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
-__copyright__ = "Copyright (c) 2011-2013 [*] sys4 AG"
+__copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
 
 class View(object):
@@ -67,7 +68,7 @@ class View(object):
             elif self.__schema == "mobileconfig":
                 path = self.__model.domain[self.__schema]
                 try:
-                    plist_tmp = readPlist(path)
+                    plist_tmp = load(path)
                     plist = plist_tmp.copy()
                     self.__plist = plist
                 except ExpatError:
@@ -123,7 +124,7 @@ class View(object):
                 else:
                     raise Exception("Missing attribute <action>")
 
-                for key, value in self.__model.domain.iteritems():
+                for key, value in self.__model.domain.items():
                     if key in ("smtp", "imap", "pop"):
                         if len(value) != 0:
                             protocol = etree.SubElement(account, "Protocol")
@@ -200,7 +201,7 @@ class View(object):
             if "account_name_short" in self.__model.domain:
                 display_short.text = self.__model.domain["account_name_short"]
 
-            for key, value in self.__model.domain.iteritems():
+            for key, value in self.__model.domain.items():
                 if key in ("smtp", "imap", "pop"):
                     if len(value) != 0:
                         self.__service(key, provider)
@@ -213,7 +214,7 @@ class View(object):
             # We only support IMAP or POP3.
             service_configured = False
 
-            for key, value in self.__model.domain.iteritems():
+            for key, value in self.__model.domain.items():
                 if not service_configured and key == "imap":
                     if len(value) != 0:
                         self.__service(key, None, proto)
@@ -523,8 +524,9 @@ class View(object):
                                   pretty_print=True)
 
         elif self.__plist is not None:
-            plist_unsigned = writePlistToString(self.__plist)
+            plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
 
+            """
             if "sign_mobileconfig" in self.__model.domain:
                 if (self.__model.domain["sign_mobileconfig"] is True and
                         "sign_cert" in self.__model.domain and
@@ -544,7 +546,7 @@ class View(object):
 
                     # First certificate is for signing!
                     # Rest is intermediate cert chain!
-                    certificates.next()
+                    next(certificates)
                     for match in certificates:
                         s.push(M2Crypto.X509.load_cert_string(match.group(0)))
                     signer.set_x509_stack(s)
@@ -565,6 +567,7 @@ class View(object):
                     return plist_signed
                 else:
                     logging.info("Not signing!")
+                """
 
             return plist_unsigned
         else:
