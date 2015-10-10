@@ -197,7 +197,7 @@ def application(environ, start_response):
 
                 if d is not None:
                     if "emailaddress" in d:
-                        emailaddress = d.get("emailaddress")[0]
+                        emailaddress = d["emailaddress"][0]
                         emailaddress.strip()
                         if not '@' in emailaddress:
                             emailaddress = urllib.parse.unquote(emailaddress)
