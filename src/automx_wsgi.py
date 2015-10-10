@@ -142,26 +142,24 @@ def application(environ, start_response):
             else:
                 # We did not receive XML, so it might be a mobileconfig request
                 # TODO: We also might check the User-Agent here
-                d = parse_qs(request_body)
+                d = parse_qs(request_body.decode('utf-8'))
 
                 if d is not None:
                     logging.debug(str(d))
-                    if b"_mobileconfig" in d:
-                        mobileconfig = d[b"_mobileconfig"][0]
-                        if mobileconfig == b"true":
+                    if "_mobileconfig" in d:
+                        mobileconfig = d["_mobileconfig"][0]
+                        if mobileconfig == "true":
                             if data.debug:
                                 logging.debug("Requesting mobileconfig "
                                               "configuration")
-                            if b"cn" in d:
-                                cn = str(d[b"cn"][0], encoding='utf-8')
+                            if "cn" in d:
+                                cn = str(d["cn"][0])
                                 cn.strip()
-                            if b"password" in d:
-                                password = str(d[b"password"][0],
-                                               encoding='utf-8')
+                            if "password" in d:
+                                password = str(d["password"][0])
                                 password.strip()
-                            if b"emailaddress" in d:
-                                emailaddress = str(d[b"emailaddress"][0],
-                                                   encoding='utf-8')
+                            if "emailaddress" in d:
+                                emailaddress = str(d["emailaddress"][0])
                                 emailaddress.strip()
                                 status = STAT_OK
                                 schema = "mobileconfig"

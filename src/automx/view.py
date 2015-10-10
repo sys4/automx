@@ -548,22 +548,19 @@ class View(object):
 
                     import subprocess as s
 
-                    # TODO: Need config param for openssl!
                     cmd = "/usr/bin/openssl smime -sign -signer " + sign_cert +\
-                          "-inkey " + sign_key + "-nodetach -outform der"
+                          " -inkey " + sign_key + " -nodetach -outform der "
                     process = s.Popen(
                         cmd.split(),
                         stdin=s.PIPE,
                         stdout=s.PIPE,
                         stderr=s.PIPE,
-                        shell=True)
+                        shell=False)
 
                     plist_signed, errors = process.communicate(
                         input=plist_unsigned)
-
                     if errors is not None:
-                        logging.error("Call to openssl failed: %s", str(errors))
-                        return plist_unsigned
+                        logging.error("openssl: %s", str(errors))
 
                     """
                     buffer = M2Crypto.BIO.MemoryBuffer(plist_unsigned)
