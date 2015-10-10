@@ -523,21 +523,6 @@ class View(object):
         elif self.__plist is not None:
             plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
 
-            """
-            sign_cert = self.__model.domain["sign_cert"]
-            sign_key = self.__model.domain["sign_key"]
-
-            stdin = plist_unsigned
-            stdout = plist_signed
-
-            openssl smime
-                -sign
-                -signer sign_cert
-                -inkey sign_key
-                -nodetach
-                -outform der
-            """
-
             if "sign_mobileconfig" in self.__model.domain:
                 if (self.__model.domain["sign_mobileconfig"] is True and
                         "sign_cert" in self.__model.domain and
@@ -548,19 +533,17 @@ class View(object):
 
                     import subprocess as s
 
-                    cmd = "/usr/bin/openssl smime -sign -signer " + sign_cert +\
-                          " -inkey " + sign_key + " -nodetach -outform der"
+                    # TODO: Do we need intermediate-CAs?
+                    cmd = self.__model.openssl +\
+                          " smime -sign -nodetach -outform der -aes-256-cbc"\
+                          " -signer " + sign_cert + " -inkey " + sign_key
                     process = s.Popen(
-                        cmd.split(),
-                        stdin=s.PIPE,
-                        stdout=s.PIPE,
-                        stderr=s.PIPE,
-                        shell=False)
+                        cmd.split(), stdin=s.PIPE, stdout=s.PIPE, stderr=s.PIPE)
 
                     plist_signed, errors = process.communicate(
                         input=plist_unsigned)
                     if errors is not None:
-                        logging.error("openssl: %s", str(errors))
+                        logging.warning("openssl: %s", str(errors))
 
                     return plist_signed
                 else:

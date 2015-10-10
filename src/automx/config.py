@@ -183,6 +183,11 @@ class Config(configparser.RawConfigParser):
         except TypeError:
             raise Exception("Missing options in section automx")
 
+        try:
+            self.__automx["openssl"] = self.get("automx", "openssl")
+        except:
+            self.__automx["openssl"] = "/usr/bin/openssl"
+
         # if a domain has its own section, use settings from it
         cmp_domains = [dom.lower() for dom in self.__automx["domains"]]
         if (domain.lower() in iter(cmp_domains) or
@@ -826,30 +831,29 @@ class Config(configparser.RawConfigParser):
 
         raise NoSectionError(domain)
 
-    def get_provider(self):
+    @property
+    def provider(self):
         return self.__automx["provider"]
 
-    provider = property(fget=get_provider)
+    @property
+    def openssl(self):
+        return self.__automx['openssl']
 
-    def get_domain(self):
+    @property
+    def domain(self):
         return self.__domain
 
-    domain = property(fget=get_domain)
-
-    def get_cn(self):
+    @property
+    def cn(self):
         return self.__cn
 
-    cn = property(fget=get_cn)
-
-    def get_password(self):
+    @property
+    def password(self):
         return self.__password
 
-    password = property(fget=get_password)
-
-    def get_emailaddress(self):
+    @property
+    def emailaddress(self):
         return self.__emailaddress
-
-    emailaddress = property(fget=get_emailaddress)
 
 
 class Memcache(object):
