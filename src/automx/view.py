@@ -19,9 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 import logging
-# The following module does not exist for Python3
-# import M2Crypto
-import re
 
 from lxml import etree
 from lxml.etree import XMLSyntaxError
@@ -527,6 +524,20 @@ class View(object):
             plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
 
             """
+            sign_cert = self.__model.domain["sign_cert"]
+            sign_key = self.__model.domain["sign_key"]
+
+            stdin = plist_unsigned
+            stdout = plist_signed
+
+            openssl smime
+                -sign
+                -signer sign_cert
+                -inkey sign_key
+                -nodetach
+                -outform der
+            """
+
             if "sign_mobileconfig" in self.__model.domain:
                 if (self.__model.domain["sign_mobileconfig"] is True and
                         "sign_cert" in self.__model.domain and
@@ -535,6 +546,26 @@ class View(object):
                     sign_cert = self.__model.domain["sign_cert"]
                     sign_key = self.__model.domain["sign_key"]
 
+                    import subprocess as s
+
+                    # TODO: Need config param for openssl!
+                    cmd = "/usr/bin/openssl smime -sign -signer " + sign_cert +\
+                          "-inkey " + sign_key + "-nodetach -outform der"
+                    process = s.Popen(
+                        cmd.split(),
+                        stdin=s.PIPE,
+                        stdout=s.PIPE,
+                        stderr=s.PIPE,
+                        shell=True)
+
+                    plist_signed, errors = process.communicate(
+                        input=plist_unsigned)
+
+                    if errors is not None:
+                        logging.error("Call to openssl failed: %s", str(errors))
+                        return plist_unsigned
+
+                    """
                     buffer = M2Crypto.BIO.MemoryBuffer(plist_unsigned)
                     signer = M2Crypto.SMIME.SMIME()
                     s = M2Crypto.X509.X509_Stack()
@@ -563,11 +594,11 @@ class View(object):
                     output = M2Crypto.BIO.MemoryBuffer()
                     p7.write_der(output)
                     plist_signed = output.getvalue()
+                    """
 
                     return plist_signed
                 else:
                     logging.info("Not signing!")
-                """
 
             return plist_unsigned
         else:
