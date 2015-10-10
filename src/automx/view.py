@@ -549,7 +549,7 @@ class View(object):
                     import subprocess as s
 
                     cmd = "/usr/bin/openssl smime -sign -signer " + sign_cert +\
-                          " -inkey " + sign_key + " -nodetach -outform der "
+                          " -inkey " + sign_key + " -nodetach -outform der"
                     process = s.Popen(
                         cmd.split(),
                         stdin=s.PIPE,
@@ -561,37 +561,6 @@ class View(object):
                         input=plist_unsigned)
                     if errors is not None:
                         logging.error("openssl: %s", str(errors))
-
-                    """
-                    buffer = M2Crypto.BIO.MemoryBuffer(plist_unsigned)
-                    signer = M2Crypto.SMIME.SMIME()
-                    s = M2Crypto.X509.X509_Stack()
-
-                    cert_handle = open(sign_cert).read()
-                    certificates = re.finditer(r"-----BEGIN CERTIFICATE-----"
-                                               ".*?-----END CERTIFICATE-----",
-                                               cert_handle, re.S)
-
-                    # First certificate is for signing!
-                    # Rest is intermediate cert chain!
-                    next(certificates)
-                    for match in certificates:
-                        s.push(M2Crypto.X509.load_cert_string(match.group(0)))
-                    signer.set_x509_stack(s)
-
-                    # Load key and _first_ certificate
-                    try:
-                        signer.load_key(sign_key, sign_cert)
-                    except M2Crypto.BIO.BIOError:
-                        logging.error("Cannot access %s or %s. Not signing!"
-                                      % (sign_cert, sign_key))
-                        return plist_unsigned
-
-                    p7 = signer.sign(buffer)
-                    output = M2Crypto.BIO.MemoryBuffer()
-                    p7.write_der(output)
-                    plist_signed = output.getvalue()
-                    """
 
                     return plist_signed
                 else:
