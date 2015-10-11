@@ -149,10 +149,7 @@ class View(object):
                     displayname.text = self.__model.domain["display_name"]
 
                 emailaddress = etree.SubElement(user, "EmailAddress")
-                if "activesync_email" in self.__model.domain:
-                    emailaddress.text = self.__model.domain["activesync_email"]
-                else:
-                    emailaddress.text = self.__model.domain["emailaddress"]
+                emailaddress.text = self.__model.domain["emailaddress"]
 
                 action = etree.SubElement(response, "Action")
 
@@ -530,13 +527,18 @@ class View(object):
 
                     sign_cert = self.__model.domain["sign_cert"]
                     sign_key = self.__model.domain["sign_key"]
-
+                    if "sign_more_certs" in self.__model.domain:
+                        extra = " -certfile " + self.__model.domain[
+                            "sign_more_certs"]
+                    else:
+                        extra = ""
                     import subprocess as s
 
                     # TODO: Do we need intermediate-CAs?
                     cmd = self.__model.openssl +\
                           " smime -sign -nodetach -outform der -aes-256-cbc"\
-                          " -signer " + sign_cert + " -inkey " + sign_key
+                          " -signer " + sign_cert + " -inkey " + sign_key +\
+                          extra
                     process = s.Popen(
                         cmd.split(), stdin=s.PIPE, stdout=s.PIPE, stderr=s.PIPE)
 
