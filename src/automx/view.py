@@ -532,6 +532,7 @@ class View(object):
                             "sign_more_certs"]
                     else:
                         extra = ""
+
                     import subprocess as s
 
                     # TODO: Do we need intermediate-CAs?

@@ -814,7 +814,7 @@ class Config(configparser.RawConfigParser):
 
         result = re.sub(r"\$\{(\w+)(:%[sud1-9])?\}",
                         repl,
-                        str(expression, "utf-8"),
+                        expression,
                         re.UNICODE)
 
         if self.debug:
