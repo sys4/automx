@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 
+import os
+import sys
 import traceback
 import logging
 import urllib.request
@@ -36,6 +38,8 @@ from automx.view import View
 __version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 
 def application(environ, start_response):
