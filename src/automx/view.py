@@ -520,6 +520,43 @@ class View(object):
         elif self.__plist is not None:
             plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
 
+            # Old M2Crypto that is not ported yet to Python3
+            """
+                    sign_cert = self.__model.domain["sign_cert"]
+                    sign_key = self.__model.domain["sign_key"]
+
+                    buffer = M2Crypto.BIO.MemoryBuffer(plist_unsigned)
+                    signer = M2Crypto.SMIME.SMIME()
+                    s = M2Crypto.X509.X509_Stack()
+
+                    cert_handle = open(sign_cert).read()
+                    certificates = re.finditer(r"-----BEGIN CERTIFICATE-----"
+                                                ".*?-----END CERTIFICATE-----",
+                                                cert_handle, re.S)
+
+                    # First certificate is for signing!
+                    # Rest is intermediate cert chain!
+                    certificates.next()
+                    for match in certificates:
+                        s.push(M2Crypto.X509.load_cert_string(match.group(0)))
+                    signer.set_x509_stack(s)
+
+                    # Load key and _first_ certificate
+                    try:
+                        signer.load_key(sign_key, sign_cert)
+                    except M2Crypto.BIO.BIOError:
+                        logging.error("Cannot access %s or %s. Not signing!"
+                                      % (sign_cert, sign_key))
+                        return plist_unsigned
+
+                    p7 = signer.sign(buffer)
+                    output = M2Crypto.BIO.MemoryBuffer()
+                    p7.write_der(output)
+                    plist_signed = output.getvalue()
+
+                    return plist_signed
+            """
+
             if "sign_mobileconfig" in self.__model.domain:
                 if (self.__model.domain["sign_mobileconfig"] is True and
                         "sign_cert" in self.__model.domain and
@@ -527,6 +564,7 @@ class View(object):
 
                     sign_cert = self.__model.domain["sign_cert"]
                     sign_key = self.__model.domain["sign_key"]
+                    
                     if "sign_more_certs" in self.__model.domain:
                         extra = " -certfile " + self.__model.domain[
                             "sign_more_certs"]
@@ -535,7 +573,6 @@ class View(object):
 
                     import subprocess as s
 
-                    # TODO: Do we need intermediate-CAs?
                     cmd = self.__model.openssl +\
                           " smime -sign -nodetach -outform der -aes-256-cbc"\
                           " -signer " + sign_cert + " -inkey " + sign_key +\
