@@ -133,6 +133,12 @@ class Config(configparser.RawConfigParser):
         else:
             self.debug = False
 
+        # We need a home directory for the OpenSSL-rand file
+        if self.has_option("automx", "homedir"):
+            os.environ["HOME"] = self.get("automx", "homedir")
+        else:
+            os.environ["HOME"] = "/var/automx"
+
         self.memcache = Memcache(self, environ)
 
         # defaults

@@ -582,7 +582,7 @@ class View(object):
 
                     plist_signed, errors = process.communicate(
                         input=plist_unsigned)
-                    if errors is not None:
+                    if errors not in (b"", None):
                         logging.warning("openssl: %s", str(errors))
 
                     return plist_signed
