@@ -952,9 +952,9 @@ class Memcache(object):
             networks = ("127.0.0.1", "::1/128")
 
         for network in iter(networks):
-            a = ipaddress.IPAddress(self.__client)
-            n = ipaddress.IPNetwork(network)
-            if n.Contains(a):
+            a = ipaddress.ip_address(self.__client)
+            n = ipaddress.ip_network(network)
+            if a in n:
                 if self.__config.debug:
                     logging.debug("FOUND %s, %s" % (a, n))
                 return True
