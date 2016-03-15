@@ -15,17 +15,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 import sys
-import configparser
 import shlex
 import re
 import logging
-import ipaddress
 
 try:
+    import ipaddress
+except ImportError:
+    import ipaddr as ipaddress
+
+try:
+    import configparser
+except ImportError:
+    # noinspection PyPep8Naming
+    import ConfigParser as configparser
+
+try:
+    # noinspection PyUnresolvedReferences
     import memcache
 
     use_memcache = True
@@ -35,6 +48,8 @@ except ImportError:
 from configparser import NoOptionError, NoSectionError
 from dateutil import parser
 from collections import OrderedDict
+from builtins import dict, int, str
+
 
 __version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
@@ -109,6 +124,7 @@ class Config(configparser.RawConfigParser):
         found_conf = False
         conf_files = list(["/usr/local/etc/automx.conf", "/etc/automx.conf"])
 
+        conf = None
         for conf in iter(conf_files):
             if os.path.exists(conf):
                 found_conf = True
@@ -191,13 +207,13 @@ class Config(configparser.RawConfigParser):
 
         try:
             self.__automx["openssl"] = self.get("automx", "openssl")
-        except:
+        except (NoSectionError, NoOptionError):
             self.__automx["openssl"] = "/usr/bin/openssl"
 
         # if a domain has its own section, use settings from it
         cmp_domains = [dom.lower() for dom in self.__automx["domains"]]
         if (domain.lower() in iter(cmp_domains) or
-                    self.__automx["domains"][0] == "*"):
+                self.__automx["domains"][0] == "*"):
             cmp_sections = [dom.lower() for dom in self.sections()]
             if domain.lower() in iter(cmp_sections):
                 self.__eval_options(domain)
@@ -246,7 +262,7 @@ class Config(configparser.RawConfigParser):
                     elif opt == "sign_mobileconfig":
                         try:
                             settings[opt] = self.getboolean(section, opt)
-                        except:
+                        except (NoSectionError, NoOptionError, ValueError):
                             logging.error("%s is not boolean!" % opt)
                             settings[opt] = False
                     elif opt in ("sign_cert", "sign_key", "sign_more_certs"):
@@ -337,6 +353,7 @@ class Config(configparser.RawConfigParser):
                         ldap_cfg[opt] = result
 
                 # Do we connect with TLS?
+                reqcert = None
                 if ldap_cfg["usetls"].strip().lower() in TRUE:
                     if ldap_cfg["reqcert"] in ("never",
                                                "allow",
@@ -369,6 +386,7 @@ class Config(configparser.RawConfigParser):
                     tls = True
 
                 # Are we SASL binding to our servers?
+                auth_tokens = None
                 if ldap_cfg["bindmethod"] == "sasl":
                     mech = ldap_cfg["saslmech"]
 
@@ -406,6 +424,7 @@ class Config(configparser.RawConfigParser):
                         continue
                     break
 
+                scope = None
                 if con is not None:
                     if ldap_cfg["scope"] in ("sub", "subtree"):
                         scope = ldap.SCOPE_SUBTREE
@@ -414,16 +433,15 @@ class Config(configparser.RawConfigParser):
                     elif ldap_cfg["scope"] in ("base", "exact"):
                         scope = ldap.SCOPE_BASE
 
-                    filter = self.__replace_makro(ldap_cfg["filter"])
+                    s_filter = self.__replace_makro(ldap_cfg["filter"])
 
                     rid = con.search(ldap_cfg["base"],
                                      scope,
-                                     filter,
+                                     s_filter,
                                      ldap_cfg["result_attrs"])
 
-                    raw_res = (None, None)
                     raw_res = con.result(rid, True, 60)
-                    if raw_res[0] == None:
+                    if raw_res[0] is None:
                         con.abandon(rid)
                         raise Exception("LDAP server timeout reached")
 
@@ -431,19 +449,19 @@ class Config(configparser.RawConfigParser):
                     self.__vars = dict()
 
                     # we did not receive data from LDAP
-                    if raw_res[1] != []:
+                    if raw_res[1]:
                         for entry in raw_res[1]:
                             for key, value in list(entry[1].items()):
                                 # result attributes might be multi values, but
                                 # we only accept the first value.
-                                self.__vars[key] = str(value[0], "utf-8")
+                                self.__vars[key] = str(value[0])
                     else:
                         logging.warning("No LDAP result from server!")
                         raise DataNotFoundException
 
                     try:
                         con.unbind()
-                    except ldap.LDAPError as e:
+                    except ldap.LDAPError:
                         pass
 
                 if backend == "ldap":
@@ -531,7 +549,7 @@ class Config(configparser.RawConfigParser):
                 if self.has_option(section, "seperator"):
                     seperator = self.get(section, "seperator")
 
-                cmd = shlex.split(self.get(section, "script"))
+                cmd = shlex.split(script_args)
                 for i, item in enumerate(cmd):
                     cmd[i] = self.__replace_makro(item)
 
@@ -539,6 +557,8 @@ class Config(configparser.RawConfigParser):
                 pipe_in, pipe_out = os.pipe()
                 pid = os.fork()
 
+                recv = None
+                result = None
                 if pid == 0:
                     # child
                     os.close(pipe_in)
@@ -555,7 +575,7 @@ class Config(configparser.RawConfigParser):
                     result = os.waitpid(pid, 0)
 
                 # check return code
-                if result[1] != 0:
+                if result[1]:
                     raise Exception("ERROR while calling script",
                                     result,
                                     recv.strip())
@@ -574,7 +594,7 @@ class Config(configparser.RawConfigParser):
                 else:
                     self.__eval_options(section, backend="static_append")
 
-            ### backends beyond this line do not have a follow option ###
+            # backends beyond this line do not have a follow option #
 
             elif backend == "filter":
                 if self.has_option(section, "section_filter"):
@@ -646,7 +666,7 @@ class Config(configparser.RawConfigParser):
             elif backend == "global":
                 if self.has_section("global"):
                     self.__eval_options("global")
-                    settings = self.__replace_makro(settings)
+                    self.__replace_makro(settings)
                 else:
                     raise Exception("Missing section 'global'")
 
@@ -754,7 +774,8 @@ class Config(configparser.RawConfigParser):
 
         return proto_settings
 
-    def create_list(self, value):
+    @staticmethod
+    def create_list(value):
         result = value.split()
 
         if len(result) > 1:
@@ -783,7 +804,7 @@ class Config(configparser.RawConfigParser):
 
         def repl(mobj):
             if mobj.group(1) in self.__vars:
-                result = self.__vars[mobj.group(1)]
+                _result = self.__vars[mobj.group(1)]
 
                 if mobj.group(2) is not None:
                     macro = mobj.group(2)[1:]
@@ -791,19 +812,19 @@ class Config(configparser.RawConfigParser):
                     if self.debug:
                         logging.debug("__expand_vars()->macro=%s" % macro)
 
-                    if "@" in result:
+                    if "@" in _result:
                         if macro == "%u":
-                            return result.split("@")[0]
+                            return _result.split("@")[0]
                         if macro == "%d":
-                            return result.split("@")[1]
+                            return _result.split("@")[1]
                         if macro == "%s":
-                            return result
+                            return _result
 
-                        result = result.split("@")[1]
+                        _result = _result.split("@")[1]
 
                     # now the macro may only be part of a FQDN hostname
-                    if "." in result:
-                        dcs = result.split(".")
+                    if "." in _result:
+                        dcs = _result.split(".")
                         if macro in ("%1", "%2", "%3", "%4", "%5",
                                      "%6", "%7", "%8", "%9"):
                             i = int(macro[1])
@@ -812,7 +833,7 @@ class Config(configparser.RawConfigParser):
 
                             return dcs[-i]
 
-                return result
+                return _result
             else:
                 # we always must expand variables. Even if it is the empty
                 # string

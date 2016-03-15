@@ -15,15 +15,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-
+import sys
 import uuid
 import logging
 
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from xml.parsers.expat import ExpatError
-from plistlib import load, dumps, FMT_XML
+from builtins import dict, int, str
+
+try:
+    # noinspection PyUnresolvedReferences
+    from plistlib import load, dumps, FMT_XML
+except ImportError:
+    # noinspection PyPep8Naming
+    from plistlib import readPlist
+    # noinspection PyPep8Naming
+    from plistlib import writePlistToString
+
 
 __version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
@@ -49,9 +63,8 @@ class View(object):
         self.__xml = None
         self.__plist = None
 
+    # noinspection PyPep8Naming
     def __build_xml_plist_tree(self):
-        root = None
-
         if self.__schema in self.__model.domain:
             if self.__schema in ("autodiscover", "autoconfig"):
                 path = self.__model.domain[self.__schema]
@@ -65,7 +78,10 @@ class View(object):
             elif self.__schema == "mobileconfig":
                 path = self.__model.domain[self.__schema]
                 try:
-                    plist_tmp = load(path)
+                    if sys.version_info < (3,):
+                        plist_tmp = readPlist(path)
+                    else:
+                        plist_tmp = load(path)
                     plist = plist_tmp.copy()
                     self.__plist = plist
                 except ExpatError:
@@ -87,9 +103,7 @@ class View(object):
 
                 if ("display_name" in self.__model.domain or
                         ("smtp" in self.__model.domain and
-                             "smtp_author" in self.__model.domain["smtp"][0])):
-
-                    has_user = True
+                         "smtp_author" in self.__model.domain["smtp"][0])):
 
                     user = etree.SubElement(response, "User")
 
@@ -103,8 +117,8 @@ class View(object):
                         if "smtp_author" in smtp[0]:
                             email = smtp[0]["smtp_author"]
 
-                            smtp_author = etree.SubElement(user,
-                                                    "AutoDiscoverSMTPAddress")
+                            smtp_author = etree.SubElement(
+                                user, "AutoDiscoverSMTPAddress")
                             smtp_author.text = email
 
                 account = etree.SubElement(response, "Account")
@@ -237,10 +251,10 @@ class View(object):
             rev_provider = ".".join(rev_provider[::-1])
             rev_email = self.__model.emailaddress.split("@")
             rev_email = ".".join(rev_email[::-1])
-            payload_identifier = ("org.automx.mail."
-                                  + rev_provider
-                                  + "."
-                                  + rev_email)
+            payload_identifier = ("org.automx.mail." +
+                                  rev_provider +
+                                  "." +
+                                  rev_email)
 
             s = dict(EmailAccountDescription=org,
                      EmailAccountName=email_account_name,
@@ -289,12 +303,13 @@ class View(object):
 
             c = etree.SubElement(root, "Type")
 
+            s_type = None
             if service in ("smtp", "imap"):
-                type = service.upper()
+                s_type = service.upper()
             elif service in "pop":
-                type = "POP3"
+                s_type = "POP3"
 
-            c.text = type
+            c.text = s_type
 
             if service + "_server" in elem:
                 c = etree.SubElement(root, "Server")
@@ -316,7 +331,6 @@ class View(object):
                 c = etree.SubElement(root, "SPA")
 
                 value = elem[service + "_auth"]
-                result = ""
 
                 if value != "cleartext":
                     spa = "on"
@@ -360,7 +374,7 @@ class View(object):
 
             if service == "smtp":
                 if (service + "_auth" in elem and
-                            elem[service + "_auth"] == "smtp-after-pop"):
+                        elem[service + "_auth"] == "smtp-after-pop"):
                     c = etree.SubElement(root, "SMTPLast")
                     c.text = "on"
 
@@ -518,7 +532,11 @@ class View(object):
                                   pretty_print=True)
 
         elif self.__plist is not None:
-            plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
+            if sys.version_info < (3,):
+                plist_unsigned = writePlistToString(self.__plist)
+            else:
+                # noinspection PyArgumentList
+                plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
 
             # Old M2Crypto that is not ported yet to Python3
             """
@@ -573,10 +591,10 @@ class View(object):
 
                     import subprocess as s
 
-                    cmd = self.__model.openssl +\
-                          " smime -sign -nodetach -outform der -aes-256-cbc"\
-                          " -signer " + sign_cert + " -inkey " + sign_key +\
-                          extra
+                    cmd = self.__model.openssl + \
+                        " smime -sign -nodetach -outform der -aes-256-cbc" \
+                        " -signer " + sign_cert + " -inkey " + sign_key + \
+                        extra
                     process = s.Popen(
                         cmd.split(), stdin=s.PIPE, stdout=s.PIPE, stderr=s.PIPE)
 

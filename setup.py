@@ -6,11 +6,11 @@ setup(name='automx',
       description='Provides account configuration data to mailclients',
       url='http://automx.org/',
       license='GPL',
-      version='0.10.2',
+      version='1.1.0',
       py_modules=['automx_wsgi'],
       packages=['automx'],
       package_dir={'': 'src'},
       data_files=[('/etc', ['src/conf/automx.conf'])],
       scripts=['src/automx-test'],
+      requires=['future', 'lxml', 'ipaddr', 'pyldap', 'sqlalchemy']
       )
-

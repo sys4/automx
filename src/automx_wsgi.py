@@ -15,37 +15,48 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 import sys
 import traceback
 import logging
-import urllib.request
-import urllib.parse
-import urllib.error
 
 from html import escape
-from urllib.parse import parse_qs
 from io import BytesIO
 from lxml import etree
 from lxml.etree import XMLSyntaxError
+from builtins import int, str
+
+try:
+    from urllib.parse import urlparse, urlencode, parse_qs, unquote
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
+except ImportError:
+    from urlparse import urlparse, parse_qs
+    from urllib import urlencode, unquote
+    from urllib2 import urlopen, Request, HTTPError
 
 from automx.config import Config
 from automx.config import DataNotFoundException
 from automx.view import View
 
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+
+
 __version__ = '1.1.0'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+# HTTP status codes
+STAT_OK = "200 OK"
+STAT_ERR = "500 Internal Server Error"
 
 
 def application(environ, start_response):
-    # HTTP status codes
-    STAT_OK = "200 OK"
-    STAT_ERR = "500 Internal Server Error"
 
     response_body = ""
     cn = None
@@ -59,6 +70,8 @@ def application(environ, start_response):
     subschema = None
 
     process = True
+    data = None
+    status = STAT_OK
 
     try:
         data = Config(environ)
@@ -86,8 +99,6 @@ def application(environ, start_response):
             logging.debug("-" * 15 + " END environ " + "-" * 15)
 
         if request_method == "POST":
-            valid_xml = True
-
             try:
                 request_body_size = int(environ.get('CONTENT_LENGTH', 0))
             except ValueError:
@@ -106,44 +117,6 @@ def application(environ, start_response):
             try:
                 tree = etree.parse(fd)
             except XMLSyntaxError:
-                valid_xml = False
-
-            if valid_xml:
-                root = tree.getroot()
-
-                # We need to strip the namespace for XPath
-                expr = "//*[local-name() = $name]"
-
-                response_schema = root.xpath(expr,
-                                             name="AcceptableResponseSchema")
-                if len(response_schema) == 0:
-                    logging.warning("Error in XML request")
-                    process = False
-                    status = STAT_ERR
-                    data.memcache.set_client()
-                else:
-                    # element.text is a http-URI that has a location part
-                    # which we need to scan.
-                    if "/mobilesync/" in response_schema[0].text:
-                        subschema = "mobile"
-                    elif "/outlook/" in response_schema[0].text:
-                        subschema = "outlook"
-                    else:
-                        process = False
-                        status = STAT_ERR
-
-                    emailaddresses = root.xpath(expr, name="EMailAddress")
-                    if len(emailaddresses) == 0:
-                        logging.warning("Error in autodiscover request!")
-                        process = False
-                        status = STAT_ERR
-                        data.memcache.set_client()
-                    else:
-                        emailaddress = emailaddresses[0].text
-                        schema = "autodiscover"
-                        status = STAT_OK
-
-            else:
                 # We did not receive XML, so it might be a mobileconfig request
                 # TODO: We also might check the User-Agent here
                 d = parse_qs(request_body.decode('utf-8'))
@@ -182,6 +155,39 @@ def application(environ, start_response):
                 else:
                     process = False
                     status = STAT_ERR
+            else:
+                root = tree.getroot()
+
+                # We need to strip the namespace for XPath
+                expr = "//*[local-name() = $name]"
+
+                response_schema = root.xpath(expr,
+                                             name="AcceptableResponseSchema")
+                if len(response_schema) == 0:
+                    logging.warning("Error in XML request")
+                    process = False
+                    status = STAT_ERR
+                    data.memcache.set_client()
+                else:
+                    # element.text is a http-URI that has a location part
+                    # which we need to scan.
+                    if "/mobilesync/" in response_schema[0].text:
+                        subschema = "mobile"
+                    elif "/outlook/" in response_schema[0].text:
+                        subschema = "outlook"
+                    else:
+                        process = False
+
+                    emailaddresses = root.xpath(expr, name="EMailAddress")
+                    if len(emailaddresses) == 0:
+                        logging.warning("Error in autodiscover request!")
+                        process = False
+                        status = STAT_ERR
+                        data.memcache.set_client()
+                    else:
+                        emailaddress = emailaddresses[0].text
+                        schema = "autodiscover"
+                        status = STAT_OK
 
         elif request_method == "GET":
             # FIXME: maybe we need to catch AutoDiscover GET-REDIRECT requests
@@ -202,8 +208,8 @@ def application(environ, start_response):
                     if "emailaddress" in d:
                         emailaddress = d["emailaddress"][0]
                         emailaddress.strip()
-                        if not '@' in emailaddress:
-                            emailaddress = urllib.parse.unquote(emailaddress)
+                        if '@' not in emailaddress:
+                            emailaddress = unquote(emailaddress)
                         status = STAT_OK
                         schema = "autoconfig"
                     else:
@@ -262,7 +268,7 @@ def application(environ, start_response):
         if data.debug:
             if (schema == "mobileconfig" and
                     "sign_mobileconfig" in data.domain and
-                        data.domain["sign_mobileconfig"] is True):
+                    data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
                 logging.debug("Response:\n" + response_body.decode('utf-8'))
