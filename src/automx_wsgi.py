@@ -149,7 +149,8 @@ def application(environ, start_response):
                 d = parse_qs(request_body.decode('utf-8'))
 
                 if d is not None:
-                    logging.debug(str(d))
+                    if data.debug:
+                        logging.debug(str(d))
                     if "_mobileconfig" in d:
                         mobileconfig = d["_mobileconfig"][0]
                         if mobileconfig == "true":
