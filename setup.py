@@ -12,5 +12,5 @@ setup(name='automx',
       package_dir={'': 'src'},
       data_files=[('/etc', ['src/conf/automx.conf'])],
       scripts=['src/automx-test'],
-      requires=['future', 'lxml', 'ipaddr', 'pyldap', 'sqlalchemy']
+      requires=['future', 'lxml', 'ipaddress', 'pyldap', 'sqlalchemy']
       )
