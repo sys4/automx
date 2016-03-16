@@ -25,11 +25,7 @@ import sys
 import shlex
 import re
 import logging
-
-try:
-    import ipaddress
-except ImportError:
-    import ipaddr as ipaddress
+import ipaddress
 
 try:
     import configparser
@@ -454,7 +450,7 @@ class Config(configparser.RawConfigParser):
                             for key, value in list(entry[1].items()):
                                 # result attributes might be multi values, but
                                 # we only accept the first value.
-                                self.__vars[key] = str(value[0])
+                                self.__vars[key] = str(value[0].decode("utf-8"))
                     else:
                         logging.warning("No LDAP result from server!")
                         raise DataNotFoundException
@@ -545,9 +541,9 @@ class Config(configparser.RawConfigParser):
                 else:
                     raise Exception("Missing option <result_attrs>")
 
-                seperator = None
-                if self.has_option(section, "seperator"):
-                    seperator = self.get(section, "seperator")
+                separator = None
+                if self.has_option(section, "separator"):
+                    separator = self.get(section, "separator")
 
                 cmd = shlex.split(script_args)
                 for i, item in enumerate(cmd):
@@ -584,7 +580,7 @@ class Config(configparser.RawConfigParser):
                     logging.warning("No result from script!")
                     raise DataNotFoundException
 
-                result = recv.strip().split(seperator, len(result_attrs))
+                result = recv.strip().split(separator, len(result_attrs))
 
                 for i in range(min(len(result_attrs), len(result))):
                     self.__vars[result_attrs[i]] = result[i].strip()
@@ -972,8 +968,11 @@ class Memcache(object):
         else:
             networks = ("127.0.0.1", "::1/128")
 
-        for network in iter(networks):
+        if sys.version_info < (3,):
+            a = ipaddress.ip_address(self.__client.decode("utf-8"))
+        else:
             a = ipaddress.ip_address(self.__client)
+        for network in iter(networks):
             n = ipaddress.ip_network(network)
             if a in n:
                 if self.__config.debug:

@@ -254,7 +254,7 @@ def application(environ, start_response):
         try:
             view = View(data, schema, subschema)
             response_body = view.render()
-            if response_body == "":
+            if len(response_body) == 0:
                 status = STAT_ERR
         except Exception as e:
             if data.debug:
@@ -273,21 +273,38 @@ def application(environ, start_response):
             else:
                 logging.debug("Response:\n" + response_body.decode('utf-8'))
 
+    body_len = str(len(response_body))
+
+    def aenc(key, value):
+        """Auto-enocde to ascii; Make headers compatible for Py2/Py3
+
+        :param key: header key
+        :param value: header value
+        :return: auto encoded tuple
+        """
+        if sys.version_info < (3,):
+            return key.encode("ascii"), value.encode("ascii")
+        else:
+            return key, value
+
     if schema in ('autoconfig', "autodiscover"):
-        response_headers = [('Content-Type', 'text/xml'),
-                            ('Content-Length', str(len(response_body)))]
+        response_headers = [aenc('Content-Type', 'text/xml'),
+                            aenc('Content-Length', body_len)]
     elif schema == "mobileconfig":
-        response_headers = [('Content-Type',
-                             'application/x-apple-aspen-config'
-                             '; chatset=utf-8'),
-                            ('Content-Disposition',
-                             'attachment; '
-                             'filename="company.mobileconfig'),
-                            ('Content-Length', str(len(response_body)))]
+        response_headers = [aenc('Content-Type',
+                                 'application/x-apple-aspen-config'
+                                 '; chatset=utf-8'),
+                            aenc('Content-Disposition',
+                                 'attachment; '
+                                 'filename="company.mobileconfig'),
+                            aenc('Content-Length', body_len)]
     else:
         # Failure?
-        response_headers = [('Content-Type', 'text/html'),
-                            ('Content-Length', str(len(response_body)))]
+        response_headers = [aenc('Content-Type', 'text/html'),
+                            aenc('Content-Length', body_len)]
+
+    if sys.version_info < (3,):
+        status = status.encode("ascii")
 
     start_response(status, response_headers)
 

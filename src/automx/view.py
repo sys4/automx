@@ -27,16 +27,13 @@ import logging
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from xml.parsers.expat import ExpatError
-from builtins import dict, int, str
 
 try:
     # noinspection PyUnresolvedReferences
     from plistlib import load, dumps, FMT_XML
 except ImportError:
     # noinspection PyPep8Naming
-    from plistlib import readPlist
-    # noinspection PyPep8Naming
-    from plistlib import writePlistToString
+    from plistlib import readPlist, writePlistToString
 
 
 __version__ = '1.1.0'
