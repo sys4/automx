@@ -1,3 +1,8 @@
+* Version 1.1.0
+---------------------------------
+- Include code changes from never-released 0.10.3
+- Make code Python2.7 up to Python3.5 compatible
+
 * Version 0.10.3
 ---------------------------------
 - Replace macros in *_server varaibles

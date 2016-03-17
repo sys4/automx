@@ -1,9 +1,11 @@
-Version 0.9 to 1.0:
+Version 1.1.0 to 1.2.0:
 
 * We may implement a web services backend.
 
-* Starting with 0.10.0, we will drop python 2.6.x and below support. We will
-  make automx compatible with 2.7.x and 3.x versions.
+* We may implement further iOS options for CalDAV and CardDAV and similar.
+
+* Maybe we will include mutt support.
+
+* Proxy for Autodiscover.
 
 No further plans at this time of writing.
-

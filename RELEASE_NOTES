@@ -1,3 +1,18 @@
+Version 0.10 to 1.1.0:
+
+Many smaller bugs have been fixed. M2Crypto was removed in favor of an
+external call to OpenSSL.
+
+Major changes are that this release is the first release that works for
+Python 2.7 up to Python 3.5. Please see also the installation instructions.
+For Python 3.x you should replace python-ldap with pyldap, which is a drop-in
+replacement that is compatible with Python 2 and Python 3.
+
+The master branch had a interim version of 0.10.3, which was primarily a bug
+fix release. As automx itself was mostly feature complete, it would had
+become the version 1.0.0. Because porting it to Py2/3, the version directly
+jumps to 1.1.0
+
 Version 0.9.x to 0.10:
 
 Automx does support mobileconfig profiles for Apple iOS devices as well as
