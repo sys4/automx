@@ -25,6 +25,7 @@ import sys
 import shlex
 import re
 import logging
+# noinspection PyCompatibility
 import ipaddress
 
 try:
@@ -41,9 +42,11 @@ try:
 except ImportError:
     use_memcache = False
 
+# noinspection PyCompatibility
 from configparser import NoOptionError, NoSectionError
 from dateutil import parser
 from collections import OrderedDict
+# noinspection PyCompatibility
 from builtins import dict, int, str
 
 
@@ -113,6 +116,7 @@ class Config(configparser.RawConfigParser):
     """
 
     def __init__(self, environ):
+        # noinspection PyCallByClass,PyTypeChecker
         configparser.RawConfigParser.__init__(self,
                                               defaults=None,
                                               dict_type=OrderedDict)
@@ -467,6 +471,7 @@ class Config(configparser.RawConfigParser):
 
             elif backend in ("sql", "sql_append"):
                 try:
+                    # noinspection PyPackageRequirements
                     from sqlalchemy.engine import create_engine
                 except:
                     raise Exception("python sqlalchemy missing")

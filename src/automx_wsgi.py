@@ -25,19 +25,26 @@ import sys
 import traceback
 import logging
 
+# noinspection PyCompatibility
 from html import escape
-from io import BytesIO
+from io import StringIO
 from lxml import etree
 from lxml.etree import XMLSyntaxError
+# noinspection PyCompatibility
 from builtins import int, str
 
 try:
+    # noinspection PyCompatibility
     from urllib.parse import urlparse, urlencode, parse_qs, unquote
+    # noinspection PyCompatibility
     from urllib.request import urlopen, Request
+    # noinspection PyCompatibility
     from urllib.error import HTTPError
 except ImportError:
+    # noinspection PyCompatibility
     from urlparse import urlparse, parse_qs
     from urllib import urlencode, unquote
+    # noinspection PyCompatibility
     from urllib2 import urlopen, Request, HTTPError
 
 from automx.config import Config
@@ -113,7 +120,8 @@ def application(environ, start_response):
                 logging.debug("Request POST (raw)\n" +
                               request_body.decode('utf-8'))
 
-            fd = BytesIO(request_body)
+            fd = StringIO(request_body.decode("utf-8"))
+            fd.readline()  # Skip XML declaration
             try:
                 tree = etree.parse(fd)
             except XMLSyntaxError:
@@ -131,13 +139,13 @@ def application(environ, start_response):
                                 logging.debug("Requesting mobileconfig "
                                               "configuration")
                             if "cn" in d:
-                                cn = str(d["cn"][0])
+                                cn = d["cn"][0]
                                 cn.strip()
                             if "password" in d:
-                                password = str(d["password"][0])
+                                password = d["password"][0]
                                 password.strip()
                             if "emailaddress" in d:
-                                emailaddress = str(d["emailaddress"][0])
+                                emailaddress = d["emailaddress"][0]
                                 emailaddress.strip()
                                 status = STAT_OK
                                 schema = "mobileconfig"
@@ -293,7 +301,7 @@ def application(environ, start_response):
     elif schema == "mobileconfig":
         response_headers = [aenc('Content-Type',
                                  'application/x-apple-aspen-config'
-                                 '; chatset=utf-8'),
+                                 '; charset=utf-8'),
                             aenc('Content-Disposition',
                                  'attachment; '
                                  'filename="company.mobileconfig'),
