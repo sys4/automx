@@ -115,7 +115,8 @@ If you install automx on an existing host, which has it's own domain-name, then
 it is also possible to use above entries as nicknames:
 
 somehost.example.com. IN A 192.168.2.1
-    autoconfig IN CNAME somehost autodiscover IN CNAME somehost
+autoconfig            IN CNAME somehost.example.com.
+autodiscover          IN CNAME somehost.example.com.
 
 Web Server Configuration
 
