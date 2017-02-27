@@ -31,7 +31,7 @@ function clean_exit() {
 # We need a mail address
 if [[ $1 ]]; then
 	PROFILE="$1"
-else 
+else
 	echo "Provide the mail address for which configuration settings should be retrieved."
 	read -ep "Mail address: " PROFILE
 fi
@@ -43,19 +43,34 @@ MBREQUEST="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
 MBCRESPONSE="$(mktemp /tmp/${PROGRAM_NAME}.XXXXXX)"
 
 # Test Mozilla schema
+MOZFOUND=0
 AUTOCONF="autoconfig.$DOMAIN"
-if [[ $(dig +short $AUTOCONF) ]]; then
+WELL_KNOWN="$DOMAIN/.well-known/autoconfig"
+if [[ ! $(dig +short $AUTOCONF) ]]; then
+	echo
+	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
+	echo
+else
 	CON="http://$AUTOCONF/mail/config-v1.1.xml?emailaddress=$PROFILE"
 	echo
 	echo "Testing Autoconfig ..."
 	echo "Connecting to $CON ..."
 	echo
-	wget -S -O - -q --no-check-certificate $CON
-else
-	echo
-	echo "Autodiscovery domain for Mozilla Thunderbird not found ($AUTOCONF)"
-	echo
+	wget -S -O - -q --no-check-certificate $CON && MOZFOUND=1
 fi
+if [ $MOZFOUND -ne 1 ]; then
+	# some error happened; try fallback URL
+	echo "Trying fallback URL ..."
+	CON="http://$WELL_KNOWN/mail/config-v1.1.xml?emailaddress=$PROFILE"
+	echo "Connecting to $CON ..."
+	echo
+	wget -S -O - -q --no-check-certificate $CON && MOZFOUND=1
+fi
+if [ $MOZFOUND -eq 0 ]; then
+	# no supported autoconfig information
+	echo "No autoconfig endpoint found."
+	echo
+if
 
 
 # Test Microsoft schema
@@ -78,14 +93,14 @@ if [[ $AUTODISC ]]; then
 		  </Request>
 		</Autodiscover>
 	REQ
-	
+
 	echo
 	echo "Testing Autodiscover (Microsoft Outlook(tm)) ..."
 	echo "Connecting to $CON ..."
 	echo
 	wget -S -O - -q --post-file=$OLREQUEST --no-check-certificate $CON
 	rm $OLREQUEST
-	
+
 	# Test Microsoft Mobile schema
 	cat <<-REQ >$MBREQUEST
 		<?xml version="1.0" encoding="utf-8"?>
@@ -96,7 +111,7 @@ if [[ $AUTODISC ]]; then
 		  </Request>
 		</Autodiscover>
 	REQ
-	
+
 	echo
 	echo "Testing Autodiscover (mobilesync) ..."
 	echo "Connecting to $CON ..."
