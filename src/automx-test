@@ -70,7 +70,7 @@ if [ $MOZFOUND -eq 0 ]; then
 	# no supported autoconfig information
 	echo "No autoconfig endpoint found."
 	echo
-if
+fi
 
 
 # Test Microsoft schema
