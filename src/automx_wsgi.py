@@ -54,7 +54,7 @@ from automx.view import View
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
@@ -279,7 +279,10 @@ def application(environ, start_response):
                     data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
-                logging.debug("Response:\n" + response_body.decode('utf-8'))
+                if sys.version_info < (3,):
+                    logging.debug("Response:\n" + response_body.decode('utf-8'))
+                else:
+                    logging.debug(str("Response:\n%s" % response_body))
 
     body_len = str(len(response_body))
 

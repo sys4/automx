@@ -1,3 +1,7 @@
+Version 1.1.0 to 1.1.1:
+
+Added some Outlook options
+
 Version 0.10 to 1.1.0:
 
 Many smaller bugs have been fixed. M2Crypto was removed in favor of an

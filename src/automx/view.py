@@ -36,7 +36,7 @@ except ImportError:
     from plistlib import readPlist, writePlistToString
 
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
@@ -317,8 +317,13 @@ class View(object):
                 c.text = elem[service + "_port"]
 
             c = etree.SubElement(root, "DomainRequired")
-            c.text = "off"
-            # DomainName - not implemented, yet
+            if service + "_domain_required" in elem:
+                c.text = elem[service + "_domain_required"]
+            else:
+                c.text = "off"
+            if service + "_domain_name" in elem:
+                c = etree.SubElement(root, "DomainName")
+                c.text = elem[service + "_domain_name"]
 
             if service + "_auth_identity" in elem:
                 c = etree.SubElement(root, "LoginName")

@@ -50,7 +50,7 @@ from collections import OrderedDict
 from builtins import dict, int, str
 
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __author__ = "Christian Roessner, Patrick Ben Koetter"
 __copyright__ = "Copyright (c) 2011-2015 [*] sys4 AG"
 
@@ -751,6 +751,20 @@ class Config(configparser.RawConfigParser):
             if self.has_option(section, service + "_refresh_ttl"):
                 opt = service + "_refresh_ttl"
                 result = self.get(section, opt)
+                proto_settings[opt] = result
+
+            if self.has_option(section, service + "_domain_required"):
+                opt = service + "_domain_required"
+                result = self.get(section, opt)
+                if result.lower() in TRUE:
+                    proto_settings[opt] = "on"
+                else:
+                    proto_settings[opt] = "off"
+
+            if self.has_option(section, service + "_domain_name"):
+                opt = service + "_domain_name"
+                result = self.__expand_vars(self.get(section, opt))
+                result = self.__replace_makro(result)
                 proto_settings[opt] = result
 
             if service == "smtp":

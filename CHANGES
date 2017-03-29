@@ -1,3 +1,8 @@
+* Version 1.1.1
+---------------------------------
+- Added service_domain_required option for Outlook
+- Added service_domain_name option for Outlook
+
 * Version 1.1.0
 ---------------------------------
 - Include code changes from never-released 0.10.3
