@@ -15,11 +15,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import sys
 import uuid
 import logging
@@ -27,13 +22,7 @@ import logging
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from xml.parsers.expat import ExpatError
-
-try:
-    # noinspection PyUnresolvedReferences
-    from plistlib import load, dumps, FMT_XML
-except ImportError:
-    # noinspection PyPep8Naming
-    from plistlib import readPlist, writePlistToString
+from plistlib import load, dumps, FMT_XML
 
 
 __version__ = '1.1.1'
@@ -75,10 +64,7 @@ class View(object):
             elif self.__schema == "mobileconfig":
                 path = self.__model.domain[self.__schema]
                 try:
-                    if sys.version_info < (3,):
-                        plist_tmp = readPlist(path)
-                    else:
-                        plist_tmp = load(path)
+                    plist_tmp = load(path)
                     plist = plist_tmp.copy()
                     self.__plist = plist
                 except ExpatError:
@@ -534,11 +520,7 @@ class View(object):
                                   pretty_print=True)
 
         elif self.__plist is not None:
-            if sys.version_info < (3,):
-                plist_unsigned = writePlistToString(self.__plist)
-            else:
-                # noinspection PyArgumentList
-                plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
+            plist_unsigned = dumps(self.__plist, fmt=FMT_XML)
 
             # Old M2Crypto that is not ported yet to Python3
             """

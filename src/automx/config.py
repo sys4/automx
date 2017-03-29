@@ -15,24 +15,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import os
 import sys
 import shlex
 import re
 import logging
-# noinspection PyCompatibility
 import ipaddress
-
-try:
-    import configparser
-except ImportError:
-    # noinspection PyPep8Naming
-    import ConfigParser as configparser
+import configparser
 
 try:
     # noinspection PyUnresolvedReferences
@@ -42,12 +31,9 @@ try:
 except ImportError:
     use_memcache = False
 
-# noinspection PyCompatibility
 from configparser import NoOptionError, NoSectionError
 from dateutil import parser
 from collections import OrderedDict
-# noinspection PyCompatibility
-from builtins import dict, int, str
 
 
 __version__ = '1.1.1'
@@ -987,10 +973,7 @@ class Memcache(object):
         else:
             networks = ("127.0.0.1", "::1/128")
 
-        if sys.version_info < (3,):
-            a = ipaddress.ip_address(self.__client.decode("utf-8"))
-        else:
-            a = ipaddress.ip_address(self.__client)
+        a = ipaddress.ip_address(self.__client)
         for network in iter(networks):
             n = ipaddress.ip_network(network)
             if a in n:

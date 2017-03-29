@@ -15,37 +15,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import os
 import sys
 import traceback
 import logging
 
-# noinspection PyCompatibility
 from html import escape
 from io import StringIO
 from lxml import etree
 from lxml.etree import XMLSyntaxError
-# noinspection PyCompatibility
 from builtins import int, str
 
-try:
-    # noinspection PyCompatibility
-    from urllib.parse import urlparse, urlencode, parse_qs, unquote
-    # noinspection PyCompatibility
-    from urllib.request import urlopen, Request
-    # noinspection PyCompatibility
-    from urllib.error import HTTPError
-except ImportError:
-    # noinspection PyCompatibility
-    from urlparse import urlparse, parse_qs
-    from urllib import urlencode, unquote
-    # noinspection PyCompatibility
-    from urllib2 import urlopen, Request, HTTPError
+from urllib.parse import urlparse, urlencode, parse_qs, unquote
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 
 from automx.config import Config
 from automx.config import DataNotFoundException
@@ -279,43 +262,25 @@ def application(environ, start_response):
                     data.domain["sign_mobileconfig"] is True):
                 logging.debug("No debugging output for signed mobileconfig!")
             else:
-                if sys.version_info < (3,):
-                    logging.debug("Response:\n" + response_body.decode('utf-8'))
-                else:
-                    logging.debug(str("Response:\n%s" % response_body))
+                logging.debug(str("Response:\n%s" % response_body))
 
     body_len = str(len(response_body))
 
-    def aenc(key, value):
-        """Auto-enocde to ascii; Make headers compatible for Py2/Py3
-
-        :param key: header key
-        :param value: header value
-        :return: auto encoded tuple
-        """
-        if sys.version_info < (3,):
-            return key.encode("ascii"), value.encode("ascii")
-        else:
-            return key, value
-
     if schema in ('autoconfig', "autodiscover"):
-        response_headers = [aenc('Content-Type', 'text/xml'),
-                            aenc('Content-Length', body_len)]
+        response_headers = [('Content-Type', 'text/xml'),
+                            ('Content-Length', body_len)]
     elif schema == "mobileconfig":
-        response_headers = [aenc('Content-Type',
-                                 'application/x-apple-aspen-config'
-                                 '; charset=utf-8'),
-                            aenc('Content-Disposition',
-                                 'attachment; '
-                                 'filename="company.mobileconfig'),
-                            aenc('Content-Length', body_len)]
+        response_headers = [('Content-Type',
+                             'application/x-apple-aspen-config'
+                             '; charset=utf-8'),
+                            ('Content-Disposition',
+                             'attachment; '
+                             'filename="company.mobileconfig'),
+                            ('Content-Length', body_len)]
     else:
         # Failure?
-        response_headers = [aenc('Content-Type', 'text/html'),
-                            aenc('Content-Length', body_len)]
-
-    if sys.version_info < (3,):
-        status = status.encode("ascii")
+        response_headers = [('Content-Type', 'text/html'),
+                            ('Content-Length', body_len)]
 
     start_response(status, response_headers)
 
