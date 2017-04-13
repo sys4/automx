@@ -49,7 +49,7 @@ class View(object):
     is used in Mozilla Thunderbird and several other open-source MUAs. It also
     supports .mobileconfig profile support as found on iOS devices. These
     profiles can also be used on Mac OS X Mail.app
-        
+
     """
 
     def __init__(self, model, schema, subschema):
@@ -133,7 +133,7 @@ class View(object):
                     raise Exception("Missing attribute <action>")
 
                 for key, value in self.__model.domain.items():
-                    if key in ("smtp", "imap", "pop"):
+                    if key in ("smtp", "imap", "pop", "caldav", "carddav", "ox"):
                         if len(value) != 0:
                             protocol = etree.SubElement(account, "Protocol")
                             self.__service(key, protocol)
@@ -305,6 +305,12 @@ class View(object):
                 s_type = service.upper()
             elif service in "pop":
                 s_type = "POP3"
+            elif service in "caldav":
+                s_type = "CalDAV"
+            elif service in "carddav":
+                s_type = "CardDAV"
+            elif service in "ox":
+                s_type = "X-OX-APPSUITE"
 
             c.text = s_type
 
@@ -464,19 +470,19 @@ class View(object):
             if service + "_server" in elem:
                 if service in ("imap", "pop"):
                     proto["in_server"] = elem[service + "_server"]
-                else:
+                elif service == "smtp":
                     proto["out_server"] = elem[service + "_server"]
 
             if service + "_port" in elem:
                 if service in ("imap", "pop"):
                     proto["in_port"] = int(elem[service + "_port"])
-                else:
+                elif service == "smtp":
                     proto["out_port"] = int(elem[service + "_port"])
 
             if service + "_auth_identity" in elem:
                 if service in ("imap", "pop"):
                     proto["in_username"] = elem[service + "_auth_identity"]
-                else:
+                elif service == "smtp":
                     proto["out_username"] = elem[service + "_auth_identity"]
 
             if service + "_auth" in elem:
@@ -504,7 +510,7 @@ class View(object):
 
                 if service in ("imap", "pop"):
                     proto["in_auth"] = result
-                else:
+                elif service == "smtp":
                     proto["out_auth"] = result
 
             if service + "_encryption" in elem:
@@ -513,12 +519,12 @@ class View(object):
                 if value in ("ssl", "starttls"):
                     if service in ("imap", "pop"):
                         proto["in_encryption"] = True
-                    else:
+                    elif service == "smtp":
                         proto["out_encryption"] = True
                 else:
                     if service in ("imap", "pop"):
                         proto["in_encryption"] = False
-                    else:
+                    elif service == "smtp":
                         proto["out_encryption"] = False
 
     def render(self):
@@ -584,7 +590,7 @@ class View(object):
 
                     sign_cert = self.__model.domain["sign_cert"]
                     sign_key = self.__model.domain["sign_key"]
-                    
+
                     if "sign_more_certs" in self.__model.domain:
                         extra = " -certfile " + self.__model.domain[
                             "sign_more_certs"]
