@@ -72,47 +72,47 @@ class Config(configparser.RawConfigParser):
     independend from the view. It may query different backends to gather all
     required information needed to generate XML output later on in the view
     class.
-    
+
     It uses a OrderdDict to guarentee the correct service order that is needed
     in the XML output. This said means that it is a difference, if a service
     like IMAP is configured before POP3 or upside down, because a MUA follows
     this order.
-    
-    The class currently support smtp, pop and imap services.
-    
+
+    The class currently support smtp, pop, imap, carddav, caldav and ox services.
+
     The class currently supports the following backends:
-    
+
     -> global - This backend tells automx to use the global section
-    
+
     -> static - all kind of service information that can be sent directly to
                 the MUA
-                
+
     -> filter - This backend can execute commands and collects results from
                 stdout. The result may be "", which means we skip further
                 searching. It may return data, which should point to a section
                 that we try to follow.
-                
+
     -> ldap   - Read all kind of information from LDAP servers. The result
                 attributes are stored in an internal dictionary and if options
                 later on in this backend section (is read as static backend)
                 do contain variables in the form ${attributename}, these are
                 expanded to the collected data.
-                
+
     -> sql    - Read all kind of information from SQL servers. The result
                 attributes are stored in an internal dictionary. See ldpa
-                
+
     -> script - Execute a script and split a result into attributes, which are
                 stored in an internal dictionary, See ldap
-                
+
     -> file   - Provide static files. If present, all collected data are
                 discarded and only the static file is sent to the remote
                 client. This may change in future releases.
-    
+
     Note: There may exist a DEFAULT section that is appended to _all_ sections
     in the configuration file. That said you can do really complex
     configurations that on the other hand make life easier. This section also
     may contain variables, which, if found in the vars-dictionary, are used.
-    
+
     """
 
     def __init__(self, environ):
@@ -259,6 +259,12 @@ class Config(configparser.RawConfigParser):
                         service = self.__service(section, "imap")
                     elif opt == "pop":
                         service = self.__service(section, "pop")
+                    elif opt == "carddav":
+                        service = self.__service(section, "carddav")
+                    elif opt == "caldav":
+                        service = self.__service(section, "caldav")
+                    elif opt == "ox":
+                        service = self.__service(section, "ox")
                     elif opt == "sign_mobileconfig":
                         try:
                             settings[opt] = self.getboolean(section, opt)
@@ -274,7 +280,7 @@ class Config(configparser.RawConfigParser):
                     else:
                         pass
 
-                    if opt in ("smtp", "imap", "pop"):
+                    if opt in ("smtp", "imap", "pop", "caldav", "carddav", "ox"):
                         if backend == "static_append":
                             if opt in settings:
                                 if self.debug:
@@ -650,7 +656,7 @@ class Config(configparser.RawConfigParser):
 
                             got_data = True
 
-                            # we replace our search_domain 
+                            # we replace our search_domain
                             self.__search_domain = special_opt
                             self.__emailaddress = new_emailaddress
 
