@@ -67,6 +67,28 @@ smtp
 	protocol to connect to this server is SMTP. Specifying this name is
 	only applicable for account_type = email.
 
+caldav
+	This name specifies a CalDAV service as defined in RFC 4791. The
+	protocol to connect to this server is HTTP. The server definition expects
+	a URL like https://caldav.example.com/. Specifying this name is only
+	applicable for account_type = email currently.
+	This service only affects autodiscover view.
+
+carddav
+	This name specifies a CardDAV service as defined in RFC 6352. The
+	protocol to connect to this server is HTTP. The server definition expects
+	a URL like https://carddav.example.com/. Specifying this name is only
+	applicable for account_type = email currently.
+	This service only affects autodiscover view.
+
+ox
+	This name specifies an existing OX App Suite service. Some clients
+	need to know where to access the OX App Suite HTTP API. The server
+	definition expects a URL like https://ox.example.com/. Specifying
+	this name is only applicable for account_type = email currently.
+	This service only affects autodiscover view.
+
+
 Parameters
 ''''''''''
 
@@ -74,7 +96,7 @@ autoconfig (no default)
 	Specifies a path to a file that contains static autoconfiguration
 	options following to the Mozilla schema.
 
-		.. NOTE:: 
+		.. NOTE::
 
 			This parameter is valid only if backend = file has been specified.
 
@@ -194,7 +216,7 @@ mobileconfig (no default)
 	Specifies a path to a file that contains static mobileconfiguration
 	options following to the Mozilla schema.
 
-		.. NOTE:: 
+		.. NOTE::
 
 			This parameter is valid only if backend = file has been specified.
 
@@ -390,5 +412,3 @@ See also
 .. _automx_sql(5): automx_sql.5.html
 .. _automx_script(5): automx_script.5.html
 .. _automx-test(1): automx-test.1.html
-
-
