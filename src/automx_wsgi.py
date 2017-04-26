@@ -120,8 +120,8 @@ def application(environ, start_response):
                 logging.debug("Request POST (raw)\n" +
                               request_body.decode('utf-8'))
 
-            fd = StringIO(request_body.decode("utf-8"))
-            fd.readline()  # Skip XML declaration
+            fd = StringIO(request_body.decode("utf-8").replace(
+                '<?xml version="1.0" encoding="utf-8"?>', ''))
             try:
                 tree = etree.parse(fd)
             except XMLSyntaxError:
