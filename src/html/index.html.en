@@ -43,11 +43,11 @@
   </div>
 
   <div id="footer-desktop" class="hide-for-small">
-    <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
+    <a class="right automx-powered" href="https://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
   </div>
   <div id="footer-mobile" class="show-for-small row">
     <div class="small-12 columns">
-      <a class="right automx-powered" href="http://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
+      <a class="right automx-powered" href="https://automx.org" target="_blank">Powered by <img src="img/automx-banner.png" width="126" height="20" alt="automx banner" /></a>
     </div>
   </div>
 
