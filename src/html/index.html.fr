@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="fr" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="fr" > <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>automx - Client Mobile</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <script src="js/vendor/custom.modernizr.js"></script>
+</head>
+<body>
+
+  <div class="row">
+    <div id="company-banner" class="small-12 large-6 large-centered columns">
+      <img src="img/company-banner.png" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-12 large-6 large-centered columns">
+
+      <form action="/mobileconfig" method="post">
+
+	<input type="hidden" name="_mobileconfig" value="true" />
+
+	<label for="emailaddress">Adresse E-Mail</label>
+	<input name="emailaddress" id="emailaddress" type="email" placeholder="pierre.dupont@example.com (obligatoire)">
+
+	<label for="cn">Nom complet</label>
+	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Les E-Mails de votre part n’afficheront votre adresse e-mail que si vous laissez ce champ vide.">
+	  <input name="cn" id="cn" type="text" placeholder="John Doe (optional)">
+	</span>
+
+	<label for="password">Mot de passe</label>
+	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="Le mot de passe vous sera demandé lors de la première connexion si vous laissez ce champ vide.">
+	  <input name="password" id="password" type="password" placeholder="Mot de passe (optionnel)">
+	</span>
+
+	<input type="submit" class="button small-12 right" value="Demander la configuration !" />
+      </form>
+    </div>
+  </div>
+
+  <div id="footer-desktop" class="hide-for-small">
+    <a class="right automx-powered" href="https://automx.org" target="_blank">Développé par <img src="img/automx-banner.png" width="126" height="20" alt="bannière automx" /></a>
+  </div>
+  <div id="footer-mobile" class="show-for-small row">
+    <div class="small-12 columns">
+      <a class="right automx-powered" href="https://automx.org" target="_blank">Développé par <img src="img/automx-banner.png" width="126" height="20" alt="bannière automx" /></a>
+    </div>
+  </div>
+
+  <script>
+  document.write('<script src=' +
+  ('__proto__' in {} ? 'js/vendor/zepto' : 'js/vendor/jquery') +
+  '.js><\/script>')
+  </script>
+  <script src="js/foundation.min.js"></script>
+  <script src="js/foundation/foundation.forms.js"></script>
+  <script src="js/foundation/foundation.tooltips.js"></script>
+  <script>
+    $(document).foundation();
+
+    function hideAddressBar()
+    {
+        if(!window.location.hash)
+        {
+            if(document.height <= window.outerHeight + 10)
+            {
+                document.body.style.height = (window.outerHeight + 50) +'px';
+                setTimeout( function() { window.scrollTo(0, 1); }, 50 );
+            }
+            else
+            {
+                setTimeout( function() { window.scrollTo(0, 1); }, 0 );
+            }
+        }
+    }
+    window.addEventListener("load", hideAddressBar );
+    window.addEventListener("orientationchange", hideAddressBar );
+  </script>
+</body>
+</html>
