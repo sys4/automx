@@ -1,16 +1,7 @@
 # automx
 
-This is automx, a mail client account configuration service. automx combines
-various autoconfiguration techniques in one webservice.
-
-## Mailclients
-automx can provision Outlook, Thunderbird, iOS devices and other clients that
-support either Microsoft's autodiscover mechanism or Mozilla's autoconfig.
-
-## Backends
-automx can either statically or dynamically generate email account information
-using various backends. It supports reading individual account configuration
-from LDAP, SQL and SCRIPT.
+This is automx, a mail client account configuration service. automx has been deprecated
+in favor of a complete rewrite, which resides as automx2 on gitlab.
 
 ## What's next?
 
