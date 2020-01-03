@@ -854,7 +854,7 @@ class Config(configparser.RawConfigParser):
 
                             return dcs[-i]
 
-                return _result
+                return _result.decode('utf-8')
             else:
                 # we always must expand variables. Even if it is the empty
                 # string
