@@ -24,7 +24,7 @@
 	<input type="hidden" name="_mobileconfig" value="true" />
 
 	<label for="emailaddress">E-Mail Adresse</label>
-	<input name="emailaddress" id="emailaddress" type="email" placeholder="max.mustermann@beispiel.de (erforderlich)">
+	<input name="emailaddress" id="emailaddress" type="email" placeholder="max.mustermann@example.com (erforderlich)">
 
 	<label for="cn">Name</label>
 	<span data-tooltip data-options="disable-for-touch:true" class="has-tip tip-top" title="In E-Mails von Ihnen wird nur Ihre Mailadresse angezeigt, wenn sie dieses Feld leer lassen.">
